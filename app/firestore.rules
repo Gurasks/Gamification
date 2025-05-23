@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // For development - allow all access
+    match /{document=**} {
+      allow read, write: if true;
+    }
+
+    // For production - consider adding:
+    // - Request rate limiting
+    // - Data validation
+    // - Or implement a simple secret token system
+  }
+}
