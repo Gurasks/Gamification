@@ -1,3 +1,5 @@
+import type { SelectionMethod } from "./teamSelection";
+
 export interface PersistentUser {
   id: string;
   name: string;
@@ -12,9 +14,16 @@ export interface Refinement {
   selectionMethod: SelectionMethod;
   teams: Record<string, string>;
   title: string;
+  hasStarted?: boolean;
 }
 
-export type SelectionMethod =
-  | 'RANDOM'
-  | 'CHOOSE_YOUR_TEAM'
-  | 'OWNER_CHOOSES';
+export interface Card {
+  id: string;
+  text: string;
+  columnId: string;
+  refinementId: string;
+  teamName: string;
+  createdBy: string;
+  ratings: Record<string, number>;
+  createdAt: Date;
+}

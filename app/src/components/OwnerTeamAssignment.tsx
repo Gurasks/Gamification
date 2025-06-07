@@ -1,7 +1,7 @@
 import React from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from './config/firebase';
-import type { PersistentUser } from './global-types';
+import { db } from '../config/firebase';
+import type { PersistentUser } from '../types/global';
 
 interface OwnerTeamAssignmentProps {
   refinementId: string;

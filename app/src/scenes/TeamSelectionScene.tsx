@@ -1,13 +1,14 @@
 import React, { useEffect, useState, type SetStateAction } from 'react';
-import './App.css'
 import { useNavigate, useParams } from 'react-router-dom';
-import { useUser } from './UserContext';
+import { useUser } from '../components/UserContext';
 import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
-import { db } from './config/firebase';
-import type { PersistentUser, Refinement, SelectionMethod } from './global-types';
-import SelectionMethodChooser from './SelectionMethodChooser';
-import OwnerTeamAssignment from './OwnerTeamAssignment';
-import TeamSelection from './TeamSelection';
+import { db } from '../config/firebase';
+import type { PersistentUser, Refinement } from '../types/global';
+import SelectionMethodChooser from '../components/SelectionMethodChooser';
+import OwnerTeamAssignment from '../components/OwnerTeamAssignment';
+import TeamSelection from '../components/TeamSelection';
+import _ from 'lodash';
+import type { SelectionMethod } from '../types/teamSelection';
 
 
 const TeamSelectionScene: React.FC = () => {
@@ -47,9 +48,15 @@ const TeamSelectionScene: React.FC = () => {
     setAvailableTeams(getAvailableTeams(newNumOfTeams));
   }
 
-  const handleStartRefinement = () => {
-    if (refinementId) {
-      navigate(`/team-selection/${refinementId}`);
+  const handleStartRefinement = async () => {
+    if (refinementId && refinement && _.size(refinement.teams) === refinement.members.length) {
+      const teamName = refinement.teams[user.id];
+      if (teamName) {
+        await updateDoc(doc(db, 'refinements', refinementId), {
+          hasStarted: true,
+        });
+        navigate(`/board/${refinementId}/team/${teamName}`);
+      }
     }
   };
 
@@ -64,12 +71,21 @@ const TeamSelectionScene: React.FC = () => {
       })) as Refinement[];
       if (refinementDataArray.length === 1) {
         const refinementData = refinementDataArray[0];
+        const teamName = refinementData.teams?.[user.id];
+        if (refinementData.hasStarted) {
+          if (teamName) {
+            navigate(`/board/${refinementId}/team/${teamName}`);
+          } else {
+            navigate('/');
+          }
+        }
         setAvailableTeams(getAvailableTeams(refinementData.numOfTeams));
         setIsOwner(refinementData.owner === user.id);
         setMembers(refinementData.members as unknown as PersistentUser[]);
         setNumOfTeams(refinementData.numOfTeams);
         setOwner(refinementData.owner);
         setRefinement(refinementData);
+
       }
     });
 
@@ -131,7 +147,7 @@ const TeamSelectionScene: React.FC = () => {
                 <li key={member.id} className={` mb-2 ${member.id === owner
                   ? 'text-rose-800'
                   : member.id === user.id ? 'text-teal-800' : 'text-gray-800'
-                  }`}>{member.name} {teamParticipants ? (<span> -
+                  }`}>{member.name} {teamParticipants && teamParticipants[member.id] ? (<span> -
                     <span className='text-orange-400 font-bold'> {teamParticipants[member.id]}</span>
                   </span>) : ''}</li>
               ))}
@@ -143,9 +159,8 @@ const TeamSelectionScene: React.FC = () => {
           className={`w-full py-2 px-4 rounded-md shadow-sm text-white ${refinementId ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}
         >
-          Participar
+          Começar
         </button>) : null}
-
       </div>
     </div>
   ) : null;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { SelectionMethod } from './global-types';
+import type { SelectionMethod } from '../types/global';
 
 interface SelectionMethodChooserProps {
   currentMethod: SelectionMethod;

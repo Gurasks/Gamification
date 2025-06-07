@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
-import { usePersistentUser } from './hooks/global';
-import type { PersistentUser } from './global-types';
+import { usePersistentUser } from '../hooks/global';
+import type { PersistentUser } from '../types/global';
 
 interface UserContextType {
   user: PersistentUser;

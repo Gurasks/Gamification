@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from './config/firebase';
+import { db } from '../config/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import { useUser } from './UserContext';
-import type { PersistentUser } from './global-types';
+import { useUser } from '../components/UserContext';
+import type { PersistentUser } from '../types/global';
 import _ from 'lodash';
 
 interface Refinement {
@@ -42,7 +42,7 @@ const Home: React.FC = () => {
         console.error("Error updating document: ", error);
       }
     } else {
-      console.log(" Doccument doesn't exist!");
+      console.log(" Document doesn't exist!");
     }
   }
 
@@ -67,30 +67,6 @@ const Home: React.FC = () => {
 
     navigate(`/team-selection/${newRefinementId}`);
   };
-
-  // const handleCreateRefinement = async () => {
-  //   const newBoardId = uuidv4();
-  //   await setDoc(doc(db, 'boards', newBoardId), {
-  //     title: newRefinementName,
-  //     createdAt: new Date(),
-  //   });
-
-  //   // Create default columns
-  //   const columns = [
-  //     { title: "Went Well", order: 1 },
-  //     { title: "To Improve", order: 2 },
-  //     { title: "Action Items", order: 3 }
-  //   ];
-
-  //   for (const column of columns) {
-  //     await addDoc(collection(db, 'columns'), {
-  //       ...column,
-  //       boardId: newBoardId
-  //     });
-  //   }
-
-  //   navigate(`/board/${newBoardId}`);
-  // };
 
   useEffect(() => {
     if (_.isEmpty(user)) {

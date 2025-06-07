@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import type { PersistentUser } from '../global-types';
+import type { PersistentUser } from '../types/global';
 
 
 export function usePersistentUser(defaultUser = {} as PersistentUser) {
   const [user, setUser] = useState<PersistentUser>(() => {
-    // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('persistentUser');
       if (stored) {

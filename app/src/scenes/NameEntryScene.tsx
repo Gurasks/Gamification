@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from './UserContext';
+import { useUser } from '../components/UserContext';
 import { v4 as uuidv4 } from 'uuid';
 
-const NameEntry: React.FC = () => {
+const NameEntryScene: React.FC = () => {
   const [name, setName] = useState('');
   const { setUser } = useUser();
   const navigate = useNavigate();
@@ -45,4 +45,4 @@ const NameEntry: React.FC = () => {
   );
 };
 
-export default NameEntry;
+export default NameEntryScene;

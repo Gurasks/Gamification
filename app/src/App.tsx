@@ -1,11 +1,11 @@
 import './App.css'
 // import RequirementDefinition from './RequerimentDefinition';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import NameEntry from './NameEntry';
-import { UserProvider } from './UserContext';
-import Board from './Board';
-import Home from './Home';
-import TeamSelectionScene from './TeamSelectionScene';
+import NameEntryScene from './scenes/NameEntryScene';
+import { UserProvider } from './components/UserContext';
+import Board from './scenes/Board';
+import TeamSelectionScene from './scenes/TeamSelectionScene';
+import Home from './scenes/Home';
 
 const App: React.FC = () => {
   return (
@@ -14,9 +14,9 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-gray-50">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/board/:boardId" element={<Board />} />
+            <Route path="/board/:refinementId/team/:teamName" element={<Board />} />
             <Route path="/team-selection/:refinementId" element={<TeamSelectionScene />} />
-            <Route path="/name-entry" element={<NameEntry />} />
+            <Route path="/name-entry" element={<NameEntryScene />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

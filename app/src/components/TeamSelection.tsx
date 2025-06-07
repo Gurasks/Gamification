@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
-import { db } from './config/firebase';
+import { db } from '../config/firebase';
 import { useUser } from './UserContext';
-import type { SelectionMethod } from './global-types';
+import type { SelectionMethod } from '../types/global';
 
 interface TeamSelectionProps {
   refinementId: string;
