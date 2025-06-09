@@ -17,6 +17,14 @@ export interface Refinement {
   hasStarted?: boolean;
 }
 
+export interface Comment {
+  id: string;
+  text: string;
+  createdBy: string;
+  createdById: string;
+  createdAt: Date;
+}
+
 export interface Card {
   id: string;
   text: string;
@@ -24,6 +32,8 @@ export interface Card {
   refinementId: string;
   teamName: string;
   createdBy: string;
+  createdById: string;
   ratings: Record<string, number>;
   createdAt: Date;
+  comments?: Comment[];
 }

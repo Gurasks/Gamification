@@ -1,19 +1,18 @@
-import React, { useEffect, useState, type SetStateAction } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
-import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import type { PersistentUser, Refinement } from '../types/global';
-import SelectionMethodChooser from '../components/SelectionMethodChooser';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import OwnerTeamAssignment from '../components/OwnerTeamAssignment';
+import SelectionMethodChooser from '../components/SelectionMethodChooser';
 import TeamSelection from '../components/TeamSelection';
-import _ from 'lodash';
-import type { SelectionMethod } from '../types/teamSelection';
+import { useUser } from '../components/UserContext';
+import { createUnsubscribeMembers } from '../hooks/firestoreUnsubscriber';
+import type { PersistentUser, Refinement } from '../types/global';
+import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase } from '../services/firestoreService';
 
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
   const { user } = useUser();
+  const navigate = useNavigate();
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [members, setMembers] = useState<PersistentUser[]>([] as PersistentUser[]);
@@ -22,72 +21,20 @@ const TeamSelectionScene: React.FC = () => {
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
   const [refinement, setRefinement] = useState<Refinement | null>(null);
 
-  const navigate = useNavigate();
-
-  const getAvailableTeams = (numOfTeams: number) => {
-    const newAvailableTeams = [];
-    for (let i = 0; i < numOfTeams; i++) {
-      newAvailableTeams.push(`Time ${String.fromCharCode(65 + i)}`);
-    }
-    return newAvailableTeams;
-  }
-
-  const handleMethodChange = async (method: SelectionMethod) => {
-    if (!refinementId) return;
-    await updateDoc(doc(db, 'refinements', refinementId), {
-      selectionMethod: method,
-    });
-  };
-
-  const handleNumberChange = async (e: { target: { value: SetStateAction<string>; }; }) => {
-    const newNumOfTeams = parseInt(e.target.value as string);
-    if (!refinementId) return;
-    await updateDoc(doc(db, 'refinements', refinementId), {
-      numOfTeams: newNumOfTeams,
-    });
-    setAvailableTeams(getAvailableTeams(newNumOfTeams));
-  }
-
-  const handleStartRefinement = async () => {
-    if (refinementId && refinement && _.size(refinement.teams) === refinement.members.length) {
-      const teamName = refinement.teams[user.id];
-      if (teamName) {
-        await updateDoc(doc(db, 'refinements', refinementId), {
-          hasStarted: true,
-        });
-        navigate(`/board/${refinementId}/team/${teamName}`);
-      }
-    }
-  };
 
   useEffect(() => {
     if (!refinementId) return;
-
-    const refinementQuery = query(collection(db, 'refinements'), where('id', '==', refinementId));
-    const unsubscribeMembers = onSnapshot(refinementQuery, (snapshot) => {
-      const refinementDataArray = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Refinement[];
-      if (refinementDataArray.length === 1) {
-        const refinementData = refinementDataArray[0];
-        const teamName = refinementData.teams?.[user.id];
-        if (refinementData.hasStarted) {
-          if (teamName) {
-            navigate(`/board/${refinementId}/team/${teamName}`);
-          } else {
-            navigate('/');
-          }
-        }
-        setAvailableTeams(getAvailableTeams(refinementData.numOfTeams));
-        setIsOwner(refinementData.owner === user.id);
-        setMembers(refinementData.members as unknown as PersistentUser[]);
-        setNumOfTeams(refinementData.numOfTeams);
-        setOwner(refinementData.owner);
-        setRefinement(refinementData);
-
-      }
-    });
+    const unsubscribeMembers = createUnsubscribeMembers(
+      refinementId,
+      user,
+      setRefinement,
+      setAvailableTeams,
+      setIsOwner,
+      setNumOfTeams,
+      setOwner,
+      setMembers,
+      navigate
+    );
 
     return () => {
       unsubscribeMembers();
@@ -110,11 +57,11 @@ const TeamSelectionScene: React.FC = () => {
               type='number'
               min="2"
               defaultValue={numOfTeams}
-              onChange={handleNumberChange}
+              onChange={e => updateNumOfTeamsToRefinementInFirebase(refinementId, setAvailableTeams, e)}
             />
             <SelectionMethodChooser
               currentMethod={refinement.selectionMethod || 'RANDOM'}
-              onMethodChange={handleMethodChange}
+              onMethodChange={(method) => updateSelectionMethodToRefinementInFirebase(refinementId, method)}
               isOwner={isOwner}
             />
           </>
@@ -154,7 +101,7 @@ const TeamSelectionScene: React.FC = () => {
           </ul>
         </div>
         {user.id === owner ? (<button
-          onClick={handleStartRefinement}
+          onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
           disabled={user.id !== owner}
           className={`w-full py-2 px-4 rounded-md shadow-sm text-white ${refinementId ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}

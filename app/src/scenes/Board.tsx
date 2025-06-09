@@ -1,12 +1,12 @@
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
-import { collection, query, where, onSnapshot, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import _ from 'lodash';
-import type { Refinement, Card } from '../types/global';
 import BoardCard from '../components/BoardCard';
 import Timer from '../components/Timer';
+import { useUser } from '../components/UserContext';
+import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
+import { addCommentToCardInFirestore, createCardInFirestore, loadRefinementWithId, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestoreService';
+import type { Card } from '../types/global';
 
 
 const Board: React.FC = () => {
@@ -20,71 +20,22 @@ const Board: React.FC = () => {
   useEffect(() => {
     if (!refinementId) return;
 
-    const loadBoard = async () => {
-      const refinementDoc = await getDoc(doc(db, 'refinements', refinementId));
-      if (refinementDoc.exists()) {
-        setRefinement(refinementDoc.data());
-      }
-    };
-
-    loadBoard();
-
-    const refinementQuery = query(collection(db, 'refinements'), where('refinementId', '==', refinementId));
-    const unsubscribeColumns = onSnapshot(refinementQuery, (snapshot) => {
-      const refinementDataArray = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Refinement[];
-      if (refinementDataArray.length === 1) {
-        setRefinement(refinementDataArray[0]);
-      }
-    });
-
-    const cardsQuery = query(collection(db, 'cards'), where('refinementId', '==', refinementId));
-    const unsubscribeCards = onSnapshot(cardsQuery, (snapshot) => {
-      const crds = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
-      })) as Card[];
-      setCards(crds);
-    });
-
+    loadRefinementWithId(refinementId, setRefinement);
+    const unsubscribeRefinement = createUnsubscribeRefinement(refinementId, setRefinement);
+    const unsubscribeCards = createUnsubscribeCards(refinementId, setCards);
     return () => {
-      unsubscribeColumns();
+      unsubscribeRefinement();
       unsubscribeCards();
     };
   }, [refinementId]);
 
-  const handleAddCard = async () => {
-    if (!newCardText.trim() || _.isEmpty(user)) return;
-
-    await addDoc(collection(db, 'cards'), {
-      text: newCardText,
-      refinementId,
-      createdBy: user.name,
-      teamName,
-      votes: [],
-      createdAt: new Date()
-    });
-
-    setNewCardText('');
-  };
-
-  const handleRate = async (cardId: string, rating: number) => {
-    if (!user?.id) return;
-
-    const cardRef = doc(db, 'cards', cardId);
-    await updateDoc(cardRef, {
-      [`ratings.${user.id}`]: rating
-    });
-  };
-
   if (!refinement) return <div className="p-4">Carregando refinamento...</div>;
+
   if (_.isEmpty(user)) {
     navigate('/name-entry');
     return <div>Redirecionando para tela de nome...</div>;
   }
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -104,10 +55,10 @@ const Board: React.FC = () => {
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={newCardText}
               onChange={(e) => setNewCardText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddCard()}
+              onKeyPress={(e) => e.key === 'Enter' && createCardInFirestore(newCardText, refinementId, user, teamName, setNewCardText)}
             />
             <button
-              onClick={handleAddCard}
+              onClick={() => createCardInFirestore(newCardText, refinementId, user, teamName, setNewCardText)}
               disabled={!newCardText.trim()}
               className="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
             >
@@ -128,7 +79,20 @@ const Board: React.FC = () => {
             .filter(card => card.teamName === teamName)
             .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
             .map(card => (
-              <BoardCard card={card} user={user} handleRate={handleRate} />
+              <BoardCard
+                key={card.id}
+                card={card}
+                user={user}
+                handleRate={(cardId, rating) => { updateRatingToCardInFirestore(cardId, rating, user); }}
+                onEdit={async (cardId, newText) => {
+                  await updateCardInFirestore(cardId, newText);
+                }}
+                onComment={async (cardId, commentText) => {
+                  await addCommentToCardInFirestore(cardId, commentText, user);
+                }}
+                onCommentEdit={async (cardId, commentId, commentText) => {
+                  await updateCommentToCardInFirestore(cardId, commentId, commentText);
+                }} />
             ))}
         </div>
       </div>
