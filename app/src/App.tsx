@@ -5,11 +5,13 @@ import { UserProvider } from './components/UserContext';
 import Board from './scenes/Board';
 import TeamSelectionScene from './scenes/TeamSelectionScene';
 import Home from './scenes/Home';
+import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
   return (
     <UserProvider>
       <Router>
+        <Toaster position="top-center" />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/board/:refinementId/team/:teamName" element={<Board />} />
