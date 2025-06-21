@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   serverTimestamp,
+  setDoc,
   updateDoc,
   type DocumentData,
 } from "firebase/firestore";
@@ -34,9 +35,10 @@ export const createRefinementInFirestore = async (
   } as Refinement;
 
   try {
-    const docRef = await addDoc(collection(db, "refinements"), newRefinement);
-    console.log("Document written with ID: ", docRef.id);
-    return docRef.id;
+    const docRef = doc(db, "refinements", refinementId);
+    await setDoc(docRef, newRefinement);
+    console.log("Document written with ID: ", refinementId);
+    return refinementId;
   } catch (error) {
     console.error("Error adding document: ", error);
     throw error;
@@ -165,8 +167,7 @@ export const addCommentToCardInFirestore = async (
         text: commentText,
         createdBy: user.name,
         createdById: user.id,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
       }),
     });
   } catch (error) {
