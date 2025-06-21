@@ -69,32 +69,29 @@ const Board: React.FC = () => {
           </div>
         </div>
       </div>
-
+      <h3 className="text-lg font-medium text-gray-700 sticky top-0 bg-white py-2 z-10">
+        {teamName}
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-3">
-          <h3 className="text-lg font-medium text-gray-700 sticky top-0 bg-white py-2 z-10">
-            {teamName}
-          </h3>
-          {cards
-            .filter(card => card.teamName === teamName)
-            .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-            .map(card => (
-              <BoardCard
-                key={card.id}
-                card={card}
-                user={user}
-                handleRate={(cardId, rating) => { updateRatingToCardInFirestore(cardId, rating, user); }}
-                onEdit={async (cardId, newText) => {
-                  await updateCardInFirestore(cardId, newText);
-                }}
-                onComment={async (cardId, commentText) => {
-                  await addCommentToCardInFirestore(cardId, commentText, user);
-                }}
-                onCommentEdit={async (cardId, commentId, commentText) => {
-                  await updateCommentToCardInFirestore(cardId, commentId, commentText);
-                }} />
-            ))}
-        </div>
+        {cards
+          .filter(card => card.teamName === teamName)
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          .map(card => (
+            <BoardCard
+              key={card.id}
+              card={card}
+              user={user}
+              handleRate={(cardId, rating) => { updateRatingToCardInFirestore(cardId, rating, user); }}
+              onEdit={async (cardId, newText) => {
+                await updateCardInFirestore(cardId, newText);
+              }}
+              onComment={async (cardId, commentText) => {
+                await addCommentToCardInFirestore(cardId, commentText, user);
+              }}
+              onCommentEdit={async (cardId, commentId, commentText) => {
+                await updateCommentToCardInFirestore(cardId, commentId, commentText);
+              }} />
+          ))}
       </div>
     </div>
   );
