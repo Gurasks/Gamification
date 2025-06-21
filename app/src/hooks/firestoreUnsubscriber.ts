@@ -1,10 +1,4 @@
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  type DocumentData,
-} from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import type { Card, PersistentUser, Refinement } from "../types/global";
@@ -12,21 +6,25 @@ import { getAvailableTeams } from "../services/teamSelectionService";
 
 export const createUnsubscribeRefinement = (
   refinementId: string,
-  setRefinement: (arg0: DocumentData) => void
+  setRefinement: (refinement: Refinement) => void
 ) => {
   const refinementQuery = query(
     collection(db, "refinements"),
     where("refinementId", "==", refinementId)
   );
+
   const unsubscribeRefinement = onSnapshot(refinementQuery, (snapshot) => {
-    const refinementDataArray = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Refinement[];
-    if (refinementDataArray.length === 1) {
-      setRefinement(refinementDataArray[0]);
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      const refinementData = {
+        id: doc.id,
+        ...doc.data(),
+        startTime: doc.data().startTime?.toDate(),
+      } as Refinement;
+      setRefinement(refinementData);
     }
   });
+
   return unsubscribeRefinement;
 };
 

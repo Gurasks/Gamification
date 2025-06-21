@@ -103,7 +103,7 @@ const TeamSelectionScene: React.FC = () => {
         {user.id === owner ? (<button
           onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
           disabled={user.id !== owner}
-          className={`w-full py-2 px-4 rounded-md shadow-sm text-white ${refinementId ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+          className={`w-full py-2 px-4 rounded-md shadow-sm text-white ${!refinementId || user.id !== owner ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}
         >
           Começar

@@ -1,3 +1,4 @@
+import type { Timestamp } from "firebase/firestore";
 import type { SelectionMethod } from "./teamSelection";
 
 export interface PersistentUser {
@@ -7,14 +8,18 @@ export interface PersistentUser {
 
 export interface Refinement {
   id: string;
-  createdAt: Date;
-  members: string[];
+  createdAt: Timestamp;
+  members: PersistentUser[];
   numOfTeams: number;
   owner: string;
   selectionMethod: SelectionMethod;
   teams: Record<string, string>;
   title: string;
-  hasStarted?: boolean;
+  hasStarted: boolean;
+  startTime?: Timestamp;
+  timerMinutes?: number;
+  timerSeconds?: number;
+  updatedAt?: Timestamp;
 }
 
 export interface Comment {
@@ -22,7 +27,7 @@ export interface Comment {
   text: string;
   createdBy: string;
   createdById: string;
-  createdAt: Date;
+  createdAt: Timestamp;
 }
 
 export interface Card {
@@ -34,6 +39,12 @@ export interface Card {
   createdBy: string;
   createdById: string;
   ratings: Record<string, number>;
-  createdAt: Date;
+  createdAt: Timestamp;
   comments?: Comment[];
+  updatedAt?: Timestamp;
+}
+
+export interface TimerInfo {
+  minutes: number;
+  seconds: number;
 }

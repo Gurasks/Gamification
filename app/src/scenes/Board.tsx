@@ -5,16 +5,18 @@ import BoardCard from '../components/BoardCard';
 import Timer from '../components/Timer';
 import { useUser } from '../components/UserContext';
 import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, loadRefinementWithId, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestoreService';
-import type { Card } from '../types/global';
+import { addCommentToCardInFirestore, createCardInFirestore, loadRefinementWithId, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore, updateTimerToRefinementInFirebase } from '../services/firestoreService';
+import type { Card, Refinement, TimerInfo } from '../types/global';
+import { calculateTimeLeft } from '../services/boardService';
 
 
 const Board: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
   const { user } = useUser();
-  const [refinement, setRefinement] = useState<any>(null);
+  const [refinement, setRefinement] = useState<Refinement>({} as Refinement);
   const [cards, setCards] = useState<Card[]>([]);
   const [newCardText, setNewCardText] = useState('');
+  const [time, setTime] = useState({ minutes: 0, seconds: 0 } as TimerInfo);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +31,34 @@ const Board: React.FC = () => {
     };
   }, [refinementId]);
 
+  useEffect(() => {
+    const { startTime, timerMinutes, timerSeconds } = refinement;
+
+    if (
+      refinementId &&
+      startTime &&
+      typeof timerMinutes === 'number' &&
+      typeof timerSeconds === 'number'
+    ) {
+      setTime(calculateTimeLeft(startTime, timerMinutes, timerSeconds));
+    }
+  }, [refinementId, refinement.startTime]);
+
+  const handleComplete = () => {
+    console.log('Timer completed!');
+  };
+
+  const handleAddMinute = () => {
+    if (!refinementId) return;
+    updateTimerToRefinementInFirebase(
+      refinementId,
+      { minutes: 1, seconds: 0 } as TimerInfo,  // Reset seconds to 0
+      setTime
+    );
+  };
+
+
+
   if (!refinement) return <div className="p-4">Carregando refinamento...</div>;
 
   if (_.isEmpty(user)) {
@@ -40,7 +70,11 @@ const Board: React.FC = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">{refinement.title}</h1>
-        <Timer initialMinutes={5} initialSeconds={0} />
+        <Timer
+          minutesLeft={time.minutes}
+          secondsLeft={time.seconds}
+          onComplete={handleComplete}
+          onAddMinute={handleAddMinute} />
       </div>
 
       <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
@@ -75,13 +109,15 @@ const Board: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards
           .filter(card => card.teamName === teamName)
-          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          // .sort((a, b) => a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime())
           .map(card => (
             <BoardCard
               key={card.id}
               card={card}
               user={user}
-              handleRate={(cardId, rating) => { updateRatingToCardInFirestore(cardId, rating, user); }}
+              handleRate={(cardId, rating) => {
+                updateRatingToCardInFirestore(cardId, rating, user);
+              }}
               onEdit={async (cardId, newText) => {
                 await updateCardInFirestore(cardId, newText);
               }}

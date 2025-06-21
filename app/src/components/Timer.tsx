@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
 
 type TimerProps = {
-  initialMinutes: number;
-  initialSeconds: number;
+  minutesLeft: number;
+  secondsLeft: number;
   onComplete?: () => void;
+  onAddMinute: () => void;
 };
 
-const Timer = ({ initialMinutes, initialSeconds, onComplete }: TimerProps) => {
+const Timer = ({ minutesLeft, secondsLeft, onComplete, onAddMinute }: TimerProps) => {
   const [time, setTime] = useState({
-    minutes: initialMinutes,
-    seconds: initialSeconds
+    minutes: minutesLeft,
+    seconds: secondsLeft
   });
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  useEffect(() => {
+    setTime({ minutes: minutesLeft, seconds: secondsLeft });
+    setIsCompleted(false); // Reset completion state when initial time changes
+  }, [minutesLeft, secondsLeft]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -19,25 +26,32 @@ const Timer = ({ initialMinutes, initialSeconds, onComplete }: TimerProps) => {
         if (prev.minutes > 0) return { minutes: prev.minutes - 1, seconds: 59 };
 
         clearInterval(timer);
-        onComplete?.();
+        if (!isCompleted) {
+          setIsCompleted(true);
+          onComplete?.();
+        }
         return prev;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [onComplete]);
+  }, [onComplete, isCompleted]);
 
-  const formattedTime = `${time.minutes.toString().padStart(2, '0')}:${time.seconds
-    .toString()
-    .padStart(2, '0')}`;
+  const handleAddMinute = () => {
+    if (isCompleted && onAddMinute) {
+      setIsCompleted(false);
+      onAddMinute();
+    }
+  };
+
+  const formattedTime = `${time.minutes.toString().padStart(2, '0')}:${time.seconds.toString().padStart(2, '0')
+    }`;
   const isLowTime = time.minutes === 0 && time.seconds <= 30;
 
   return (
-    <div className="flex items-center justify-center">
-      <div
-        className={`relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden ${isLowTime ? 'bg-red-400' : 'bg-indigo-500'
-          } shadow-lg`}
-      >
+    <div className="flex flex-col items-center justify-center gap-2">
+      <div className={`relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden ${isLowTime ? 'bg-red-400' : 'bg-indigo-500'
+        } shadow-lg`}>
         {/* SVG Wave Inside Circle */}
         <svg
           className="absolute bottom-0 w-full h-2/5"
@@ -56,6 +70,16 @@ const Timer = ({ initialMinutes, initialSeconds, onComplete }: TimerProps) => {
           {formattedTime}
         </span>
       </div>
+
+      {/* Add Minute Button (only shows when timer completes) */}
+      {isCompleted && (
+        <button
+          onClick={handleAddMinute}
+          className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+        >
+          +1 Minuto
+        </button>
+      )}
     </div>
   );
 };

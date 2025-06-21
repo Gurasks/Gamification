@@ -10,20 +10,84 @@ import {
 } from "firebase/firestore";
 import _ from "lodash";
 import { db } from "../config/firebase";
-import type { PersistentUser } from "../types/global";
+import type { PersistentUser, Refinement, TimerInfo } from "../types/global";
 import type { SelectionMethod } from "../types/teamSelection";
 import type { SetStateAction } from "react";
 import { getAvailableTeams } from "./teamSelectionService";
 import type { useNavigate } from "react-router-dom";
 
+export const createRefinementInFirestore = async (
+  refinementId: string,
+  refinementName: string,
+  user: PersistentUser
+): Promise<string> => {
+  const newRefinement = {
+    id: refinementId,
+    title: refinementName,
+    numOfTeams: 2, // Default number of teams
+    selectionMethod: "OWNER_CHOOSES", // Default selection method
+    createdAt: serverTimestamp(),
+    members: [user],
+    owner: user.id,
+    teams: {},
+    hasStarted: false,
+  } as Refinement;
+
+  try {
+    const docRef = await addDoc(collection(db, "refinements"), newRefinement);
+    console.log("Document written with ID: ", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    throw error;
+  }
+};
+
 // Load refinement data by ID
 export const loadRefinementWithId = async (
   refinementId: string,
-  setRefinement: (arg0: DocumentData) => void
+  setRefinement: (refinement: Refinement) => void
 ) => {
   const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
   if (refinementDoc.exists()) {
-    setRefinement(refinementDoc.data());
+    setRefinement(refinementDoc.data() as Refinement);
+  }
+};
+
+export const updateDocumentListMembers = async (
+  refinementId: string,
+  user: PersistentUser
+) => {
+  const docRef = doc(db, "refinements", refinementId);
+  const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
+  if (refinementDoc.exists()) {
+    const refinementData = refinementDoc.data() as Refinement;
+    const membersList = refinementData.members;
+    const memberExists = membersList.find((member) => member.id === user.id);
+    if (!memberExists && !refinementData.hasStarted) {
+      membersList.push(user);
+    } else if (!memberExists && refinementData.hasStarted) {
+      console.log("Refinement has already started, cannot join");
+      return "started";
+    } else {
+      console.log("User already exists in the members list");
+      return "inRefinement";
+    }
+
+    try {
+      await updateDoc(docRef, {
+        ...refinementData,
+        members: membersList,
+      });
+      console.log("Document updated successfully");
+      return "success";
+    } catch (error) {
+      console.error("Error updating document: ", error);
+      return "error";
+    }
+  } else {
+    console.log("Document doesn't exist!");
+    return "notFound";
   }
 };
 
@@ -45,7 +109,7 @@ export const createCardInFirestore = async (
       createdById: user.id,
       teamName,
       votes: [],
-      createdAt: new Date(),
+      createdAt: serverTimestamp(),
     });
 
     setNewCardText("");
@@ -101,7 +165,8 @@ export const addCommentToCardInFirestore = async (
         text: commentText,
         createdBy: user.name,
         createdById: user.id,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       }),
     });
   } catch (error) {
@@ -134,6 +199,7 @@ export const updateCommentToCardInFirestore = async (
         };
         await updateDoc(cardRef, {
           comments: updatedComments,
+          updatedAt: serverTimestamp(),
         });
       }
     }
@@ -150,6 +216,7 @@ export const updateSelectionMethodToRefinementInFirebase = async (
   if (!refinementId) return;
   await updateDoc(doc(db, "refinements", refinementId), {
     selectionMethod: method,
+    updatedAt: serverTimestamp(),
   });
 };
 
@@ -164,6 +231,7 @@ export const updateNumOfTeamsToRefinementInFirebase = async (
   if (!refinementId) return;
   await updateDoc(doc(db, "refinements", refinementId), {
     numOfTeams: newNumOfTeams,
+    updatedAt: serverTimestamp(),
   });
   setAvailableTeams(getAvailableTeams(newNumOfTeams));
 };
@@ -183,8 +251,33 @@ export const startRefinementInFirebase = async (
     if (teamName) {
       await updateDoc(doc(db, "refinements", refinementId), {
         hasStarted: true,
+        startTime: serverTimestamp(),
+        timerMinutes: 5,
+        timerSeconds: 0,
+        updatedAt: serverTimestamp(),
       });
       navigate(`/board/${refinementId}/team/${teamName}`);
     }
+  }
+};
+
+export const updateTimerToRefinementInFirebase = async (
+  refinementId: string,
+  timerInfo: TimerInfo,
+  setTime: (time: TimerInfo) => void
+) => {
+  if (!refinementId) return;
+
+  try {
+    await updateDoc(doc(db, "refinements", refinementId), {
+      startTime: serverTimestamp(),
+      timerMinutes: timerInfo.minutes,
+      timerSeconds: timerInfo.seconds,
+      lastUpdated: serverTimestamp(), // Additional field to force update
+    });
+    console.log("Timer updated successfully");
+    setTime(timerInfo);
+  } catch (error) {
+    console.error("Error updating timer:", error);
   }
 };

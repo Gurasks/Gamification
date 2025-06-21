@@ -1,19 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '../components/UserContext';
-import type { PersistentUser } from '../types/global';
 import _ from 'lodash';
+import { createRefinementInFirestore, updateDocumentListMembers } from '../services/firestoreService';
 
-interface Refinement {
-  id: string,
-  title: string,
-  owner: string,
-  members: PersistentUser[],
-  createdAt: Date,
-}
 
 const Home: React.FC = () => {
   const { user } = useUser();
@@ -21,50 +12,26 @@ const Home: React.FC = () => {
   const [newRefinementName, setNewRefinementName] = useState('');
   const navigate = useNavigate();
 
-  async function updateDocumentListMembers(refinementId: string, user: PersistentUser) {
-    const docRef = doc(db, 'refinements', refinementId);
-    const refinementDoc = await getDoc(doc(db, 'refinements', refinementId));
-    if (refinementDoc.exists()) {
-      const refinementData = refinementDoc.data() as Refinement;
-      const membersList = refinementData.members;
-      const memberExists = membersList.find((member) => member.id === user.id);
-      if (!memberExists) {
-        membersList.push(user);
-      }
-
-      try {
-        await updateDoc(docRef, {
-          ...refinementData,
-          members: membersList,
-        });
-        console.log("Document updated successfully");
-      } catch (error) {
-        console.error("Error updating document: ", error);
-      }
-    } else {
-      console.log(" Document doesn't exist!");
-    }
-  }
-
-  ;
-
-  const handleJoinRefinement = () => {
+  const handleJoinRefinement = async () => {
     if (refinementId) {
-      updateDocumentListMembers(refinementId, user);
-      navigate(`/team-selection/${refinementId}`);
-    }
-  };
+      const response = await updateDocumentListMembers(refinementId, user);
+      if (!response) {
+        console.error('Failed to join refinement');
+        return;
+      } else if (response === 'inRefinement' || response === 'success') {
+        console.log('User already exists in the refinement');
+        navigate(`/team-selection/${refinementId}`);
+      }
+    };
+  }
 
   const handleCreateRefinement = async () => {
     const newRefinementId = uuidv4();
-    await setDoc(doc(db, 'refinements', newRefinementId), {
-      id: newRefinementId,
-      title: newRefinementName,
-      owner: user.id,
-      members: [user],
-      createdAt: new Date(),
-    });
-
+    const docId = createRefinementInFirestore(newRefinementId, newRefinementName, user);
+    if (!docId) {
+      console.error('Failed to create refinement');
+      return;
+    }
     navigate(`/team-selection/${newRefinementId}`);
   };
 
