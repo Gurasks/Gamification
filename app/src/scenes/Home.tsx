@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '../components/UserContext';
 import _ from 'lodash';
 import { createRefinementInFirestore, updateDocumentListMembers } from '../services/firestoreService';
+import { handleReponse } from '../services/homeServices';
 
 
 const Home: React.FC = () => {
@@ -12,18 +13,16 @@ const Home: React.FC = () => {
   const [newRefinementName, setNewRefinementName] = useState('');
   const navigate = useNavigate();
 
+
   const handleJoinRefinement = async () => {
     if (refinementId) {
       const response = await updateDocumentListMembers(refinementId, user);
-      if (!response) {
-        console.error('Failed to join refinement');
-        return;
-      } else if (response === 'inRefinement' || response === 'success') {
-        console.log('User already exists in the refinement');
+      const redirection = handleReponse(response);
+      if (redirection) {
         navigate(`/team-selection/${refinementId}`);
       }
-    };
-  }
+    }
+  };
 
   const handleCreateRefinement = async () => {
     const newRefinementId = uuidv4();
