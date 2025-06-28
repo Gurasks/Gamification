@@ -2,6 +2,7 @@ import { Check, MessageSquareMore, PencilLine, SendHorizontal, X } from 'lucide-
 import { useRef, useState } from 'react';
 import type { Card, PersistentUser } from "../types/global";
 import StarRating from "./StarRating";
+import CommentInputBox from "./CommentInputBox";
 
 interface BoardCardProps {
   card: Card;
@@ -46,7 +47,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow border border-gray-200 hover:border-indigo-200 transition-colors">
+    <div className="text-sm [text-align:justify] p-4 bg-white rounded-lg shadow border border-gray-200 hover:border-indigo-200 transition-colors">
       {/* Card Content */}
       {isEditing ? (
         <div className="mb-3">
@@ -56,7 +57,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
             className="w-full p-2 border rounded"
             autoFocus
           />
-          <div className="flex gap-2 mt-2">
+          <div className="ml-4 flex gap-2 mt-2">
             <button
               onClick={handleEditSubmit}
               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -75,11 +76,11 @@ const BoardCard: React.FC<BoardCardProps> = ({
         </div>
       ) : (
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{card.text}</h3>
+          <h3 className="text-base font-semibold text-gray-800 mb-2">{card.text}</h3>
           {user.id === card.createdById && (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-xs text-indigo-500 hover:text-indigo-700"
+              className="ml-4 text-xs text-indigo-500 hover:text-indigo-700"
               title="Editar"
             >
               <PencilLine />
@@ -93,69 +94,59 @@ const BoardCard: React.FC<BoardCardProps> = ({
         {showComments && (
           <div className="mt-2 space-y-2">
             {card.comments?.map((comment) => (
-              <div key={comment.id} className="p-2 bg-gray-50 rounded text-sm">
-                {commentIdToEdit === comment.id ? (
-                  <div className="mb-3">
-                    <textarea
-                      value={editCommentText}
-                      onChange={(e) => setEditCommentText(e.target.value)}
-                      className="w-full p-2 border rounded"
-                      autoFocus
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={handleCommentEditSubmit}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        title="Salvar"
-                      >
-                        <Check />
-                      </button>
-                      <button
-                        onClick={() => setCommentIdToEdit("")}
-                        className="px-3 py-1 text-white bg-red-400 rounded hover:bg-red-500"
-                        title="Cancelar"
-                      >
-                        <X />
-                      </button>
+              <div key={comment.id} className="flex justify-between items-start p-1 bg-gray-50 rounded text-sm">
+                <div key={comment.id} className="text-sm [text-align:justify] p-2 bg-gray-50 rounded text-sm">
+                  {commentIdToEdit === comment.id ? (
+                    <div className="mb-3">
+                      <textarea
+                        value={editCommentText}
+                        onChange={(e) => setEditCommentText(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        autoFocus
+                      />
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={handleCommentEditSubmit}
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                          title="Salvar"
+                        >
+                          <Check />
+                        </button>
+                        <button
+                          onClick={() => setCommentIdToEdit("")}
+                          className="px-3 py-1 text-white bg-red-400 rounded hover:bg-red-500"
+                          title="Cancelar"
+                        >
+                          <X />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <p>{comment.text}</p>
-                )
-                }
+                  ) : (
+                    <p>{comment.text}</p>
+                  )
+                  }
+                  <p className="text-xs text-gray-400">- {comment.createdBy}</p>
+                </div>
                 {user.id === comment.createdById && (
                   <button
                     onClick={() => {
                       setCommentIdToEdit(comment.id)
                       setEditCommentText(comment.text)
                     }}
-                    className="text-xs text-indigo-500 hover:text-indigo-700"
+                    className="text-xs text-indigo-500 hover:text-indigo-700 pl-2"
                     title="Editar"
                   >
                     <PencilLine />
                   </button>
                 )}
-                <p className="text-xs text-gray-400">- {comment.createdBy}</p>
               </div>
             ))}
 
-            <div className="flex gap-2 mt-2">
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 p-1 text-sm border rounded"
-                ref={commentInputRef}
-              />
-              <button
-                onClick={handleCommentSubmit}
-                className="px-2 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
-                title="Comentar"
-              >
-                <SendHorizontal size={15} />
-              </button>
-            </div>
+            <CommentInputBox
+              commentText={commentText}
+              setCommentText={setCommentText}
+              handleCommentSubmit={handleCommentSubmit}
+            />
           </div>
         )}
       </div>
