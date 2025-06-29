@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 type TimerProps = {
   minutesLeft: number;
   secondsLeft: number;
-  onComplete?: () => void;
+  onComplete: () => void;
   onAddMinute: () => void;
 };
 

@@ -1,16 +1,4 @@
-import toast from "react-hot-toast";
-
-export const returnToastMessage = (message: string, type: string) => {
-  if (type === "error") {
-    toast.error(message, {
-      duration: 5000, // Tempo de exibição do toast (em milissegundos)
-    });
-  } else if (type === "success") {
-    toast.success(message, {
-      duration: 5000, // Tempo de exibição do toast (em milissegundos)
-    });
-  }
-};
+import { returnToastMessage } from "./globalServices";
 
 export const handleReponse = (response: string) => {
   let message =

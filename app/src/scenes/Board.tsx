@@ -7,13 +7,19 @@ import { useUser } from '../components/UserContext';
 import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
 import { addCommentToCardInFirestore, createCardInFirestore, loadRefinementWithId, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore, updateTimerToRefinementInFirebase } from '../services/firestoreService';
 import type { Card, Refinement, TimerInfo } from '../types/global';
-import { calculateTimeLeft } from '../services/boardService';
+import { calculateTimeLeft, getNextTeam } from '../services/boardService';
+import CardCreation from '../components/CardCreation';
+import { returnToastMessage } from '../services/globalServices';
+import { getAvailableTeams } from '../services/teamSelectionService';
 
 
 const Board: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
   const { user } = useUser();
   const [refinement, setRefinement] = useState<Refinement>({} as Refinement);
+  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
+  const [myTeam, setMyTeam] = useState<string>('');
+  const [timerCompleted, setTimerCompleted] = useState(false);
   const [cards, setCards] = useState<Card[]>([]);
   const [newCardText, setNewCardText] = useState('');
   const [time, setTime] = useState({ minutes: 0, seconds: 0 } as TimerInfo);
@@ -23,6 +29,7 @@ const Board: React.FC = () => {
     if (!refinementId) return;
 
     loadRefinementWithId(refinementId, setRefinement);
+    setAvailableTeams(getAvailableTeams(refinement.numOfTeams || 2));
     const unsubscribeRefinement = createUnsubscribeRefinement(refinementId, setRefinement);
     const unsubscribeCards = createUnsubscribeCards(refinementId, setCards);
     return () => {
@@ -30,6 +37,13 @@ const Board: React.FC = () => {
       unsubscribeCards();
     };
   }, [refinementId]);
+
+  useEffect(() => {
+    if (refinementId && refinement.teams) {
+      setMyTeam(refinement.teams[user.id] || '');
+      setAvailableTeams(getAvailableTeams(refinement.numOfTeams || 2));
+    }
+  }, [refinementId, refinement.teams, user.id, refinement.numOfTeams]);
 
   useEffect(() => {
     const { startTime, timerMinutes, timerSeconds } = refinement;
@@ -45,25 +59,32 @@ const Board: React.FC = () => {
   }, [refinementId, refinement.startTime]);
 
   const handleComplete = () => {
-    console.log('Timer completed!');
+    returnToastMessage('Tempo esgotado!', 'timer');
+    setTimerCompleted(true);
   };
 
   const handleAddMinute = () => {
     if (!refinementId) return;
     updateTimerToRefinementInFirebase(
       refinementId,
-      { minutes: 1, seconds: 0 } as TimerInfo,  // Reset seconds to 0
+      { minutes: 1, seconds: 0 } as TimerInfo,
       setTime
     );
+    setTimerCompleted(false);
   };
 
+  const handleChangeBoard = () => {
+    if (!refinementId || !teamName) return;
+    const nextTeam = getNextTeam(teamName, availableTeams);
+    navigate(`/board/${refinementId}/team/${nextTeam}`);
+  }
 
 
   if (!refinement) return <div className="p-4">Carregando refinamento...</div>;
 
   if (_.isEmpty(user)) {
     navigate('/name-entry');
-    return <div>Redirecionando para tela de nome...</div>;
+    return <div>Redirecionando para tela de identificação...</div>;
   }
 
   return (
@@ -74,35 +95,31 @@ const Board: React.FC = () => {
           minutesLeft={time.minutes}
           secondsLeft={time.seconds}
           onComplete={handleComplete}
-          onAddMinute={handleAddMinute} />
+          onAddMinute={handleAddMinute}
+        />
       </div>
 
-      <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
-        <div
-          className="flex-1 p-4 border rounded-lg min-w-[250px] transition-colors bg-indigo-50 border-indigo-300"
+      {myTeam === teamName && !timerCompleted && (
+        <CardCreation
+          user={user}
+          refinementId={refinement.id}
+          teamName={teamName || ''}
+          newCardText={newCardText}
+          setNewCardText={setNewCardText}
+          createCard={createCardInFirestore}
+        />)
+      }
+
+      <div className="flex gap-2 mt-2">
+        <button
+          onClick={handleChangeBoard}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+          title="Mudar times"
         >
-          <h2 className="text-lg font-semibold mb-3 text-gray-700">{teamName} - {user.name}</h2>
-          <div className="flex gap-2 mt-3">
-            <input
-              type="text"
-              placeholder="Adicione uma sugestão..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={newCardText}
-              onChange={(e) => setNewCardText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && createCardInFirestore(newCardText, refinementId, user, teamName, setNewCardText)}
-            />
-            <button
-              onClick={() => createCardInFirestore(newCardText, refinementId, user, teamName, setNewCardText)}
-              disabled={!newCardText.trim()}
-              className="p-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
+          Mudar times
+        </button>
       </div>
+
       <h3 className="text-lg font-medium text-gray-700 sticky top-0 bg-white py-2 z-10">
         {teamName}
       </h3>

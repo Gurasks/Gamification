@@ -28,6 +28,13 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const [showComments, setShowComments] = useState(false);
   const commentInputRef = useRef<HTMLInputElement>(null);
 
+  const handleCommentSubmit = async () => {
+    if (commentText.trim()) {
+      await onComment(card.id, commentText);
+      setCommentText('');
+    }
+  };
+
   const handleEditSubmit = async () => {
     await onEdit(card.id, editText);
     setIsEditing(false);
@@ -36,13 +43,6 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const handleCommentEditSubmit = async () => {
     await onCommentEdit(card.id, commentIdToEdit, editCommentText);
     setCommentIdToEdit("");
-  };
-
-  const handleCommentSubmit = async () => {
-    if (commentText.trim()) {
-      await onComment(card.id, commentText);
-      setCommentText('');
-    }
   };
 
   return (

@@ -274,7 +274,7 @@ export const updateTimerToRefinementInFirebase = async (
       startTime: serverTimestamp(),
       timerMinutes: timerInfo.minutes,
       timerSeconds: timerInfo.seconds,
-      lastUpdated: serverTimestamp(), // Additional field to force update
+      updatedAt: serverTimestamp(),
     });
     console.log("Timer updated successfully");
     setTime(timerInfo);
