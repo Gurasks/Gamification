@@ -141,7 +141,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
             ))}
 
             <VariableTextArea
-              text={editCommentText}
+              text={commentText}
               setText={setCommentText}
               handleSubmit={handleCommentSubmit}
             />
