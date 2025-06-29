@@ -11,6 +11,8 @@ import { calculateTimeLeft, getNextTeam } from '../services/boardService';
 import CardCreation from '../components/CardCreation';
 import { returnToastMessage } from '../services/globalServices';
 import { getAvailableTeams } from '../services/teamSelectionService';
+import VariableTextArea from "../components/VariableTextArea";
+
 
 
 const Board: React.FC = () => {
@@ -118,11 +120,27 @@ const Board: React.FC = () => {
         >
           Mudar times
         </button>
+
+      </div>
+      <div className='mt-4 mb-6'>
+        <h2 className="text-lg font-semibold mb-3 text-gray-700">{teamName} - {user.name}</h2>
+
+        <VariableTextArea
+          text={newCardText}
+          setText={setNewCardText}
+          handleSubmit={() =>
+            createCardInFirestore(
+              newCardText,
+              refinementId,
+              user,
+              teamName,
+              setNewCardText
+            )
+          }
+        />
+
       </div>
 
-      <h3 className="text-lg font-medium text-gray-700 sticky top-0 bg-white py-2 z-10">
-        {teamName}
-      </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards
           .filter(card => card.teamName === teamName)
