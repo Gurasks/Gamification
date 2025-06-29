@@ -11,7 +11,7 @@ import { calculateTimeLeft, getNextTeam } from '../services/boardService';
 import CardCreation from '../components/CardCreation';
 import { returnToastMessage } from '../services/globalServices';
 import { getAvailableTeams } from '../services/teamSelectionService';
-import CommentInputBox from "../components/CommentInputBox";
+import VariableTextArea from "../components/VariableTextArea";
 
 
 
@@ -125,10 +125,10 @@ const Board: React.FC = () => {
       <div className='mt-4 mb-6'>
         <h2 className="text-lg font-semibold mb-3 text-gray-700">{teamName} - {user.name}</h2>
 
-        <CommentInputBox
-          commentText={newCardText}
-          setCommentText={setNewCardText}
-          handleCommentSubmit={() =>
+        <VariableTextArea
+          text={newCardText}
+          setText={setNewCardText}
+          handleSubmit={() =>
             createCardInFirestore(
               newCardText,
               refinementId,

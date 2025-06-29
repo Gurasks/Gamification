@@ -1,8 +1,8 @@
-import { Check, MessageSquareMore, PencilLine, SendHorizontal, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Check, MessageSquareMore, PencilLine, X } from 'lucide-react';
+import { useState } from 'react';
 import type { Card, PersistentUser } from "../types/global";
 import StarRating from "./StarRating";
-import CommentInputBox from "./CommentInputBox";
+import VariableTextArea from "./VariableTextArea";
 
 interface BoardCardProps {
   card: Card;
@@ -27,7 +27,6 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const [editCommentText, setEditCommentText] = useState("");
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
-  const commentInputRef = useRef<HTMLInputElement>(null);
 
   const handleCommentSubmit = async () => {
     if (commentText.trim()) {
@@ -95,14 +94,13 @@ const BoardCard: React.FC<BoardCardProps> = ({
           <div className="mt-2 space-y-2">
             {card.comments?.map((comment) => (
               <div key={comment.id} className="flex justify-between items-start p-1 bg-gray-50 rounded text-sm">
-                <div key={comment.id} className="text-sm [text-align:justify] p-2 bg-gray-50 rounded text-sm">
+                <div key={comment.id} className="flex-grow w-full resize-none text-sm [text-align:justify] p-2 bg-gray-50 rounded text-sm">
                   {commentIdToEdit === comment.id ? (
-                    <div className="mb-3">
-                      <textarea
-                        value={editCommentText}
-                        onChange={(e) => setEditCommentText(e.target.value)}
-                        className="w-full p-2 border rounded"
-                        autoFocus
+                    <div className="mb-3 w-full">
+                      <VariableTextArea
+                        text={editCommentText}
+                        setText={setCommentText}
+                        handleSubmit={handleCommentSubmit}
                       />
                       <div className="flex gap-2 mt-2">
                         <button
@@ -142,10 +140,10 @@ const BoardCard: React.FC<BoardCardProps> = ({
               </div>
             ))}
 
-            <CommentInputBox
-              commentText={commentText}
-              setCommentText={setCommentText}
-              handleCommentSubmit={handleCommentSubmit}
+            <VariableTextArea
+              text={editCommentText}
+              setText={setCommentText}
+              handleSubmit={handleCommentSubmit}
             />
           </div>
         )}
