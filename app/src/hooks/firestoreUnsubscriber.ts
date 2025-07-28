@@ -1,4 +1,4 @@
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import type { Card, PersistentUser, Refinement } from "../types/global";
@@ -14,13 +14,12 @@ export const createUnsubscribeRefinement = (
   );
 
   const unsubscribeRefinement = onSnapshot(refinementQuery, (snapshot) => {
-    if (!snapshot.empty) {
-      const doc = snapshot.docs[0];
-      const refinementData = {
-        id: doc.id,
-        ...doc.data(),
-        startTime: doc.data().startTime?.toDate(),
-      } as Refinement;
+    const refinementDataArray = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Refinement[];
+    if (refinementDataArray.length === 1) {
+      const refinementData = refinementDataArray[0];
       setRefinement(refinementData);
     }
   });
@@ -87,4 +86,37 @@ export const createUnsubscribeMembers = (
   });
 
   return unsubscribeMembers;
+};
+
+export const createUnsubscribeSyncTimer = (
+  timerId: string,
+  setTimeLeft: (arg0: number) => void,
+  setIsRunning: (arg0: boolean) => void,
+  setEndTime: (arg0: Date | null) => void
+) => {
+  const timerRef = doc(db, "timers", timerId);
+  const unsubscribe = onSnapshot(timerRef, (doc) => {
+    const data = doc.data();
+    if (!data) return;
+
+    const { startTime, duration, isRunning } = data;
+    setIsRunning(isRunning);
+
+    if (isRunning && startTime) {
+      const start = startTime.toDate();
+      const end = new Date(start.getTime() + duration * 1000);
+      setEndTime(end);
+
+      const now = new Date();
+      const remaining = Math.max(
+        0,
+        Math.floor((end.getTime() - now.getTime()) / 1000)
+      );
+      setTimeLeft(remaining);
+    } else {
+      setTimeLeft(duration);
+      setEndTime(null);
+    }
+  });
+  return unsubscribe;
 };

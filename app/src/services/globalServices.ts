@@ -1,6 +1,14 @@
 import toast from "react-hot-toast";
 import { CheckCircle, XCircle } from "lucide-react";
 import React from "react";
+import type { Refinement } from "../types/global";
+
+export const returnTimerId = (
+  teamName: string | undefined,
+  refinement: Refinement
+) => {
+  return (teamName && refinement.teamTimers?.[teamName]) || "";
+};
 
 export const returnToastMessage = (message: string, type: string) => {
   if (type === "error") {

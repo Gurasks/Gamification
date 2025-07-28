@@ -10,12 +10,13 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import _ from "lodash";
-import { db } from "../config/firebase";
-import type { PersistentUser, Refinement, TimerInfo } from "../types/global";
-import type { SelectionMethod } from "../types/teamSelection";
 import type { SetStateAction } from "react";
-import { getAvailableTeams } from "./teamSelectionService";
 import type { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { db } from "../config/firebase";
+import type { PersistentUser, Refinement } from "../types/global";
+import type { SelectionMethod } from "../types/teamSelection";
+import { getAvailableTeams } from "./teamSelectionService";
 
 export const createRefinementInFirestore = async (
   refinementId: string,
@@ -52,7 +53,12 @@ export const loadRefinementWithId = async (
 ) => {
   const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
   if (refinementDoc.exists()) {
-    setRefinement(refinementDoc.data() as Refinement);
+    const refinementData = refinementDoc.data() as Refinement;
+    if (!refinementData) {
+      console.error("Refinement data is undefined");
+      return;
+    }
+    setRefinement(refinementData);
   }
 };
 
@@ -246,39 +252,62 @@ export const startRefinementInFirebase = async (
   if (
     refinementId &&
     refinement &&
+    refinement.teams &&
     _.size(refinement.teams) === refinement.members.length
   ) {
     const teamName = refinement.teams[user.id];
     if (teamName) {
+      const availableTeams = getAvailableTeams(refinement.numOfTeams);
+      const teamTimers = availableTeams.reduce((acc, team) => {
+        acc[team] = uuidv4();
+        return acc;
+      }, {} as Record<string, string>);
+
       await updateDoc(doc(db, "refinements", refinementId), {
         hasStarted: true,
         startTime: serverTimestamp(),
-        timerMinutes: 5,
-        timerSeconds: 0,
+        teamTimers: teamTimers,
         updatedAt: serverTimestamp(),
       });
+
+      await initializeTimers(teamTimers, 300);
+      console.log("Refinement started successfully");
       navigate(`/board/${refinementId}/team/${teamName}`);
     }
   }
 };
 
-export const updateTimerToRefinementInFirebase = async (
-  refinementId: string,
-  timerInfo: TimerInfo,
-  setTime: (time: TimerInfo) => void
+export const initializeTimers = async (
+  teamTimers: Record<string, string>,
+  initialDuration: number
 ) => {
-  if (!refinementId) return;
+  Object.values(teamTimers).forEach(async (timerId) => {
+    await setDoc(doc(db, "timers", timerId), {
+      startTime: serverTimestamp(),
+      duration: initialDuration,
+      isRunning: true,
+      lastUpdated: serverTimestamp(),
+    });
+  });
+};
+
+export const updateTimeToSyncTimerInFirebase = async (
+  timerId: string,
+  timeLeft: number,
+  seconds: number
+) => {
+  if (!timerId || seconds <= 0) return;
 
   try {
-    await updateDoc(doc(db, "refinements", refinementId), {
+    const timerRef = doc(db, "timers", timerId);
+    await updateDoc(timerRef, {
+      duration: timeLeft + seconds,
       startTime: serverTimestamp(),
-      timerMinutes: timerInfo.minutes,
-      timerSeconds: timerInfo.seconds,
-      updatedAt: serverTimestamp(),
+      isRunning: true,
+      lastUpdated: serverTimestamp(),
     });
-    console.log("Timer updated successfully");
-    setTime(timerInfo);
+    console.log("Time added successfully");
   } catch (error) {
-    console.error("Error updating timer:", error);
+    console.error("Error adding time to sync timer:", error);
   }
 };

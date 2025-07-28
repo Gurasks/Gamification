@@ -17,9 +17,8 @@ export interface Refinement {
   title: string;
   hasStarted: boolean;
   startTime?: Timestamp;
-  timerMinutes?: number;
-  timerSeconds?: number;
   updatedAt?: Timestamp;
+  teamTimers?: Record<string, string>;
 }
 
 export interface Comment {
@@ -42,9 +41,4 @@ export interface Card {
   createdAt: Timestamp;
   comments?: Comment[];
   updatedAt?: Timestamp;
-}
-
-export interface TimerInfo {
-  minutes: number;
-  seconds: number;
 }

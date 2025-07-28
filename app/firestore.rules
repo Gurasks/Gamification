@@ -1,14 +1,65 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // For development - allow all access
-    match /{document=**} {
-      allow read, write: if true;
+    // Allow anyone to read timers
+    match /timers/{timerId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if (
+        request.auth != null &&
+        request.resource.data.keys().hasAll(['startTime', 'duration', 'isRunning', 'lastUpdated']) &&
+        request.resource.data.lastUpdated == request.time
+      );
     }
 
-    // For production - consider adding:
-    // - Request rate limiting
-    // - Data validation
-    // - Or implement a simple secret token system
+    // Refinements (your boards/rooms)
+    match /refinements/{refinementId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if (
+        // Owner can update all fields
+        (request.auth.uid == resource.data.createdById) ||
+
+        // Anyone can update just the timer fields
+        (request.resource.data.keys().hasOnly(['startTime', 'timerMinutes', 'timerSeconds', 'lastUpdated']) &&
+         request.resource.data.lastUpdated == request.time)
+      );
+    }
+
+    // Cards within refinements
+    match /cards/{cardId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if (
+        // Card owner can edit text
+        (request.auth.uid == resource.data.createdById &&
+         request.resource.data.keys().hasOnly(['text', 'updatedAt'])) ||
+
+        // Anyone can add comments
+        (request.resource.data.comments != null &&
+         request.resource.data.keys().hasOnly(['comments'])) ||
+
+        // Users can update their own ratings
+        (request.resource.data.ratings != null &&
+         request.resource.data.keys().hasOnly(['ratings']) &&
+         request.resource.data.ratings.keys().hasOnly([request.auth.uid]))
+      );
+    }
+
+    // Comments subcollection (alternative to array)
+    match /cards/{cardId}/comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if (
+        request.auth.uid == resource.data.createdById
+      );
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId;
+    }
   }
 }
