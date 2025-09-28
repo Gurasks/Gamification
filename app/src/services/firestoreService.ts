@@ -4,9 +4,12 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
   type DocumentData,
 } from "firebase/firestore";
 import _ from "lodash";
@@ -14,9 +17,11 @@ import type { SetStateAction } from "react";
 import type { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../config/firebase";
-import type { PersistentUser, Refinement } from "../types/global";
+import type { Card, PersistentUser, Refinement } from "../types/global";
 import type { SelectionMethod } from "../types/teamSelection";
 import { getAvailableTeams } from "./teamSelectionService";
+import type { UserStats } from "../types/leaderboard";
+import { calculateAverageRating } from "./boardService";
 
 export const createRefinementInFirestore = async (
   refinementId: string,
@@ -309,5 +314,95 @@ export const updateTimeToSyncTimerInFirebase = async (
     console.log("Time added successfully");
   } catch (error) {
     console.error("Error adding time to sync timer:", error);
+  }
+};
+
+export const fetchLeaderboardData = async (
+  refinementId: string
+): Promise<UserStats[]> => {
+  try {
+    const cardsQuery = query(
+      collection(db, "cards"),
+      where("refinementId", "==", refinementId)
+    );
+    const cardsSnapshot = await getDocs(cardsQuery);
+
+    const userStatsMap = new Map<string, UserStats>();
+
+    cardsSnapshot.forEach((cardDoc) => {
+      const card = cardDoc.data() as Card;
+      const comments = card.comments || [];
+
+      comments.forEach((comment: any) => {
+        const userId = comment.createdById;
+        const userName = comment.createdBy;
+
+        if (!userStatsMap.has(userId)) {
+          userStatsMap.set(userId, {
+            userId,
+            userName,
+            totalComments: 0,
+            totalReplies: 0,
+            averageRating: 0,
+            totalCardsCreated: 0,
+          });
+        }
+
+        const userStats = userStatsMap.get(userId)!;
+        // O totalComments são os comentários feitos por usuário em diferentes cards
+        userStats.totalComments++;
+      });
+
+      // Process each card
+      const userId = card.createdById;
+      const userName = card.createdBy;
+
+      if (!userStatsMap.has(userId)) {
+        userStatsMap.set(userId, {
+          userId,
+          userName,
+          totalReplies: 0,
+          totalComments: 0,
+          averageRating: 0,
+          totalCardsCreated: 0,
+        });
+      }
+
+      const userStats = userStatsMap.get(userId)!;
+
+      // Calculate ratings if available
+      if (card.ratings !== undefined) {
+        userStats.averageRating += calculateAverageRating(card.ratings);
+      }
+      // comments são os comentários dentro dos cards e não os comentários feitos pelos usuários
+      if (card.comments) {
+        // Os replies são os comentários dentro dos cards que são o número de comentários feitos
+        // por todos os usuários
+        userStats.totalReplies += card.comments.length;
+      }
+
+      userStatsMap.get(userId)!.totalCardsCreated++;
+    });
+
+    const leaderboardData: UserStats[] = Array.from(userStatsMap.values()).map(
+      (user) => ({
+        userId: user.userId,
+        userName: user.userName,
+        averageRating:
+          user.totalCardsCreated > 0
+            ? Number(
+                (Number(user.averageRating) / user.totalCardsCreated).toFixed(1)
+              )
+            : 0,
+        totalCardsCreated: user.totalCardsCreated,
+        totalComments: user.totalComments,
+        totalReplies: user.totalReplies,
+      })
+    );
+
+    return leaderboardData.sort((a, b) => b.totalComments - a.totalComments);
+  } catch (error) {
+    console.error("Error fetching leaderboard data:", error);
+    return [];
   }
 };

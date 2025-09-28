@@ -6,6 +6,7 @@ import Board from './scenes/Board';
 import TeamSelectionScene from './scenes/TeamSelectionScene';
 import Home from './scenes/Home';
 import { Toaster } from 'react-hot-toast';
+import Leaderboard from './scenes/Leaderboard';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <Route path="/board/:refinementId/team/:teamName" element={<Board />} />
           <Route path="/team-selection/:refinementId" element={<TeamSelectionScene />} />
           <Route path="/name-entry" element={<NameEntryScene />} />
+          <Route path="/leaderboard/:refinementId" element={<Leaderboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
