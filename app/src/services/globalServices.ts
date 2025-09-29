@@ -45,3 +45,23 @@ export const returnToastMessage = (message: string, type: string) => {
     });
   }
 };
+
+export const uuidToBytes = (uuid: string): Uint8Array => {
+  const hex = uuid.replace(/-/g, "");
+  if (hex.length !== 32) throw new Error("Invalid UUID format");
+  return Uint8Array.from(hex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
+};
+
+// Base64-url encode for browser (no Buffer)
+export const toBase64Url = (bytes: Uint8Array): string => {
+  let binary = "";
+  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  let base64 = btoa(binary); // standard base64
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); // url-safe
+};
+
+export const getShortenedUUID = (uuid: string): string => {
+  const bytes = uuidToBytes(uuid);
+  const base64 = toBase64Url(bytes);
+  return base64.slice(0, 8); // take first 8 chars
+};

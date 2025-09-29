@@ -7,7 +7,8 @@ import { useUser } from '../components/UserContext';
 import { createUnsubscribeMembers } from '../hooks/firestoreUnsubscriber';
 import type { PersistentUser, Refinement } from '../types/global';
 import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase } from '../services/firestoreService';
-
+import ShareButton from '../components/ShareButton';
+import { getShortenedUUID } from '../services/globalServices';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
@@ -20,7 +21,6 @@ const TeamSelectionScene: React.FC = () => {
   const [owner, setOwner] = useState<string>('');
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
   const [refinement, setRefinement] = useState<Refinement | null>(null);
-
 
   useEffect(() => {
     if (!refinementId) return;
@@ -39,78 +39,197 @@ const TeamSelectionScene: React.FC = () => {
     return () => {
       unsubscribeMembers();
     };
-  }, []);
+  }, [refinementId, user, navigate]);
 
   useEffect(() => {
     if (refinement) setTeamParticipants(refinement.teams as unknown as Record<string, string>)
   }, [refinement]);
 
-  return refinementId && refinement ? (
-    <div className="app">
-      <div>
-        <h1>Quantidade de times</h1>
-        {isOwner ? (
-          <>
-            <input
-              className="text-5xl font-bold text-center my-1"
-              name="teamNumbers"
-              type='number'
-              min="2"
-              defaultValue={numOfTeams}
-              onChange={e => updateNumOfTeamsToRefinementInFirebase(refinementId, setAvailableTeams, e)}
-            />
-            <SelectionMethodChooser
-              currentMethod={refinement.selectionMethod || 'RANDOM'}
-              onMethodChange={(method) => updateSelectionMethodToRefinementInFirebase(refinementId, method)}
-              isOwner={isOwner}
-            />
-          </>
-        ) :
-          (
-            <p className="text-5xl font-bold text-center my-1">{numOfTeams}</p>
-          )
-        }
-
-        {refinement.selectionMethod === 'OWNER_CHOOSES' && isOwner ? (
-          <OwnerTeamAssignment
-            refinementId={refinementId}
-            members={members}
-            availableTeams={availableTeams}
-            currentAssignments={refinement.teams || {}}
-          />
-        ) : (
-          <TeamSelection
-            refinementId={refinementId}
-            selectionMethod={refinement.selectionMethod || 'RANDOM'}
-            availableTeams={availableTeams}
-            currentTeam={user ? refinement.teams?.[user.id] : undefined}
-          />
-        )}
-        <h1 className="mt-1">Lista de participantes</h1>
-        <div className="content">
-          <ul>
-            {members.length > 0 && members
-              .map(member => (
-                <li key={member.id} className={` mb-2 ${member.id === owner
-                  ? 'text-rose-800'
-                  : member.id === user.id ? 'text-teal-800' : 'text-gray-800'
-                  }`}>{member.name} {teamParticipants && teamParticipants[member.id] ? (<span> -
-                    <span className='text-orange-400 font-bold'> {teamParticipants[member.id]}</span>
-                  </span>) : ''}</li>
-              ))}
-          </ul>
+  if (!refinementId || !refinement) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando sessão...</p>
         </div>
-        {user.id === owner ? (<button
-          onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
-          disabled={user.id !== owner}
-          className={`w-full py-2 px-4 rounded-md shadow-sm text-white ${!refinementId || user.id !== owner ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-            }`}
-        >
-          Começar
-        </button>) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Configuração dos Times
+          </h1>
+          <p className="text-gray-600">
+            Organize os participantes e configure os times para o refinamento
+          </p>
+        </div>
+
+        {/* Main Configuration Card */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              {refinement.title}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {isOwner ? 'Você é o organizador desta sessão' : 'Aguardando configuração do organizador'}
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <ShareButton
+              refinementId={refinementId}
+              shortenedUUID={getShortenedUUID(refinementId)}
+              sessionTitle={refinement.title}
+            />
+          </div>
+
+          <div className="space-y-6">
+            {/* Number of Teams Section */}
+            <div className="border-b pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Quantidade de Times
+                  </label>
+                  {isOwner ? (
+                    <input
+                      name="teamNumbers"
+                      type="number"
+                      min="2"
+                      max="10"
+                      defaultValue={numOfTeams}
+                      onChange={e => updateNumOfTeamsToRefinementInFirebase(refinementId, setAvailableTeams, e)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-2xl font-bold"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-gray-800">{numOfTeams}</p>
+                      <p className="text-sm text-gray-500 mt-1">times</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Selection Method */}
+            {isOwner && (
+              <div className="border-b pb-4">
+                <SelectionMethodChooser
+                  currentMethod={refinement.selectionMethod || 'RANDOM'}
+                  onMethodChange={(method) =>
+                    updateSelectionMethodToRefinementInFirebase(refinementId, method)}
+                  isOwner={isOwner}
+                />
+              </div>
+            )}
+
+            {/* Team Assignment Section */}
+            <div>
+              {refinement.selectionMethod === 'OWNER_CHOOSES' && isOwner ? (
+                <OwnerTeamAssignment
+                  refinementId={refinementId}
+                  members={members}
+                  availableTeams={availableTeams}
+                  currentAssignments={refinement.teams || {}}
+                />
+              ) : (
+                <TeamSelection
+                  refinementId={refinementId}
+                  selectionMethod={refinement.selectionMethod || 'RANDOM'}
+                  availableTeams={availableTeams}
+                  currentTeam={user ? refinement.teams?.[user.id] : undefined}
+                />
+              )}
+            </div>
+
+            {/* Participants List */}
+            <div className="border-t pt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Lista de Participantes ({members.length})
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <ul className="space-y-2">
+                  {members.map(member => (
+                    <li
+                      key={member.id}
+                      className={`flex items-center justify-between p-3 rounded-lg transition-colors ${member.id === owner
+                        ? 'bg-rose-50 border border-rose-200'
+                        : member.id === user.id
+                          ? 'bg-teal-50 border border-teal-200'
+                          : 'bg-white border border-gray-200'
+                        }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span className={`font-medium ${member.id === owner
+                          ? 'text-rose-700'
+                          : member.id === user.id
+                            ? 'text-teal-700'
+                            : 'text-gray-700'
+                          }`}>
+                          {member.name}
+                        </span>
+                        {member.id === owner && (
+                          <span className="px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-full font-medium">
+                            Organizador
+                          </span>
+                        )}
+                        {member.id === user.id && (
+                          <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">
+                            Você
+                          </span>
+                        )}
+                      </div>
+
+                      {teamParticipants && teamParticipants[member.id] && (
+                        <span className="px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-full font-semibold">
+                          {teamParticipants[member.id]}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Start Button */}
+            {isOwner && (
+              <div className="pt-4">
+                <button
+                  onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
+                  disabled={!refinementId}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!refinementId
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
+                    }`}
+                >
+                  Iniciar Refinamento
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="text-center">
+          <p className="text-gray-500 text-sm">
+            {isOwner
+              ? 'Configure os times e inicie quando estiver pronto'
+              : 'Aguardando o organizador iniciar a sessão'
+            }
+          </p>
+        </div>
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default TeamSelectionScene;

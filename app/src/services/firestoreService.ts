@@ -18,19 +18,28 @@ import type { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../config/firebase";
 import type { Card, PersistentUser, Refinement } from "../types/global";
-import type { SelectionMethod } from "../types/teamSelection";
-import { getAvailableTeams } from "./teamSelectionService";
 import type { UserStats } from "../types/leaderboard";
+import type { SelectionMethod } from "../types/teamSelection";
 import { calculateAverageRating } from "./boardService";
+import { getShortenedUUID } from "./globalServices";
+import { getAvailableTeams } from "./teamSelectionService";
 
 export const createRefinementInFirestore = async (
   refinementId: string,
-  refinementName: string,
-  user: PersistentUser
-): Promise<string> => {
+  refinementData: {
+    name: string;
+    description?: string;
+    password?: string | null;
+    requiresPassword?: boolean;
+  },
+  user: any
+) => {
   const newRefinement = {
     id: refinementId,
-    title: refinementName,
+    title: refinementData.name,
+    description: refinementData.description || "",
+    password: refinementData.password || null,
+    requiresPassword: refinementData.requiresPassword || false,
     numOfTeams: 2, // Default number of teams
     selectionMethod: "OWNER_CHOOSES", // Default selection method
     createdAt: serverTimestamp(),
@@ -64,6 +73,22 @@ export const loadRefinementWithId = async (
       return;
     }
     setRefinement(refinementData);
+  }
+};
+
+export const getRefinement = async (refinementId: string) => {
+  try {
+    const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
+    if (refinementDoc.exists()) {
+      return {
+        id: refinementDoc.id,
+        ...refinementDoc.data(),
+      } as Refinement;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting refinement:", error);
+    return null;
   }
 };
 
@@ -405,4 +430,21 @@ export const fetchLeaderboardData = async (
     console.error("Error fetching leaderboard data:", error);
     return [];
   }
+};
+
+// shorten a UUID and store in Firestore
+export const shortenUUID = async (uuid: string): Promise<string> => {
+  const shortKey = getShortenedUUID(uuid);
+  await setDoc(doc(db, "uuidMappings", shortKey), {
+    uuid: uuid,
+    createdAt: Date.now(),
+  });
+
+  return shortKey;
+};
+
+// resolve short key → original UUID
+export const resolveUUID = async (shortKey: string): Promise<string | null> => {
+  const snap = await getDoc(doc(db, "uuidMappings", shortKey));
+  return snap.exists() ? (snap.data().uuid as string) : null;
 };

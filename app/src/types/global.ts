@@ -15,6 +15,9 @@ export interface Refinement {
   selectionMethod: SelectionMethod;
   teams: Record<string, string>;
   title: string;
+  description: string;
+  password: string | null;
+  requiresPassword: boolean;
   hasStarted: boolean;
   startTime?: Timestamp;
   updatedAt?: Timestamp;
