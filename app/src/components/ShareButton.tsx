@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
+import { getShortenedUUID } from '../services/globalServices';
 
 interface ShareButtonProps {
   refinementId: string;
-  shortenedUUID: string;
   sessionTitle?: string;
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, shortenedUUID, sessionTitle }) => {
+const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, sessionTitle }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipMessage, setTooltipMessage] = useState('Copy to clipboard');
-
-  const shareUrl = `${window.location.origin}/join/${refinementId}`;
+  const [tooltipMessage, setTooltipMessage] = useState('Copie o link');
+  const shortenedUUID = getShortenedUUID(refinementId);
+  const shareUrl = `${window.location.origin}/join-a-session/${shortenedUUID}`;
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setTooltipMessage('Copied!');
+      setTooltipMessage('Copiado!');
       setShowTooltip(true);
 
       // Reset tooltip after 2 seconds
       setTimeout(() => {
         setShowTooltip(false);
-        setTooltipMessage('Copy to clipboard');
+        setTooltipMessage('Copie o link');
       }, 2000);
     } catch (err) {
       // Fallback for browsers that don't support clipboard API
@@ -32,11 +32,11 @@ const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, shortenedUUID, 
       document.execCommand('copy');
       document.body.removeChild(textArea);
 
-      setTooltipMessage('Copied!');
+      setTooltipMessage('Copiado!');
       setShowTooltip(true);
       setTimeout(() => {
         setShowTooltip(false);
-        setTooltipMessage('Copy to clipboard');
+        setTooltipMessage('Copie o link');
       }, 2000);
     }
   };
@@ -51,7 +51,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, shortenedUUID, 
         });
       } catch (err) {
         // User canceled the share or it failed
-        console.log('Share canceled or failed');
+        console.log('Compatilhamento cancelado ou falhou:', err);
       }
     } else {
       // Fallback to copy

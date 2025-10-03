@@ -8,7 +8,6 @@ import { createUnsubscribeMembers } from '../hooks/firestoreUnsubscriber';
 import type { PersistentUser, Refinement } from '../types/global';
 import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase } from '../services/firestoreService';
 import ShareButton from '../components/ShareButton';
-import { getShortenedUUID } from '../services/globalServices';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
@@ -21,6 +20,7 @@ const TeamSelectionScene: React.FC = () => {
   const [owner, setOwner] = useState<string>('');
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
   const [refinement, setRefinement] = useState<Refinement | null>(null);
+  const [showDescription, setShowDescription] = useState(true);
 
   useEffect(() => {
     if (!refinementId) return;
@@ -71,26 +71,59 @@ const TeamSelectionScene: React.FC = () => {
 
         {/* Main Configuration Card */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+          <div className="flex items-start justify-between mb-6">
+            <div className="text-center flex-1">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                {refinement.title}
+              </h2>
+              <p className="text-gray-600 text-sm">
+                {isOwner ? 'Você é o organizador desta sessão' : 'Aguardando configuração do organizador'}
+              </p>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-              {refinement.title}
-            </h2>
-            <p className="text-gray-600 text-sm">
-              {isOwner ? 'Você é o organizador desta sessão' : 'Aguardando configuração do organizador'}
-            </p>
           </div>
-          <div className="flex-shrink-0">
-            <ShareButton
-              refinementId={refinementId}
-              shortenedUUID={getShortenedUUID(refinementId)}
-              sessionTitle={refinement.title}
-            />
+          <div className="flex justify-center mb-4">
+            <ShareButton refinementId={refinementId} sessionTitle={refinement.title} />
           </div>
+
+          {/* Description Section - Collapsible */}
+          {refinement.description && (
+            <div className="mb-6">
+              <button
+                onClick={() => setShowDescription(!showDescription)}
+                className="flex items-center justify-between w-full p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+              >
+                <div className="flex items-center space-x-3">
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${showDescription ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">
+                    Descrição do Refinamento
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500">
+                  {showDescription ? 'Ocultar' : 'Mostrar'}
+                </span>
+              </button>
+
+              {showDescription && (
+                <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fadeIn">
+                  <p className="text-gray-700 leading-relaxed">
+                    {refinement.description}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="space-y-6">
             {/* Number of Teams Section */}

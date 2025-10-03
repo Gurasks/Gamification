@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useUser } from "../components/UserContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { resolveUUID, updateDocumentListMembers, getRefinement } from "../services/firestoreService";
 import { handleReponse } from "../services/homeServices";
 
 const JoinScene: React.FC = () => {
+  const { sessionCode } = useParams<{ sessionCode: string }>();
   const { user } = useUser();
-  const [joinCode, setJoinCode] = useState('');
+  const [joinCode, setJoinCode] = useState(sessionCode || '');
   const [sessionPassword, setSessionPassword] = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [requiresPassword, setRequiresPassword] = useState(false);

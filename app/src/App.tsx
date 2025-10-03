@@ -18,7 +18,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<HomeScene />} />
           <Route path="/refinement-creation" element={<CreationScene />} />
-          <Route path="/join-a-session" element={<JoinScene />} />
+          <Route path="/join-a-session/:sessionCode?" element={<JoinScene />} />
           <Route path="/board/:refinementId/team/:teamName" element={<BoardScene />} />
           <Route path="/team-selection/:refinementId" element={<TeamSelectionScene />} />
           <Route path="/name-entry" element={<NameEntryScene />} />
