@@ -2,6 +2,7 @@ import {
   addDoc,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -126,6 +127,45 @@ export const updateDocumentListMembers = async (
   } else {
     console.log("Document doesn't exist!");
     return "notFound";
+  }
+};
+
+// Remove usuário da lista de membros
+export const removeUserFromRefinement = async (
+  refinementId: string,
+  userId: string
+) => {
+  try {
+    const refinementRef = doc(db, "refinements", refinementId);
+    const refinementDoc = await getDoc(refinementRef);
+
+    if (refinementDoc.exists()) {
+      const refinementData = refinementDoc.data();
+      const updatedMembers = refinementData.members.filter(
+        (member: PersistentUser) => member.id !== userId
+      );
+
+      await updateDoc(refinementRef, {
+        members: updatedMembers,
+      });
+
+      console.log("Usuário removido da sala com sucesso");
+    }
+  } catch (error) {
+    console.error("Erro ao remover usuário da sala:", error);
+    throw error;
+  }
+};
+
+// Excluir refinamento completo (apenas para dono)
+export const deleteRefinement = async (refinementId: string) => {
+  try {
+    const refinementRef = doc(db, "refinements", refinementId);
+    await deleteDoc(refinementRef);
+    console.log("Sala excluída com sucesso");
+  } catch (error) {
+    console.error("Erro ao excluir sala:", error);
+    throw error;
   }
 };
 

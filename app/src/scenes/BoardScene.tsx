@@ -11,6 +11,7 @@ import { getAvailableTeams } from '../services/teamSelectionService';
 import VariableTextArea from "../components/VariableTextArea";
 import SyncTimer from '../components/SyncTimer';
 import { returnTimerId } from '../services/globalServices';
+import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
 
 const BoardScene: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
@@ -21,6 +22,7 @@ const BoardScene: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
   const [newCardText, setNewCardText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showDescription, setShowDescription] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -117,9 +119,11 @@ const BoardScene: React.FC = () => {
                 {refinement.title}
               </h1>
               {refinement.description && (
-                <p className="text-gray-600 mb-4">
-                  {refinement.description}
-                </p>
+                <CollapsibleDescriptionArea
+                  refinementDescription={refinement.description}
+                  showDescription={showDescription}
+                  setShowDescription={setShowDescription}
+                />
               )}
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <span>Time: <strong>{teamName}</strong></span>

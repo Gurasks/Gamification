@@ -6,8 +6,10 @@ import TeamSelection from '../components/TeamSelection';
 import { useUser } from '../components/UserContext';
 import { createUnsubscribeMembers } from '../hooks/firestoreUnsubscriber';
 import type { PersistentUser, Refinement } from '../types/global';
-import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase } from '../services/firestoreService';
+import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../services/firestoreService';
 import ShareButton from '../components/ShareButton';
+import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
+import ExitConfirmationModal from '../components/ExitConfirmationModal';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
@@ -21,6 +23,7 @@ const TeamSelectionScene: React.FC = () => {
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
   const [refinement, setRefinement] = useState<Refinement | null>(null);
   const [showDescription, setShowDescription] = useState(true);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   useEffect(() => {
     if (!refinementId) return;
@@ -44,6 +47,31 @@ const TeamSelectionScene: React.FC = () => {
   useEffect(() => {
     if (refinement) setTeamParticipants(refinement.teams as unknown as Record<string, string>)
   }, [refinement]);
+
+  const handleExitRoom = async () => {
+    if (!refinementId || !user) return;
+
+    try {
+      if (isOwner) {
+        await deleteRefinement(refinementId);
+      } else {
+        await removeUserFromRefinement(refinementId, user.id);
+      }
+
+      setShowExitModal(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao sair da sala:', error);
+    }
+  };
+
+  const openExitModal = () => {
+    setShowExitModal(true);
+  };
+
+  const closeExitModal = () => {
+    setShowExitModal(false);
+  };
 
   if (!refinementId || !refinement) {
     return (
@@ -86,43 +114,26 @@ const TeamSelectionScene: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex justify-center mb-4">
+
+          <div className="flex justify-center gap-4 mb-6">
             <ShareButton refinementId={refinementId} sessionTitle={refinement.title} />
+            <button
+              onClick={openExitModal}
+              className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Sair da Sala</span>
+            </button>
           </div>
 
-          {/* Description Section - Collapsible */}
           {refinement.description && (
-            <div className="mb-6">
-              <button
-                onClick={() => setShowDescription(!showDescription)}
-                className="flex items-center justify-between w-full p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-              >
-                <div className="flex items-center space-x-3">
-                  <svg
-                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${showDescription ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                  <span className="text-sm font-medium text-gray-700">
-                    Descrição do Refinamento
-                  </span>
-                </div>
-                <span className="text-xs text-gray-500">
-                  {showDescription ? 'Ocultar' : 'Mostrar'}
-                </span>
-              </button>
-
-              {showDescription && (
-                <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fadeIn">
-                  <p className="text-gray-700 leading-relaxed">
-                    {refinement.description}
-                  </p>
-                </div>
-              )}
-            </div>
+            <CollapsibleDescriptionArea
+              refinementDescription={refinement.description}
+              showDescription={showDescription}
+              setShowDescription={setShowDescription}
+            />
           )}
 
           <div className="space-y-6">
@@ -233,21 +244,20 @@ const TeamSelectionScene: React.FC = () => {
               </div>
             </div>
 
-            {/* Start Button */}
-            {isOwner && (
-              <div className="pt-4">
+            <div className="flex gap-3 pt-4">
+              {isOwner && (
                 <button
                   onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
                   disabled={!refinementId}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!refinementId
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!refinementId
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
                     }`}
                 >
                   Iniciar Refinamento
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
@@ -261,6 +271,14 @@ const TeamSelectionScene: React.FC = () => {
           </p>
         </div>
       </div>
+
+      <ExitConfirmationModal
+        isOpen={showExitModal}
+        onClose={closeExitModal}
+        onConfirm={handleExitRoom}
+        isOwner={isOwner}
+        sessionTitle={refinement.title}
+      />
     </div>
   );
 };
