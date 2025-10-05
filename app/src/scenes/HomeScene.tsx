@@ -8,7 +8,7 @@ const HomeScene: React.FC = () => {
   const navigate = useNavigate();
 
   const handleCreateScene = () => {
-    navigate('/refinement-creation');
+    navigate('/session-creation');
   };
 
   const handleJoinScene = () => {

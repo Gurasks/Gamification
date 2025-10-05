@@ -5,12 +5,16 @@ type Props = {
   text: string;
   setText: (value: string) => void;
   handleSubmit: () => void;
+  disabled?: boolean;
+  placeholder?: string;
 };
 
 export default function VariableTextArea({
   text,
   setText,
   handleSubmit,
+  disabled = false,
+  placeholder,
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -29,8 +33,9 @@ export default function VariableTextArea({
         rows={1}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Adicione um comentário..."
         className="flex-1 p-2 text-sm border rounded resize-none overflow-auto"
+        disabled={disabled}
+        placeholder={placeholder || "Adicione um comentário..."}
       />
       <button
         onClick={handleSubmit}

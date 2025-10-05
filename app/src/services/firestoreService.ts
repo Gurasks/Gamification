@@ -18,46 +18,54 @@ import type { SetStateAction } from "react";
 import type { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../config/firebase";
-import type { Card, PersistentUser, Refinement } from "../types/global";
+import type {
+  Card,
+  PersistentUser,
+  Refinement,
+  RefinementCreationData,
+} from "../types/global";
 import type { UserStats } from "../types/leaderboard";
 import type { SelectionMethod } from "../types/teamSelection";
 import { calculateAverageRating } from "./boardService";
 import { getShortenedUUID } from "./globalServices";
 import { getAvailableTeams } from "./teamSelectionService";
 
+const refinementCache = new Map<string, Refinement>();
+
 export const createRefinementInFirestore = async (
   refinementId: string,
-  refinementData: {
-    name: string;
-    description?: string;
-    password?: string | null;
-    requiresPassword?: boolean;
-  },
-  user: any
-) => {
-  const newRefinement = {
-    id: refinementId,
-    title: refinementData.name,
-    description: refinementData.description || "",
-    password: refinementData.password || null,
-    requiresPassword: refinementData.requiresPassword || false,
-    numOfTeams: 2, // Default number of teams
-    selectionMethod: "OWNER_CHOOSES", // Default selection method
-    createdAt: serverTimestamp(),
-    members: [user],
-    owner: user.id,
-    teams: {},
-    hasStarted: false,
-  } as Refinement;
-
+  refinementData: RefinementCreationData,
+  user: PersistentUser
+): Promise<string> => {
   try {
+    const newRefinement = {
+      id: refinementId,
+      title: refinementData.name,
+      description: refinementData.description || "",
+      password: refinementData.password || null,
+      requiresPassword: refinementData.requiresPassword || false,
+      numOfTeams: 2,
+      selectionMethod: "OWNER_CHOOSES",
+      createdAt: serverTimestamp(),
+      members: [user],
+      owner: user.id,
+      teams: {},
+      hasStarted: false,
+      updatedAt: serverTimestamp(),
+    } as Refinement;
+
     const docRef = doc(db, "refinements", refinementId);
     await setDoc(docRef, newRefinement);
+
     console.log("Document written with ID: ", refinementId);
     return refinementId;
   } catch (error) {
     console.error("Error adding document: ", error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error(`Failed to create refinement: ${error.message}`);
+    } else {
+      throw new Error("Failed to create refinement: Unknown error");
+    }
   }
 };
 
@@ -77,14 +85,23 @@ export const loadRefinementWithId = async (
   }
 };
 
-export const getRefinement = async (refinementId: string) => {
+export const getRefinement = async (
+  refinementId: string
+): Promise<Refinement | null> => {
+  if (refinementCache.has(refinementId)) {
+    return refinementCache.get(refinementId)!;
+  }
+
   try {
     const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
     if (refinementDoc.exists()) {
-      return {
+      const refinement = {
         id: refinementDoc.id,
         ...refinementDoc.data(),
       } as Refinement;
+
+      refinementCache.set(refinementId, refinement);
+      return refinement;
     }
     return null;
   } catch (error) {

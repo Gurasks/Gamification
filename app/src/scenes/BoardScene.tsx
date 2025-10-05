@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from '../components/BoardCard';
+import { CardSkeleton } from '../components/CardSkeleton';
 import { useUser } from '../components/UserContext';
 import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
 import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestoreService';
@@ -12,6 +13,8 @@ import VariableTextArea from "../components/VariableTextArea";
 import SyncTimer from '../components/SyncTimer';
 import { returnTimerId } from '../services/globalServices';
 import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { Button } from '../components/Button';
 
 const BoardScene: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
@@ -22,7 +25,10 @@ const BoardScene: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
   const [newCardText, setNewCardText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [cardsLoading, setCardsLoading] = useState(true);
   const [showDescription, setShowDescription] = useState(false);
+  const [isCreatingCard, setIsCreatingCard] = useState(false);
+  const [isChangingTeam, setIsChangingTeam] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +39,8 @@ const BoardScene: React.FC = () => {
 
     const fetchData = async () => {
       setLoading(true);
+      setCardsLoading(true);
+
       try {
         const refinementData = await getRefinement(refinementId);
         if (refinementData) {
@@ -41,9 +49,13 @@ const BoardScene: React.FC = () => {
         }
 
         unsubscribeRefinement = createUnsubscribeRefinement(refinementId, setRefinement);
-        unsubscribeCards = createUnsubscribeCards(refinementId, setCards);
+        unsubscribeCards = createUnsubscribeCards(refinementId, (newCards) => {
+          setCards(newCards);
+          setCardsLoading(false);
+        });
       } catch (error) {
         console.error('Error loading refinement:', error);
+        setCardsLoading(false);
       } finally {
         setLoading(false);
       }
@@ -64,10 +76,35 @@ const BoardScene: React.FC = () => {
     }
   }, [refinementId, refinement.teams, user.id, refinement.numOfTeams]);
 
-  const handleChangeBoard = () => {
+  const handleChangeBoard = async () => {
     if (!refinementId || !teamName) return;
+
+    setIsChangingTeam(true);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     const nextTeam = getNextTeam(teamName, availableTeams);
     navigate(`/board/${refinementId}/team/${nextTeam}`);
+  };
+
+  const handleCreateCard = async () => {
+    if (!newCardText.trim() || isCreatingCard) return;
+
+    setIsCreatingCard(true);
+
+    try {
+      await createCardInFirestore(
+        newCardText,
+        refinementId,
+        user,
+        teamName,
+        setNewCardText
+      );
+    } catch (error) {
+      console.error('Error creating card:', error);
+    } finally {
+      setIsCreatingCard(false);
+    }
   };
 
   const handleGoBack = () => {
@@ -78,7 +115,7 @@ const BoardScene: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <LoadingSpinner size="lg" className="mb-4" />
           <p className="text-gray-600">Carregando sessão...</p>
         </div>
       </div>
@@ -90,12 +127,12 @@ const BoardScene: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Sessão não encontrada</h2>
-          <button
+          <Button
             onClick={handleGoBack}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            variant="primary"
           >
             Voltar ao Início
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -107,6 +144,7 @@ const BoardScene: React.FC = () => {
   }
 
   const teamTimerId = returnTimerId(teamName, refinement);
+  const teamCards = cards.filter(card => card.teamName === teamName);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -149,50 +187,72 @@ const BoardScene: React.FC = () => {
               <VariableTextArea
                 text={newCardText}
                 setText={setNewCardText}
-                handleSubmit={() =>
-                  createCardInFirestore(
-                    newCardText,
-                    refinementId,
-                    user,
-                    teamName,
-                    setNewCardText
-                  )
-                }
+                handleSubmit={handleCreateCard}
+                disabled={isCreatingCard}
+                placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
               />
+
+              {/* Loading para criar card */}
+              {isCreatingCard && (
+                <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
+                  <LoadingSpinner size="sm" />
+                  <span>Criando sugestão...</span>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
-              <button
+              <Button
                 onClick={handleChangeBoard}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center gap-2"
+                loading={isChangingTeam}
+                variant="primary"
+                className="flex items-center gap-2"
                 title="Mudar para outro time"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 Mudar Time
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={handleGoBack}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                variant="secondary"
               >
                 Sair
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Cards Grid */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Sugestões do Time {teamName}
-            <span className="text-sm font-normal text-gray-500 ml-2">
-              ({cards.filter(card => card.teamName === teamName).length} sugestões)
-            </span>
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-gray-800">
+              Sugestões do Time {teamName}
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({teamCards.length} sugestões)
+              </span>
+            </h3>
 
-          {cards.filter(card => card.teamName === teamName).length === 0 ? (
+            {/* Loading indicator para cards */}
+            {cardsLoading && (
+              <div className="flex items-center gap-2 text-gray-500 text-sm">
+                <LoadingSpinner size="sm" />
+                <span>Carregando...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Estado de loading dos cards */}
+          {cardsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
+            </div>
+          ) : teamCards.length === 0 ? (
+            // Estado vazio
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,28 +263,27 @@ const BoardScene: React.FC = () => {
               <p className="text-gray-400 text-sm">Seja o primeiro a adicionar uma sugestão!</p>
             </div>
           ) : (
+            // Cards carregados
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cards
-                .filter(card => card.teamName === teamName)
-                .map(card => (
-                  <BoardCard
-                    key={card.id}
-                    card={card}
-                    user={user}
-                    handleRate={(cardId, rating) => {
-                      updateRatingToCardInFirestore(cardId, rating, user);
-                    }}
-                    onEdit={async (cardId, newText) => {
-                      await updateCardInFirestore(cardId, newText);
-                    }}
-                    onComment={async (cardId, commentText) => {
-                      await addCommentToCardInFirestore(cardId, commentText, user);
-                    }}
-                    onCommentEdit={async (cardId, commentId, commentText) => {
-                      await updateCommentToCardInFirestore(cardId, commentId, commentText);
-                    }}
-                  />
-                ))}
+              {teamCards.map(card => (
+                <BoardCard
+                  key={card.id}
+                  card={card}
+                  user={user}
+                  handleRate={(cardId, rating) => {
+                    updateRatingToCardInFirestore(cardId, rating, user);
+                  }}
+                  onEdit={async (cardId, newText) => {
+                    await updateCardInFirestore(cardId, newText);
+                  }}
+                  onComment={async (cardId, commentText) => {
+                    await addCommentToCardInFirestore(cardId, commentText, user);
+                  }}
+                  onCommentEdit={async (cardId, commentId, commentText) => {
+                    await updateCommentToCardInFirestore(cardId, commentId, commentText);
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>

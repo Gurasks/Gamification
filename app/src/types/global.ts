@@ -24,6 +24,13 @@ export interface Refinement {
   teamTimers?: Record<string, string>;
 }
 
+export interface RefinementCreationData {
+  name: string;
+  description?: string;
+  password?: string | null;
+  requiresPassword?: boolean;
+}
+
 export interface Comment {
   id: string;
   text: string;

@@ -1,79 +1,43 @@
 import { useState } from "react";
-import { useUser } from "../components/UserContext";
 import { useNavigate, useParams } from "react-router-dom";
-import { resolveUUID, updateDocumentListMembers, getRefinement } from "../services/firestoreService";
-import { handleReponse } from "../services/homeServices";
+import { Button } from "../components/Button";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useRefinementJoin } from "../hooks/useRefinimentJoin";
 
 const JoinScene: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
-  const { user } = useUser();
   const [joinCode, setJoinCode] = useState(sessionCode || '');
   const [sessionPassword, setSessionPassword] = useState('');
-  const [isJoining, setIsJoining] = useState(false);
-  const [requiresPassword, setRequiresPassword] = useState(false);
-  const [refinementData, setRefinementData] = useState<any>(null);
-  const [error, setError] = useState('');
+
+  const {
+    isJoining,
+    error,
+    requiresPassword,
+    refinementData,
+    joinSession,
+    resetPasswordState,
+    resetError,
+  } = useRefinementJoin();
+
   const navigate = useNavigate();
 
   const handleJoinSession = async () => {
-    if (!joinCode.trim()) return;
+    const password = requiresPassword ? sessionPassword : undefined;
+    const result = await joinSession(joinCode, password);
 
-    setIsJoining(true);
-    setError('');
-
-    try {
-      const refinementId = await resolveUUID(joinCode.trim());
-
-      if (refinementId) {
-        // Buscar dados da sessão diretamente usando getRefinement
-        const session = await getRefinement(refinementId);
-
-        if (session) {
-          setRefinementData(session); // Atualiza o estado para uso futuro
-
-          if (session.requiresPassword && !sessionPassword) {
-            // Sessão requer senha mas nenhuma foi fornecida ainda
-            setRequiresPassword(true);
-            setIsJoining(false);
-            return;
-          }
-
-          if (session.requiresPassword && sessionPassword !== session.password) {
-            setError('Senha incorreta');
-            setIsJoining(false);
-            return;
-          }
-
-          // Senha correta ou sessão não requer senha
-          const response = await updateDocumentListMembers(refinementId, user);
-          const redirection = handleReponse(response);
-          if (redirection) {
-            navigate(`/team-selection/${refinementId}`);
-          } else {
-            setError('Não foi possível entrar na sessão');
-            setIsJoining(false);
-          }
-        } else {
-          setError('Sessão não encontrada');
-          setIsJoining(false);
-        }
-      } else {
-        setError('Código inválido');
-        setIsJoining(false);
-      }
-    } catch (error) {
-      console.error('Erro ao entrar na sessão:', error);
-      setError('Erro ao entrar na sessão');
-      setIsJoining(false);
+    if (result?.success) {
+      navigate(`/team-selection/${result.refinementId}`);
+    } else if (result?.requiresPassword) {
+      // Mantém o estado de requiresPassword true e aguarda a senha
+      return;
     }
   };
 
   const handleGoBack = () => {
     if (requiresPassword) {
       // Volta para a tela de código
-      setRequiresPassword(false);
+      resetPasswordState();
       setSessionPassword('');
-      setError('');
     } else {
       navigate('/');
     }
@@ -81,6 +45,23 @@ const JoinScene: React.FC = () => {
 
   const handleQuickJoin = (code: string) => {
     setJoinCode(code);
+    resetError();
+  };
+
+  const handleInputChange = (value: string) => {
+    setJoinCode(value);
+    resetError();
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setSessionPassword(value);
+    resetError();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleJoinSession();
+    }
   };
 
   return (
@@ -136,10 +117,11 @@ const JoinScene: React.FC = () => {
                   id="joinCode"
                   type="text"
                   placeholder="Ex: ABC123"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleJoinSession()}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isJoining}
                 />
               </div>
             ) : (
@@ -152,62 +134,75 @@ const JoinScene: React.FC = () => {
                   id="sessionPassword"
                   type="password"
                   placeholder="Digite a senha da sessão"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   value={sessionPassword}
-                  onChange={(e) => setSessionPassword(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleJoinSession()}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isJoining}
                 />
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm animate-fade-in">
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  {error}
+                </div>
+              </div>
+            )}
+
+            {/* Loading Indicator durante o processo */}
+            {isJoining && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-600 px-4 py-3 rounded-lg text-sm">
+                <div className="flex items-center">
+                  <LoadingSpinner size="sm" color="blue" className="mr-2" />
+                  {requiresPassword ? 'Verificando senha...' : 'Entrando na sessão...'}
+                </div>
               </div>
             )}
 
             {/* Action Buttons */}
             <div className="flex space-x-3 pt-2">
-              <button
+              <Button
                 onClick={handleGoBack}
                 disabled={isJoining}
-                className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="secondary"
+                className="flex-1"
               >
                 {requiresPassword ? 'Voltar ao Código' : 'Voltar'}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleJoinSession}
                 disabled={
                   !joinCode.trim() ||
                   (requiresPassword && !sessionPassword.trim()) ||
                   isJoining
                 }
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!joinCode.trim() ||
-                  (requiresPassword && !sessionPassword.trim()) ||
-                  isJoining
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : requiresPassword
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white transform hover:scale-105'
-                    : 'bg-green-500 hover:bg-green-600 text-white transform hover:scale-105'
-                  }`}
+                loading={isJoining}
+                variant={requiresPassword ? "primary" : "primary"}
+                className={`flex-1 ${requiresPassword ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'}`}
               >
-                {isJoining ? 'Entrando...' : requiresPassword ? 'Verificar Senha' : 'Participar'}
-              </button>
+                {requiresPassword ? 'Verificar Senha' : 'Participar'}
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Quick Join Options (só mostra na tela de código) */}
-        {!requiresPassword && (
-          <div className="text-center">
+        {!requiresPassword && !isJoining && (
+          <div className="text-center animate-fade-in">
             <p className="text-gray-500 text-sm mb-3">Sessões recentes:</p>
             <div className="flex justify-center space-x-2">
               {['TEAM123', 'PROJ456', 'RETRO789'].map((code) => (
                 <button
                   key={code}
                   onClick={() => handleQuickJoin(code)}
-                  className="px-3 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors duration-200"
+                  disabled={isJoining}
+                  className="px-3 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {code}
                 </button>
@@ -221,6 +216,11 @@ const JoinScene: React.FC = () => {
           <p className="text-gray-500 text-sm">
             * Campo obrigatório
           </p>
+          {isJoining && (
+            <p className="text-blue-500 text-sm mt-2 animate-pulse">
+              Isso pode levar alguns segundos...
+            </p>
+          )}
         </div>
       </div>
     </div>
