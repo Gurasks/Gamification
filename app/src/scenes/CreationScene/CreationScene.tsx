@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useRefinementCreation } from '../hooks/useRefinementCreation';
+import { useRefinementCreation } from '../../hooks/useRefinementCreation';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/Button';
+import { Button } from '../../components/Button';
 
 const CreationScene: React.FC = () => {
   const {
@@ -38,7 +38,6 @@ const CreationScene: React.FC = () => {
 
   const handlePasswordChange = (value: string) => {
     updateFormData('password', value);
-    // Limpa o erro quando o usuário começar a digitar novamente
     if (passwordError) {
       setPasswordError('');
     }
@@ -46,7 +45,6 @@ const CreationScene: React.FC = () => {
 
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
-    // Limpa o erro quando o usuário começar a digitar novamente
     if (passwordError) {
       setPasswordError('');
     }
@@ -158,6 +156,7 @@ const CreationScene: React.FC = () => {
                 <button
                   type="button"
                   onClick={togglePasswordProtection}
+                  data-testid="password-protection-switch"
                   disabled={isCreating}
                   className={`relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${formData.requiresPassword ? 'bg-blue-500' : 'bg-gray-300'
                     }`}
