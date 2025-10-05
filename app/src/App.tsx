@@ -9,7 +9,7 @@ import HomeScene from './scenes/HomeScene';
 import { Toaster } from 'react-hot-toast';
 import Leaderboard from './scenes/Leaderboard';
 import CreationScene from './scenes/CreationScene/CreationScene';
-import JoinScene from './scenes/JoinScene';
+import JoinScene from './scenes/JoinScene/JoinScene';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { useGlobalLoading } from './components/LoadingContext';
 

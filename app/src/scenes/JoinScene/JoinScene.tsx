@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "../components/Button";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { useRefinementJoin } from "../hooks/useRefinimentJoin";
+import { Button } from "../../components/Button";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { useRefinementJoin } from "../../hooks/useRefinimentJoin";
 
 const JoinScene: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
