@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import OwnerTeamAssignment from '../components/OwnerTeamAssignment';
-import SelectionMethodChooser from '../components/SelectionMethodChooser';
-import TeamSelection from '../components/TeamSelection';
-import { useUser } from '../components/UserContext';
-import { createUnsubscribeMembers } from '../hooks/firestoreUnsubscriber';
-import type { PersistentUser, Refinement } from '../types/global';
-import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../services/firestoreService';
-import ShareButton from '../components/ShareButton';
-import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
-import ExitConfirmationModal from '../components/ExitConfirmationModal';
+import OwnerTeamAssignment from '../../components/OwnerTeamAssignment';
+import SelectionMethodChooser from '../../components/SelectionMethodChooser';
+import TeamSelection from '../../components/TeamSelection';
+import { useUser } from '../../components/UserContext';
+import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
+import type { PersistentUser, Refinement } from '../../types/global';
+import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../../services/firestoreService';
+import ShareButton from '../../components/ShareButton';
+import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
+import ExitConfirmationModal from '../../components/ExitConfirmationModal';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();

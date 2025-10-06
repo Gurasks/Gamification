@@ -4,7 +4,7 @@ import NameEntryScene from './scenes/NameEntryScene';
 import { UserProvider } from './components/UserContext';
 import { LoadingProvider } from './components/LoadingContext';
 import BoardScene from './scenes/BoardScene';
-import TeamSelectionScene from './scenes/TeamSelectionScene';
+import TeamSelectionScene from './scenes/TeamSelectionScene/TeamSelectionScene';
 import HomeScene from './scenes/HomeScene';
 import { Toaster } from 'react-hot-toast';
 import Leaderboard from './scenes/Leaderboard';

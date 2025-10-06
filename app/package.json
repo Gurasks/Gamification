@@ -11,6 +11,7 @@
     "test": "jest",
     "test:creation": "jest src/scenes/CreationScene/CreationScene.test.tsx",
     "test:join": "jest src/scenes/JoinScene/JoinScene.test.tsx",
+    "test:team-selection": "jest src/scenes/TeamSelectionScene/TeamSelectionScene.test.tsx",
     "test:watch": "jest --watch",
     "test:debug": "jest --verbose --no-cache"
   },
