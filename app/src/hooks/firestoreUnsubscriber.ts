@@ -2,7 +2,7 @@ import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import type { Card, PersistentUser, Refinement } from "../types/global";
-import { getAvailableTeams } from "../services/teamSelectionService";
+import { getAvailableTeams } from "../services/teamSelectionServices";
 
 export const createUnsubscribeRefinement = (
   refinementId: string,

@@ -4,7 +4,7 @@ import { act } from 'react';
 import TeamSelectionScene from './TeamSelectionScene';
 import { useUser } from '../../components/UserContext';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
-import { startRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../../services/firestoreService';
+import { startRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../../services/firestoreServices';
 
 // Mock das dependências
 jest.mock('../../components/UserContext', () => ({
@@ -15,7 +15,7 @@ jest.mock('../../hooks/firestoreUnsubscriber', () => ({
   createUnsubscribeMembers: jest.fn(),
 }));
 
-jest.mock('../../services/firestoreService', () => ({
+jest.mock('../../services/firestoreServices', () => ({
   startRefinementInFirebase: jest.fn(),
   updateNumOfTeamsToRefinementInFirebase: jest.fn(),
   updateSelectionMethodToRefinementInFirebase: jest.fn(),
@@ -30,13 +30,13 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock dos componentes filhos
-jest.mock('../../components/OwnerTeamAssignment', () => {
+jest.mock('./components/OwnerTeamAssignment', () => {
   return function MockOwnerTeamAssignment() {
     return <div data-testid="owner-team-assignment">Owner Team Assignment</div>;
   };
 });
 
-jest.mock('../../components/SelectionMethodChooser', () => {
+jest.mock('./components/SelectionMethodChooser', () => {
   return function MockSelectionMethodChooser({ onMethodChange }: { onMethodChange: (method: string) => void }) {
     return (
       <div data-testid="selection-method-chooser">
@@ -47,7 +47,7 @@ jest.mock('../../components/SelectionMethodChooser', () => {
   };
 });
 
-jest.mock('../../components/TeamSelection', () => {
+jest.mock('./components/TeamSelection', () => {
   return function MockTeamSelection() {
     return <div data-testid="team-selection">Team Selection Component</div>;
   };

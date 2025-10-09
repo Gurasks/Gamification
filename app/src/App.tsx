@@ -7,7 +7,7 @@ import BoardScene from './scenes/BoardScene';
 import TeamSelectionScene from './scenes/TeamSelectionScene/TeamSelectionScene';
 import HomeScene from './scenes/HomeScene';
 import { Toaster } from 'react-hot-toast';
-import Leaderboard from './scenes/Leaderboard';
+import LeaderboardScene from './scenes/LeaderboardScene/LeaderboardScene';
 import CreationScene from './scenes/CreationScene/CreationScene';
 import JoinScene from './scenes/JoinScene/JoinScene';
 import { LoadingOverlay } from './components/LoadingOverlay';
@@ -28,7 +28,7 @@ const AppContent: React.FC = () => {
           <Route path="/board/:refinementId/team/:teamName" element={<BoardScene />} />
           <Route path="/team-selection/:refinementId" element={<TeamSelectionScene />} />
           <Route path="/name-entry" element={<NameEntryScene />} />
-          <Route path="/leaderboard/:refinementId" element={<Leaderboard />} />
+          <Route path="/leaderboard/:refinementId" element={<LeaderboardScene />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

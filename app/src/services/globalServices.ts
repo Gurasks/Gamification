@@ -65,3 +65,12 @@ export const getShortenedUUID = (uuid: string): string => {
   const base64 = toBase64Url(bytes);
   return base64.slice(0, 8); // take first 8 chars
 };
+
+export const calculateAverageRating = (
+  ratings: Record<string, number>
+): number => {
+  const values = Object.values(ratings);
+  return values.length > 0
+    ? values.reduce((a, b) => a + b, 0) / values.length
+    : 0;
+};

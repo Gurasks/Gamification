@@ -26,9 +26,9 @@ import type {
 } from "../types/global";
 import type { UserStats } from "../types/leaderboard";
 import type { SelectionMethod } from "../types/teamSelection";
-import { calculateAverageRating } from "./boardService";
+import { calculateAverageRating } from "./globalServices";
 import { getShortenedUUID } from "./globalServices";
-import { getAvailableTeams } from "./teamSelectionService";
+import { getAvailableTeams } from "./teamSelectionServices";
 
 const refinementCache = new Map<string, Refinement>();
 
@@ -242,6 +242,31 @@ export const updateCardInFirestore = async (
   } catch (error) {
     console.error("Error updating card:", error);
     throw error;
+  }
+};
+
+export const getCardsByRefinementId = async (
+  refinementId: string
+): Promise<Card[]> => {
+  try {
+    const cardsQuery = query(
+      collection(db, "cards"),
+      where("refinementId", "==", refinementId)
+    );
+    const cardsSnapshot = await getDocs(cardsQuery);
+
+    const cards: Card[] = [];
+    cardsSnapshot.forEach((doc) => {
+      cards.push({
+        id: doc.id,
+        ...doc.data(),
+      } as Card);
+    });
+
+    return cards;
+  } catch (error) {
+    console.error("Error fetching cards:", error);
+    return [];
   }
 };
 

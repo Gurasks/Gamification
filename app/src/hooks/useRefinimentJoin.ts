@@ -4,7 +4,7 @@ import {
   resolveUUID,
   updateDocumentListMembers,
   getRefinement,
-} from "../services/firestoreService";
+} from "../services/firestoreServices";
 import { handleReponse } from "../services/homeServices";
 import toast from "react-hot-toast";
 import { useGlobalLoading } from "../components/LoadingContext";
