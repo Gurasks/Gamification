@@ -57,7 +57,7 @@ const NameEntryScene: React.FC = () => {
                 placeholder="Ex: João Silva"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName((e.target as HTMLInputElement).value)}
                 required
                 autoFocus
                 onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
@@ -69,8 +69,8 @@ const NameEntryScene: React.FC = () => {
               type="submit"
               disabled={!name.trim()}
               className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!name.trim()
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
                 }`}
             >
               Continuar

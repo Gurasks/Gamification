@@ -117,7 +117,7 @@ const CreationScene: React.FC = () => {
                 placeholder="Ex: Sprint 15 - Refinamento de Histórias"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={formData.name}
-                onChange={(e) => updateFormData('name', e.target.value)}
+                onChange={(e) => updateFormData('name', (e.target as HTMLInputElement).value)}
                 maxLength={100}
                 disabled={isCreating}
               />
@@ -137,7 +137,7 @@ const CreationScene: React.FC = () => {
                 rows={4}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 value={formData.description}
-                onChange={(e) => updateFormData('description', e.target.value)}
+                onChange={(e) => updateFormData('description', (e.target as HTMLTextAreaElement).value)}
                 maxLength={500}
                 disabled={isCreating}
               />
@@ -182,7 +182,7 @@ const CreationScene: React.FC = () => {
                         placeholder="Digite uma senha para a sessão"
                         className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
                         value={formData.password}
-                        onChange={(e) => handlePasswordChange(e.target.value)}
+                        onChange={(e) => handlePasswordChange((e.target as HTMLInputElement).value)}
                         minLength={4}
                         disabled={isCreating}
                       />
@@ -221,7 +221,7 @@ const CreationScene: React.FC = () => {
                         placeholder="Digite a senha novamente"
                         className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
                         value={confirmPassword}
-                        onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                        onChange={(e) => handleConfirmPasswordChange((e.target as HTMLInputElement).value)}
                         minLength={4}
                         disabled={isCreating}
                       />

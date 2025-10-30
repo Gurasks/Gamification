@@ -32,7 +32,7 @@ export default function VariableTextArea({
         ref={textareaRef}
         rows={1}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => setText((e.target as HTMLTextAreaElement).value)}
         className="flex-1 p-2 text-sm border rounded resize-none overflow-auto"
         disabled={disabled}
         placeholder={placeholder || "Adicione um comentário..."}

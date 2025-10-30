@@ -89,7 +89,7 @@
     ],
     "coverageDirectory": "coverage",
     "coverageReporters": ["lcov", "text-summary", "html"],
-    "moduleNameMap": {
+    "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1",
       "\\.(css|less|scss|sass)$": "identity-obj-proxy",
       "^@/(.*)$": "<rootDir>/src/$1"

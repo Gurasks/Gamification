@@ -52,7 +52,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
         <div className="mb-3">
           <textarea
             value={editText}
-            onChange={(e) => setEditText(e.target.value)}
+            onChange={(e) => setEditText((e.target as HTMLTextAreaElement).value)}
             className="w-full p-2 border rounded"
             autoFocus
           />

@@ -1,11 +1,27 @@
-# 🎯 RetroGaming - Plataforma de Refinamento com Gamificação
+# 🎯 Gamification - Sistema Gamificado de Levantamento de Requisitos (SGLR)
 
 Uma plataforma colaborativa inspirada no EasyRetro com elementos de gamificação para tornar as sessões de refinamento mais engajantes e produtivas.
+---
 
-![React](https://img.shields.io/badge/React-19.1.0-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)
-![Firebase](https://img.shields.io/badge/Firebase-11.7.3-orange)
-![Tailwind](https://img.shields.io/badge/Tailwind-4.1.7-cyan)
+### 🛠️ Tecnologias e Integrações
+
+![React](https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-11.7.3-FFCA28?logo=firebase&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.7-06B6D4?logo=tailwindcss&logoColor=white)
+<!-- ![CI/CD](https://github.com/gurasks/Gamification/workflows/SonarCloud%20Analysis/badge.svg) -->
+
+---
+
+<!-- ### 🔍 Qualidade e Análise de Código
+
+![SonarCloud Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=alert_status)
+![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=coverage)
+![SonarCloud Maintainability](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=sqale_rating)
+![SonarCloud Reliability](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=reliability_rating)
+![SonarCloud Security](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=security_rating)
+ -->
+---
 
 ## ✨ Características Principais
 
