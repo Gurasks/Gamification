@@ -31,21 +31,20 @@ const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>);
 };
 
-describe("CreationScene", () => {
-  // Mock values padrão
-  const defaultMockValues = {
-    formData: {
-      name: "",
-      description: "",
-      password: "",
-      requiresPassword: false,
-    },
-    isCreating: false,
-    handleCreateRefinement: jest.fn(),
-    updateFormData: jest.fn(),
-    validateForm: jest.fn(() => []),
-  };
+const defaultMockValues = {
+  formData: {
+    name: "",
+    description: "",
+    password: "",
+    requiresPassword: false,
+  },
+  isCreating: false,
+  handleCreateRefinement: jest.fn(),
+  updateFormData: jest.fn(),
+  validateForm: jest.fn(() => []),
+};
 
+describe("CreationScene", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseRefinementCreation.mockReturnValue(defaultMockValues);
@@ -190,5 +189,59 @@ describe("CreationScene", () => {
     await user.click(backButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/");
+  });
+});
+
+describe("CreationScene - Validação de Senha", () => {
+  // Teste 01: Validação de senha
+  it("should show error when passwords do not match", async () => {
+    const user = userEvent.setup();
+    const mockUpdateFormData = jest.fn();
+
+    mockUseRefinementCreation.mockReturnValue({
+      ...defaultMockValues,
+      formData: {
+        name: "Test Session",
+        description: "Test Description",
+        password: "1234",
+        requiresPassword: true,
+      },
+      updateFormData: mockUpdateFormData,
+    });
+
+    renderWithRouter(<CreationScene />);
+
+    // Preenche senha de confirmação diferente
+    const confirmPasswordInput = screen.getByLabelText(/confirmar senha \*/i);
+    await user.type(confirmPasswordInput, "12345");
+
+    const createButton = screen.getByRole("button", { name: /criar sessão/i });
+    await user.click(createButton);
+
+    expect(screen.getByText(/as senhas não coincidem/i)).toBeInTheDocument();
+  });
+
+  // Teste 02: Validação de senha curta
+  it("should show error when password is too short", async () => {
+    const user = userEvent.setup();
+    const mockUpdateFormData = jest.fn();
+
+    mockUseRefinementCreation.mockReturnValue({
+      ...defaultMockValues,
+      formData: {
+        name: "Test Session",
+        description: "Test Description",
+        password: "123",
+        requiresPassword: true,
+      },
+      updateFormData: mockUpdateFormData,
+    });
+
+    renderWithRouter(<CreationScene />);
+
+    const createButton = screen.getByRole("button", { name: /criar sessão/i });
+    await user.click(createButton);
+
+    expect(screen.getByText(/a senha deve ter pelo menos 4 caracteres/i)).toBeInTheDocument();
   });
 });

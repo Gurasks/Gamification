@@ -38,6 +38,14 @@ export const createRefinementInFirestore = async (
   user: PersistentUser
 ): Promise<string> => {
   try {
+    if (!refinementData.name?.trim()) {
+      throw new Error("Nome da sessão é obrigatório");
+    }
+
+    if (refinementData.requiresPassword && !refinementData.password) {
+      throw new Error("Senha é obrigatória quando a proteção está ativada");
+    }
+
     const newRefinement = {
       id: refinementId,
       title: refinementData.name,

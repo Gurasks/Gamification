@@ -13,7 +13,12 @@
     "test:join": "jest src/scenes/JoinScene/JoinScene.test.tsx",
     "test:team-selection": "jest src/scenes/TeamSelectionScene/TeamSelectionScene.test.tsx",
     "test:watch": "jest --watch",
-    "test:debug": "jest --verbose --no-cache"
+    "test:debug": "jest --verbose --no-cache",
+    "sonar": "sonar-scanner",
+    "test:coverage": "jest --coverage --coverageReporters=lcov --coverageReporters=text-summary",
+    "lint:report": "eslint . --format json --output-file eslint-report.json",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run test"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
@@ -50,7 +55,9 @@
     "ts-jest": "^29.4.4",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "sonarqube-scanner": "^3.0.1",
+    "identity-obj-proxy": "^3.0.0"
   },
   "jest": {
     "preset": "ts-jest",
@@ -70,10 +77,22 @@
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
     "moduleDirectories": ["node_modules", "src"],
     "roots": ["<rootDir>/src"],
-    "extensionsToTreatAsEsm": [".ts", ".tsx"],
-    "moduleNameMapping": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/main.tsx",
+      "!src/vite-env.d.ts",
+      "!src/types/**",
+      "!src/config/**",
+      "!src/**/*.test.{ts,tsx}",
+      "!src/**/*.spec.{ts,tsx}"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["lcov", "text-summary", "html"],
+    "moduleNameMap": {
       "^(\\.{1,2}/.*)\\.js$": "$1",
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "^@/(.*)$": "<rootDir>/src/$1"
     }
   }
 }
