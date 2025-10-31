@@ -79,3 +79,42 @@ Uma plataforma colaborativa inspirada no EasyRetro com elementos de gamificaçã
     ```bash
     npm run dev
     ```
+
+### 📊 Análise de Qualidade
+
+```bash
+# Testes com cobertura
+npm run test:coverage
+
+# Testes em modo watch
+npm run test:watch
+
+# Verificação de tipos
+npm run type-check
+
+# Linting
+npm run lint
+
+# Validação completa (types, lint, tests)
+npm run validate
+```
+
+## 🔗 Links Úteis
+
+- [**📊 Dashboard SonarCloud**](https://sonarcloud.io/project/overview?id=Gurasks_Gamification) - Análise detalhada da qualidade do código
+- [**⚡ GitHub Actions**](https://github.com/Gurasks/Gamification/actions) - Pipeline de CI/CD e execuções
+- [**🔥 Firebase Console**](https://console.firebase.google.com/) - Gerenciamento do backend e banco de dados
+- [**🐛 Reportar Bug**](https://github.com/Gurasks/Gamification/issues) - Abrir uma issue no GitHub
+- [**💡 Sugerir Melhoria**](https://github.com/Gurasks/Gamification/issues) - Propor novas funcionalidades
+
+## 📈 Status do Projeto
+
+| Métrica | Status | Dashboard |
+|---------|--------|-----------|
+| **Pipeline CI/CD** | [![CI/CD](https://github.com/Gurasks/Gamification/workflows/SonarCloud%20Analysis/badge.svg)](https://github.com/Gurasks/Gamification/actions) | [Ver Actions](https://github.com/Gurasks/Gamification/actions) |
+| **Quality Gate** | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver SonarCloud](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) |
+| **Cobertura de Testes** | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver Cobertura](https://sonarcloud.io/component_measures?id=Gurasks_Gamification&metric=coverage) |
+| **Bugs** | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver Bugs](https://sonarcloud.io/project/issues?id=Gurasks_Gamification&resolved=false&types=BUG) |
+| **Vulnerabilidades** | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver Vulnerabilidades](https://sonarcloud.io/project/issues?id=Gurasks_Gamification&resolved=false&types=VULNERABILITY) |
+| **Dívida Técnica** | [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver Dívida](https://sonarcloud.io/component_measures?id=Gurasks_Gamification&metric=sqale_index) |
+| **Code Smells** | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Gurasks_Gamification&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) | [Ver Code Smells](https://sonarcloud.io/project/issues?id=Gurasks_Gamification&resolved=false&types=CODE_SMELL) |
