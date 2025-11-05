@@ -1,8 +1,9 @@
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
-import type { Card, PersistentUser, Refinement } from "../types/global";
+import type { Card, Refinement, UserData } from "../types/global";
 import { getAvailableTeams } from "../services/teamSelectionServices";
+import { User } from "firebase/auth";
 
 export const createUnsubscribeRefinement = (
   refinementId: string,
@@ -48,13 +49,13 @@ export const createUnsubscribeCards = (
 
 export const createUnsubscribeMembers = (
   refinementId: string,
-  user: PersistentUser,
+  user: User,
   setRefinement: (arg0: Refinement) => void,
   setAvailableTeams: (arg0: string[]) => void,
   setIsOwner: (arg0: boolean) => void,
   setNumOfTeams: (arg0: number) => void,
   setOwner: (arg0: string) => void,
-  setMembers: (arg0: PersistentUser[]) => void,
+  setMembers: (arg0: UserData[]) => void,
   navigate: ReturnType<typeof useNavigate>
 ) => {
   const refinementQuery = query(
@@ -68,7 +69,7 @@ export const createUnsubscribeMembers = (
     })) as Refinement[];
     if (refinementDataArray.length === 1) {
       const refinementData = refinementDataArray[0];
-      const teamName = refinementData.teams?.[user.id];
+      const teamName = refinementData.teams?.[user.uid];
       if (refinementData.hasStarted) {
         if (teamName) {
           navigate(`/board/${refinementId}/team/${teamName}`);
@@ -77,8 +78,8 @@ export const createUnsubscribeMembers = (
         }
       }
       setAvailableTeams(getAvailableTeams(refinementData.numOfTeams));
-      setIsOwner(refinementData.owner === user.id);
-      setMembers(refinementData.members as unknown as PersistentUser[]);
+      setIsOwner(refinementData.owner === user.uid);
+      setMembers(refinementData.members);
       setNumOfTeams(refinementData.numOfTeams);
       setOwner(refinementData.owner);
       setRefinement(refinementData);

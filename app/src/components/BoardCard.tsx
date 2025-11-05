@@ -1,12 +1,13 @@
 import { Check, MessageSquareMore, PencilLine, X } from 'lucide-react';
 import { useState } from 'react';
-import type { Card, PersistentUser } from "../types/global";
+import type { Card } from "../types/global";
 import StarRating from "./StarRating";
 import VariableTextArea from "./VariableTextArea";
+import { User } from 'firebase/auth';
 
 interface BoardCardProps {
   card: Card;
-  user: PersistentUser;
+  user: User;
   handleRate: (cardId: string, rating: number) => void;
   onEdit: (cardId: string, newText: string) => Promise<void>;
   onComment: (cardId: string, commentText: string) => Promise<void>;
@@ -76,7 +77,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
       ) : (
         <div className="flex justify-between items-start">
           <h3 className="text-base font-semibold text-gray-800 mb-2">{card.text}</h3>
-          {user.id === card.createdById && (
+          {user.uid === card.createdById && (
             <button
               onClick={() => setIsEditing(true)}
               className="ml-4 text-xs text-indigo-500 hover:text-indigo-700"
@@ -125,7 +126,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                   }
                   <p className="text-xs text-gray-400">- {comment.createdBy}</p>
                 </div>
-                {user.id === comment.createdById && (
+                {user.uid === comment.createdById && (
                   <button
                     onClick={() => {
                       setCommentIdToEdit(comment.id)
@@ -155,7 +156,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
         <StarRating
           ratings={card.ratings || {}}
           onRate={(rating) => handleRate(card.id, rating)}
-          userRating={card.ratings?.[user.id]}
+          userRating={card.ratings?.[user.uid]}
         />
         <button
           onClick={() => setShowComments(!showComments)}

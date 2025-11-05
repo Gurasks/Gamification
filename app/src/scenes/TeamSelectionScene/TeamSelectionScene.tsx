@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUser } from '../../components/UserContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
-import type { PersistentUser, Refinement } from '../../types/global';
-import { startRefinementInFirebase, updateNumOfTeamsToRefinementInFirebase, updateSelectionMethodToRefinementInFirebase, removeUserFromRefinement, deleteRefinement } from '../../services/firestoreServices';
+import type { Refinement, UserData } from '../../types/global';
 import ShareButton from '../../components/ShareButton';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
 import ExitConfirmationModal from '../../components/ExitConfirmationModal';
 import SelectionMethodChooser from './components/SelectionMethodChooser';
 import OwnerTeamAssignment from './components/OwnerTeamAssignment';
 import TeamSelection from './components/TeamSelection';
+import { User } from 'firebase/auth';
+import {
+  deleteRefinement,
+  removeUserFromRefinement,
+  startRefinementInFirebase,
+  updateNumOfTeamsToRefinementInFirebase,
+  updateSelectionMethodToRefinementInFirebase
+} from '@/services/firestore/firestoreServices';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
-  const { user } = useUser();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>(false);
-  const [members, setMembers] = useState<PersistentUser[]>([] as PersistentUser[]);
+  const [members, setMembers] = useState<UserData[]>([] as UserData[]);
   const [numOfTeams, setNumOfTeams] = useState<number>(2);
   const [owner, setOwner] = useState<string>('');
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
@@ -26,7 +33,7 @@ const TeamSelectionScene: React.FC = () => {
   const [showExitModal, setShowExitModal] = useState(false);
 
   useEffect(() => {
-    if (!refinementId) return;
+    if (!refinementId || !user) return;
     const unsubscribeMembers = createUnsubscribeMembers(
       refinementId,
       user,
@@ -55,7 +62,7 @@ const TeamSelectionScene: React.FC = () => {
       if (isOwner) {
         await deleteRefinement(refinementId);
       } else {
-        await removeUserFromRefinement(refinementId, user.id);
+        await removeUserFromRefinement(refinementId, user.uid);
       }
 
       setShowExitModal(false);
@@ -72,6 +79,39 @@ const TeamSelectionScene: React.FC = () => {
   const closeExitModal = () => {
     setShowExitModal(false);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Acesso não autorizado</h2>
+          <p className="text-gray-600 mb-4">Você precisa estar logado para acessar esta página.</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Fazer Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!refinementId || !refinement) {
     return (
@@ -190,7 +230,7 @@ const TeamSelectionScene: React.FC = () => {
                   refinementId={refinementId}
                   selectionMethod={refinement.selectionMethod || 'RANDOM'}
                   availableTeams={availableTeams}
-                  currentTeam={user ? refinement.teams?.[user.id] : undefined}
+                  currentTeam={user ? refinement.teams?.[user.uid] : undefined}
                 />
               )}
             </div>
@@ -204,38 +244,38 @@ const TeamSelectionScene: React.FC = () => {
                 <ul className="space-y-2">
                   {members.map(member => (
                     <li
-                      key={member.id}
-                      className={`flex items-center justify-between p-3 rounded-lg transition-colors ${member.id === owner
+                      key={member.uid}
+                      className={`flex items-center justify-between p-3 rounded-lg transition-colors ${member.uid === owner
                         ? 'bg-rose-50 border border-rose-200'
-                        : member.id === user.id
+                        : member.uid === user.uid
                           ? 'bg-teal-50 border border-teal-200'
                           : 'bg-white border border-gray-200'
                         }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <span className={`font-medium ${member.id === owner
+                        <span className={`font-medium ${member.uid === owner
                           ? 'text-rose-700'
-                          : member.id === user.id
+                          : member.uid === user.uid
                             ? 'text-teal-700'
                             : 'text-gray-700'
                           }`}>
-                          {member.name}
+                          {member.displayName || member.email || member.uid}
                         </span>
-                        {member.id === owner && (
+                        {member.uid === owner && (
                           <span className="px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-full font-medium">
                             Organizador
                           </span>
                         )}
-                        {member.id === user.id && (
+                        {member.uid === user.uid && (
                           <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">
                             Você
                           </span>
                         )}
                       </div>
 
-                      {teamParticipants && teamParticipants[member.id] && (
+                      {teamParticipants && teamParticipants[member.uid] && (
                         <span className="px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-full font-semibold">
-                          {teamParticipants[member.id]}
+                          {teamParticipants[member.uid]}
                         </span>
                       )}
                     </li>

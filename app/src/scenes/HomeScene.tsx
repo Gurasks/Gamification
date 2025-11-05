@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
-import _ from 'lodash';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomeScene: React.FC = () => {
-  const { user } = useUser();
+  const { user, anonymousUser, loading } = useAuth();
+  const [checkingProfile, setCheckingProfile] = useState(true);
   const navigate = useNavigate();
 
   const handleCreateScene = () => {
@@ -16,26 +16,48 @@ const HomeScene: React.FC = () => {
   };
 
   useEffect(() => {
-    if (_.isEmpty(user)) {
-      navigate('/name-entry');
-    }
-  }, [])
+    const checkAccess = async () => {
+      if (!loading) {
 
+        const hasValidUser = user && user.uid;
+        const hasValidName = user?.displayName &&
+          user.displayName.length >= 2 &&
+          user.displayName !== 'Convidado';
+
+        if (!hasValidUser || (anonymousUser && !hasValidName)) {
+          navigate('/name-entry');
+        } else {
+          setCheckingProfile(false);
+        }
+      }
+    };
+
+    checkAccess();
+  }, [user, anonymousUser, loading, navigate]);
+
+  if (loading || checkingProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Bem vindo {user.name} ao jogo de refinamento!
+            Bem vindo {user?.displayName} ao jogo de refinamento!
           </h1>
           <p className="text-gray-600">
             Colabore e jogue com sua equipe em tempo real.
           </p>
         </div>
 
-        {/* Main Action Cards */}
         <div className="grid grid-cols-1 gap-6">
           {/* Create Session Card */}
           <div
@@ -80,4 +102,5 @@ const HomeScene: React.FC = () => {
     </div>
   );
 };
+
 export default HomeScene;

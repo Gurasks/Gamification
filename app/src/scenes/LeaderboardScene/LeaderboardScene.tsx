@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { LeaderboardSortTypes, TabType, TeamMetrics, UserContributions, UserStats } from '../../types/leaderboard';
-import { fetchLeaderboardData, getRefinement, getCardsByRefinementId } from '../../services/firestoreServices';
+import { fetchLeaderboardData, getRefinement, getCardsByRefinementId } from '../../services/firestore/firestoreServices';
 import { useParams } from 'react-router-dom';
 import type { Refinement, Card } from '../../types/global';
 import { getAvailableTeams } from '../../services/teamSelectionServices';

@@ -3,9 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from '../components/BoardCard';
 import { CardSkeleton } from '../components/CardSkeleton';
-import { useUser } from '../components/UserContext';
 import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestoreServices';
+import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestore/firestoreServices';
 import type { Card, Refinement } from '../types/global';
 import { getNextTeam } from '../services/boardServices';
 import { getAvailableTeams } from '../services/teamSelectionServices';
@@ -15,10 +14,11 @@ import { returnTimerId } from '../services/globalServices';
 import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Button } from '../components/Button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BoardScene: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [refinement, setRefinement] = useState<Refinement>({} as Refinement);
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [_myTeam, setMyTeam] = useState<string>('');
@@ -32,7 +32,7 @@ const BoardScene: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!refinementId) return;
+    if (!refinementId || !user) return;
 
     let unsubscribeRefinement: (() => void) | undefined;
     let unsubscribeCards: (() => void) | undefined;
@@ -67,14 +67,14 @@ const BoardScene: React.FC = () => {
       if (unsubscribeRefinement) unsubscribeRefinement();
       if (unsubscribeCards) unsubscribeCards();
     };
-  }, [refinementId]);
+  }, [refinementId, user]);
 
   useEffect(() => {
-    if (refinementId && refinement.teams) {
-      setMyTeam(refinement.teams[user.id] || '');
+    if (refinementId && refinement.teams && user) {
+      setMyTeam(refinement.teams[user.uid] || '');
       setAvailableTeams(getAvailableTeams(refinement.numOfTeams || 2));
     }
-  }, [refinementId, refinement.teams, user.id, refinement.numOfTeams]);
+  }, [refinementId, refinement.teams, user, refinement.numOfTeams]);
 
   const handleChangeBoard = async () => {
     if (!refinementId || !teamName) return;
@@ -93,6 +93,12 @@ const BoardScene: React.FC = () => {
     setIsCreatingCard(true);
 
     try {
+      if (!user) {
+        console.error('Usuário não autenticado');
+        navigate('/name-entry');
+        return;
+      }
+
       await createCardInFirestore(
         newCardText,
         refinementId,
@@ -165,7 +171,7 @@ const BoardScene: React.FC = () => {
               )}
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <span>Time: <strong>{teamName}</strong></span>
-                <span>Participante: <strong>{user.name}</strong></span>
+                <span>Participante: <strong>{user.displayName}</strong></span>
               </div>
             </div>
 

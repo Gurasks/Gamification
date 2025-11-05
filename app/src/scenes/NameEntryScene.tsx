@@ -1,18 +1,75 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
-import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from '../components/Button';
+import toast from 'react-hot-toast';
+import { auth } from '@/config/firebase';
 
 const NameEntryScene: React.FC = () => {
   const [name, setName] = useState('');
-  const { setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signInAnonymously, updateUserProfile, user, anonymousUser, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      setUser({ id: uuidv4(), name: name.trim() });
-      navigate('/');
+
+    if (!name.trim()) {
+      toast.error('Por favor, digite seu nome');
+      return;
+    }
+
+    if (name.trim().length < 2) {
+      toast.error('O nome deve ter pelo menos 2 caracteres');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (!user) {
+        // Criar sessão anônima
+        await signInAnonymously(name.trim());
+        toast.success(`Bem-vindo, ${name.trim()}!`);
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+      } else if (anonymousUser) {
+        // Atualizar nome para usuários anônimos
+        await updateUserProfile(name.trim());
+        toast.success(`Nome atualizado para ${name.trim()}!`);
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      const currentAuth = auth.currentUser;
+
+      if (currentAuth?.displayName === name.trim()) {
+        navigate('/');
+      } else {
+        console.warn('DisplayName não foi atualizado corretamente, tentando novamente...');
+        // Forçar recarregamento do usuário
+        await currentAuth?.reload();
+        navigate('/');
+      }
+
+    } catch (error: any) {
+      console.error('Error in name entry:', error);
+      toast.error('Erro ao configurar usuário. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 🔥 REMOVIDA: função handleEnterAsGuest - não permitir mais "Convidado"
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Sessão encerrada');
+    } catch (error) {
+      toast.error('Erro ao sair');
     }
   };
 
@@ -22,10 +79,13 @@ const NameEntryScene: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Bem-vindo ao Refinamento
+            {user ? 'Configurar Nome' : 'Bem-vindo ao Refinamento'}
           </h1>
           <p className="text-gray-600">
-            Identifique-se para participar das sessões de refinamento
+            {user
+              ? 'Escolha como deseja ser identificado'
+              : 'Identifique-se para participar das sessões de refinamento'
+            }
           </p>
         </div>
 
@@ -38,10 +98,13 @@ const NameEntryScene: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Identificação
+              {user ? 'Alterar Nome' : 'Identificação Obrigatória'}
             </h3>
             <p className="text-gray-600 text-sm">
-              Digite seu nome para continuar
+              {user
+                ? 'Escolha um nome para ser identificado nas sessões'
+                : 'Digite seu nome para continuar como convidado'
+              }
             </p>
           </div>
 
@@ -57,32 +120,83 @@ const NameEntryScene: React.FC = () => {
                 placeholder="Ex: João Silva"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={name}
-                onChange={(e) => setName((e.target as HTMLInputElement).value)}
+                onChange={(e) => setName(e.target.value)}
                 required
                 autoFocus
-                onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
+                minLength={2}
+                maxLength={50}
+                disabled={isLoading}
               />
+              <p className="text-xs text-gray-500 mt-1 flex justify-between">
+                <span>Mínimo 2 caracteres</span>
+                <span>{name.length}/50</span>
+              </p>
             </div>
 
-            {/* Action Button */}
-            <button
-              type="submit"
-              disabled={!name.trim()}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!name.trim()
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
-                }`}
-            >
-              Continuar
-            </button>
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <Button
+                type="submit"
+                loading={isLoading}
+                disabled={!name.trim() || name.trim().length < 2}
+                className="w-full"
+              >
+                {user ? 'Salvar Nome' : 'Continuar'}
+              </Button>
+
+              {/* Botão de logout apenas para usuários anônimos */}
+              {anonymousUser && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  Sair e Fazer Login
+                </Button>
+              )}
+            </div>
           </form>
+
+          {/* Login Options - apenas se não tem usuário */}
+          {!user && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-center text-gray-600 text-sm mb-4">
+                Ou faça login com sua conta
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate('/login')}
+                  className="text-sm"
+                >
+                  Fazer Login
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate('/register')}
+                  className="text-sm"
+                >
+                  Cadastrar
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Additional Info */}
         <div className="text-center">
           <p className="text-gray-500 text-sm">
-            * Campo obrigatório
+            * Seu nome será visível para outros participantes da sessão
           </p>
+          {anonymousUser && (
+            <p className="text-yellow-600 text-sm mt-2">
+              ⚠️ Modo anônimo - seus dados serão perdidos ao sair
+            </p>
+          )}
         </div>
       </div>
     </div>

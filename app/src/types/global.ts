@@ -1,15 +1,17 @@
 import type { Timestamp } from "firebase/firestore";
 import type { SelectionMethod } from "./teamSelection";
 
-export interface PersistentUser {
-  id: string;
-  name: string;
+export interface UserData {
+  uid: string;
+  displayName: string;
+  email: string;
+  isAnonymous: boolean;
 }
 
 export interface Refinement {
   id: string;
   createdAt: Timestamp;
-  members: PersistentUser[];
+  members: UserData[];
   numOfTeams: number;
   owner: string;
   selectionMethod: SelectionMethod;

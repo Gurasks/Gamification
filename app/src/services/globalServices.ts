@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import { CheckCircle, XCircle } from "lucide-react";
 import React from "react";
 import type { Refinement } from "../types/global";
+import { User } from "firebase/auth";
 
 export const returnTimerId = (
   teamName: string | undefined,
@@ -73,4 +74,13 @@ export const calculateAverageRating = (
   return values.length > 0
     ? values.reduce((a, b) => a + b, 0) / values.length
     : 0;
+};
+
+export const extractUserData = (user: User) => {
+  return {
+    uid: user.uid,
+    displayName: user.displayName || "Usuário",
+    email: user.email || "",
+    isAnonymous: user.isAnonymous || false,
+  };
 };

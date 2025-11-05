@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
+    "test:login": "jest src/scenes/LoginScene/LoginScene.test.tsx",
+    "test:register": "jest src/scenes/RegisterScene/RegisterScene.test.tsx",
     "test:creation": "jest src/scenes/CreationScene/CreationScene.test.tsx",
     "test:join": "jest src/scenes/JoinScene/JoinScene.test.tsx",
     "test:team-selection": "jest src/scenes/TeamSelectionScene/TeamSelectionScene.test.tsx",

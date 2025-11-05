@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useUser } from "../components/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useGlobalLoading } from "../components/LoadingContext";
+import { useGlobalLoading } from "@/contexts/LoadingContext";
 import {
   createRefinementInFirestore,
   shortenUUID,
-} from "../services/firestoreServices";
+} from "@/services/firestore/firestoreServices";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useRefinementCreation = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { setGlobalLoading, setLoadingMessage } = useGlobalLoading();
 
@@ -44,6 +44,11 @@ export const useRefinementCreation = () => {
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    if (!user) {
+      toast.error("Usuário não autenticado");
       return;
     }
 

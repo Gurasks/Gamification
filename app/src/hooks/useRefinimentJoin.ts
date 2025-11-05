@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useUser } from "../components/UserContext";
 import {
   resolveUUID,
   updateDocumentListMembers,
   getRefinement,
-} from "../services/firestoreServices";
-import { handleReponse } from "../services/homeServices";
+} from "@/services/firestore/firestoreServices";
+import { handleReponse } from "@/services/homeServices";
 import toast from "react-hot-toast";
-import { useGlobalLoading } from "../components/LoadingContext";
+import { useGlobalLoading } from "@/contexts/LoadingContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useRefinementJoin = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { setGlobalLoading, setLoadingMessage } = useGlobalLoading();
 
   const [isJoining, setIsJoining] = useState(false);
@@ -29,6 +29,11 @@ export const useRefinementJoin = () => {
     setGlobalLoading(true);
 
     try {
+      if (!user) {
+        setError("Usuário não autenticado");
+        return null;
+      }
+
       // Fase 1: Resolvendo UUID
       setLoadingMessage("Verificando código da sessão...");
       const refinementId = await resolveUUID(joinCode.trim());

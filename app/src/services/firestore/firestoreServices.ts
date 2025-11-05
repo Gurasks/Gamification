@@ -17,25 +17,55 @@ import _ from "lodash";
 import type { SetStateAction } from "react";
 import type { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../config/firebase";
+import { db } from "../../config/firebase";
 import type {
   Card,
-  PersistentUser,
   Refinement,
   RefinementCreationData,
-} from "../types/global";
-import type { UserStats } from "../types/leaderboard";
-import type { SelectionMethod } from "../types/teamSelection";
-import { calculateAverageRating } from "./globalServices";
-import { getShortenedUUID } from "./globalServices";
-import { getAvailableTeams } from "./teamSelectionServices";
+  UserData,
+} from "../../types/global";
+import type { UserStats } from "../../types/leaderboard";
+import type { SelectionMethod } from "../../types/teamSelection";
+import { calculateAverageRating, extractUserData } from "../globalServices";
+import { getShortenedUUID } from "../globalServices";
+import { getAvailableTeams } from "../teamSelectionServices";
+import { User } from "firebase/auth";
 
 const refinementCache = new Map<string, Refinement>();
+
+const validateAndCleanRefinementData = (refinement: any): any => {
+  // Remove qualquer campo que possa conter objetos complexos
+  const cleaned = { ...refinement };
+
+  // Garante que todos os campos são serializáveis
+  return {
+    id: String(cleaned.id || ""),
+    title: String(cleaned.title || ""),
+    description: String(cleaned.description || ""),
+    password: cleaned.password ? String(cleaned.password) : null,
+    requiresPassword: Boolean(cleaned.requiresPassword),
+    numOfTeams: Number(cleaned.numOfTeams) || 2,
+    selectionMethod: String(cleaned.selectionMethod || "OWNER_CHOOSES"),
+    createdAt: cleaned.createdAt,
+    members: Array.isArray(cleaned.members)
+      ? cleaned.members.map((member: any) => ({
+          uid: String(member.uid || ""),
+          displayName: String(member.displayName || "Usuário"),
+          email: String(member.email || ""),
+          isAnonymous: Boolean(member.isAnonymous),
+        }))
+      : [],
+    owner: String(cleaned.owner || ""),
+    teams: typeof cleaned.teams === "object" ? cleaned.teams : {},
+    hasStarted: Boolean(cleaned.hasStarted),
+    updatedAt: cleaned.updatedAt,
+  };
+};
 
 export const createRefinementInFirestore = async (
   refinementId: string,
   refinementData: RefinementCreationData,
-  user: PersistentUser
+  user: User
 ): Promise<string> => {
   try {
     if (!refinementData.name?.trim()) {
@@ -46,29 +76,31 @@ export const createRefinementInFirestore = async (
       throw new Error("Senha é obrigatória quando a proteção está ativada");
     }
 
+    const userData = extractUserData(user);
+
     const newRefinement = {
       id: refinementId,
-      title: refinementData.name,
-      description: refinementData.description || "",
+      title: refinementData.name.trim(),
+      description: refinementData.description?.trim() || "",
       password: refinementData.password || null,
       requiresPassword: refinementData.requiresPassword || false,
       numOfTeams: 2,
       selectionMethod: "OWNER_CHOOSES",
       createdAt: serverTimestamp(),
-      members: [user],
-      owner: user.id,
+      members: [userData],
+      owner: user.uid,
       teams: {},
       hasStarted: false,
       updatedAt: serverTimestamp(),
-    } as Refinement;
+    };
+
+    const cleanedRefinement = validateAndCleanRefinementData(newRefinement);
 
     const docRef = doc(db, "refinements", refinementId);
-    await setDoc(docRef, newRefinement);
+    await setDoc(docRef, cleanedRefinement);
 
-    console.log("Document written with ID: ", refinementId);
     return refinementId;
   } catch (error) {
-    console.error("Error adding document: ", error);
     if (error instanceof Error) {
       throw new Error(`Failed to create refinement: ${error.message}`);
     } else {
@@ -120,37 +152,43 @@ export const getRefinement = async (
 
 export const updateDocumentListMembers = async (
   refinementId: string,
-  user: PersistentUser
+  user: User
 ) => {
   const docRef = doc(db, "refinements", refinementId);
-  const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
+  const refinementDoc = await getDoc(docRef);
+
   if (refinementDoc.exists()) {
-    const refinementData = refinementDoc.data() as Refinement;
-    const membersList = refinementData.members;
-    const memberExists = membersList.find((member) => member.id === user.id);
-    if (!memberExists && !refinementData.hasStarted) {
-      membersList.push(user);
-    } else if (!memberExists && refinementData.hasStarted) {
-      console.log("Refinement has already started, cannot join");
-      return "started";
-    } else {
-      console.log("User already exists in the members list");
-      return "inRefinement";
+    const refinementData = refinementDoc.data();
+    let membersList = refinementData.members || [];
+
+    if (!Array.isArray(membersList)) {
+      membersList = [];
     }
 
-    try {
-      await updateDoc(docRef, {
-        ...refinementData,
-        members: membersList,
-      });
-      console.log("Document updated successfully");
-      return "success";
-    } catch (error) {
-      console.error("Error updating document: ", error);
-      return "error";
+    const userData = extractUserData(user);
+
+    const memberExists = membersList.find(
+      (member: UserData) => member.uid === user.uid
+    );
+
+    if (!memberExists && !refinementData.hasStarted) {
+      membersList.push(userData);
+
+      try {
+        await updateDoc(docRef, {
+          members: membersList,
+        });
+
+        return "success";
+      } catch (error) {
+        return "error";
+      }
+    } else if (!memberExists && refinementData.hasStarted) {
+      return "started";
+    } else {
+      return "inRefinement";
     }
   } else {
-    console.log("Document doesn't exist!");
     return "notFound";
   }
 };
@@ -166,18 +204,17 @@ export const removeUserFromRefinement = async (
 
     if (refinementDoc.exists()) {
       const refinementData = refinementDoc.data();
-      const updatedMembers = refinementData.members.filter(
-        (member: PersistentUser) => member.id !== userId
+      let membersList = refinementData.members || ([] as UserData[]);
+
+      const updatedMembers = membersList.filter(
+        (member: UserData) => member.uid !== userId
       );
 
       await updateDoc(refinementRef, {
         members: updatedMembers,
       });
-
-      console.log("Usuário removido da sala com sucesso");
     }
   } catch (error) {
-    console.error("Erro ao remover usuário da sala:", error);
     throw error;
   }
 };
@@ -198,7 +235,7 @@ export const deleteRefinement = async (refinementId: string) => {
 export const createCardInFirestore = async (
   newCardText: string,
   refinementId: string | undefined,
-  user: PersistentUser,
+  user: User,
   teamName: string | undefined,
   setNewCardText: (text: string) => void
 ) => {
@@ -208,8 +245,8 @@ export const createCardInFirestore = async (
     await addDoc(collection(db, "cards"), {
       text: newCardText,
       refinementId,
-      createdBy: user.name,
-      createdById: user.id,
+      createdBy: user.displayName,
+      createdById: user.uid,
       teamName,
       votes: [],
       createdAt: serverTimestamp(),
@@ -226,13 +263,13 @@ export const createCardInFirestore = async (
 export const updateRatingToCardInFirestore = async (
   cardId: string,
   rating: number,
-  user: PersistentUser
+  user: User
 ) => {
-  if (!user?.id) return;
+  if (!user?.uid) return;
 
   const cardRef = doc(db, "cards", cardId);
   await updateDoc(cardRef, {
-    [`ratings.${user.id}`]: rating,
+    [`ratings.${user.uid}`]: rating,
   });
 };
 
@@ -282,7 +319,7 @@ export const getCardsByRefinementId = async (
 export const addCommentToCardInFirestore = async (
   cardId: string,
   commentText: string,
-  user: { id: string; name: string }
+  user: User
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -291,8 +328,8 @@ export const addCommentToCardInFirestore = async (
       comments: arrayUnion({
         id: `${Date.now()}`,
         text: commentText,
-        createdBy: user.name,
-        createdById: user.id,
+        createdBy: user.displayName,
+        createdById: user.uid,
         createdAt: new Date().toISOString(),
       }),
     });
@@ -366,7 +403,7 @@ export const updateNumOfTeamsToRefinementInFirebase = async (
 export const startRefinementInFirebase = async (
   refinement: DocumentData | undefined,
   refinementId: string | undefined,
-  user: PersistentUser,
+  user: User,
   navigate: ReturnType<typeof useNavigate>
 ) => {
   if (
@@ -375,7 +412,7 @@ export const startRefinementInFirebase = async (
     refinement.teams &&
     _.size(refinement.teams) === refinement.members.length
   ) {
-    const teamName = refinement.teams[user.id];
+    const teamName = refinement.teams[user.uid];
     if (teamName) {
       const availableTeams = getAvailableTeams(refinement.numOfTeams);
       const teamTimers = availableTeams.reduce((acc, team) => {
