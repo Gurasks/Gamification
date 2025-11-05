@@ -9,17 +9,27 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
+    "test:all": "npm run test && npm run test:integration",
     "test:board": "jest src/scenes/BoardScene/BoardScene.test.tsx",
     "test:creation": "jest src/scenes/CreationScene/CreationScene.test.tsx",
+    "test:firestore": "npm run test:firestore-rules && npm run test:firestore-models",
+    "test:firestore-models": "jest src/tests/firestore-models.test.js",
+    "test:firestore-rules": "jest src/tests/firestore-rules.test.js",
     "test:home": "jest src/scenes/HomeScene/HomeScene.test.tsx",
+    "test:integration": "jest src/tests/",
     "test:join": "jest src/scenes/JoinScene/JoinScene.test.tsx",
     "test:leaderboard": "jest src/scenes/LeaderboardScene/LeaderboardScene.test.tsx",
     "test:login": "jest src/scenes/LoginScene/LoginScene.test.tsx",
     "test:name-entry": "jest src/scenes/NameEntryScene/NameEntryScene.test.tsx",
     "test:register": "jest src/scenes/RegisterScene/RegisterScene.test.tsx",
     "test:team-selection": "jest src/scenes/TeamSelectionScene/TeamSelectionScene.test.tsx",
+    "test:validation": "npm run test:firestore-rules",
     "test:watch": "jest --watch",
     "test:debug": "jest --verbose --no-cache",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "check:rules": "firebase firestore:rules:check",
+    "emulators:start": "firebase emulators:start --only firestore",
+    "emulators:test": "firebase emulators:exec --only firestore \"npm test\"",
     "sonar": "sonar-scanner",
     "test:coverage": "jest --coverage --coverageReporters=lcov --coverageReporters=text-summary",
     "lint:report": "eslint . --format json --output-file eslint-report.json",
@@ -29,7 +39,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
     "dotenv": "^16.5.0",
-    "firebase": "^11.7.3",
+    "firebase": "^12.5.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.513.0",
     "react": "^19.1.0",
@@ -41,6 +51,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@firebase/rules-unit-testing": "^5.0.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -54,35 +65,52 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.5.3",
+    "sonarqube-scanner": "^3.0.1",
     "tailwindcss": "^4.1.7",
     "ts-jest": "^29.4.4",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5",
-    "sonarqube-scanner": "^3.0.1",
-    "identity-obj-proxy": "^3.0.0"
+    "vite": "^6.3.5"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/src/setupTests.ts"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.ts"
+    ],
     "transform": {
-      "^.+\\.(ts|tsx)$": ["ts-jest", {
-        "tsconfig": {
-          "jsx": "react-jsx"
+      "^.+\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "jsx": "react-jsx"
+          }
         }
-      }]
+      ]
     },
     "testMatch": [
       "<rootDir>/src/**/*.test.{ts,tsx}",
-      "<rootDir>/src/**/*.spec.{ts,tsx}"
+      "<rootDir>/src/**/*.spec.{ts,tsx}",
+      "<rootDir>/src/tests/*.js"
     ],
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
-    "moduleDirectories": ["node_modules", "src"],
-    "roots": ["<rootDir>/src"],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "roots": [
+      "<rootDir>/src"
+    ],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
@@ -94,7 +122,11 @@
       "!src/**/*.spec.{ts,tsx}"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["lcov", "text-summary", "html"],
+    "coverageReporters": [
+      "lcov",
+      "text-summary",
+      "html"
+    ],
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1",
       "\\.(css|less|scss|sass)$": "identity-obj-proxy",
