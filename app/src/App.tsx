@@ -14,7 +14,7 @@ import { LoadingOverlay } from './components/LoadingOverlay';
 import { useGlobalLoading } from './contexts/LoadingContext';
 import LoginScene from './scenes/LoginScene/LoginScene';
 import RegisterScene from './scenes/RegisterScene/RegisterScene';
-import Navbar from './components/Navbar';
+import { AppLayout } from './components/AppLayout';
 import RouteGuard from './components/RouteGuard';
 
 const AppContent: React.FC = () => {
@@ -26,19 +26,42 @@ const AppContent: React.FC = () => {
         <Toaster position="top-center" />
         <LoadingOverlay show={globalLoading} message={loadingMessage} />
 
-        <Navbar />
-
         <RouteGuard>
           <Routes>
-            <Route path="/" element={<HomeScene />} />
+            <Route path="/" element={
+              <AppLayout noScroll={true}>
+                <HomeScene />
+              </AppLayout>
+            } />
+            <Route path="/session-creation" element={
+              <AppLayout>
+                <CreationScene />
+              </AppLayout>
+            } />
+            <Route path="/join-a-session/:sessionCode?" element={
+              <AppLayout noScroll={true}>
+                <JoinScene />
+              </AppLayout>
+            } />
+            <Route path="/board/:refinementId/team/:teamName" element={
+              <AppLayout>
+                <BoardScene />
+              </AppLayout>
+            } />
+            <Route path="/team-selection/:refinementId" element={
+              <AppLayout>
+                <TeamSelectionScene />
+              </AppLayout>
+            } />
+            <Route path="/leaderboard/:refinementId" element={
+              <AppLayout>
+                <LeaderboardScene />
+              </AppLayout>
+            } />
+
             <Route path="/login" element={<LoginScene />} />
             <Route path="/register" element={<RegisterScene />} />
-            <Route path="/session-creation" element={<CreationScene />} />
-            <Route path="/join-a-session/:sessionCode?" element={<JoinScene />} />
-            <Route path="/board/:refinementId/team/:teamName" element={<BoardScene />} />
-            <Route path="/team-selection/:refinementId" element={<TeamSelectionScene />} />
             <Route path="/name-entry" element={<NameEntryScene />} />
-            <Route path="/leaderboard/:refinementId" element={<LeaderboardScene />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </RouteGuard>
