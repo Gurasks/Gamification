@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/Button';
+import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../components/Button';
 import toast from 'react-hot-toast';
 import { auth } from '@/config/firebase';
 
@@ -29,14 +29,12 @@ const NameEntryScene: React.FC = () => {
 
     try {
       if (!user) {
-        // Criar sessão anônima
         await signInAnonymously(name.trim());
         toast.success(`Bem-vindo, ${name.trim()}!`);
 
         await new Promise(resolve => setTimeout(resolve, 100));
 
       } else if (anonymousUser) {
-        // Atualizar nome para usuários anônimos
         await updateUserProfile(name.trim());
         toast.success(`Nome atualizado para ${name.trim()}!`);
 
@@ -49,20 +47,16 @@ const NameEntryScene: React.FC = () => {
         navigate('/');
       } else {
         console.warn('DisplayName não foi atualizado corretamente, tentando novamente...');
-        // Forçar recarregamento do usuário
         await currentAuth?.reload();
         navigate('/');
       }
 
     } catch (error: any) {
-      console.error('Error in name entry:', error);
       toast.error('Erro ao configurar usuário. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
-
-  // 🔥 REMOVIDA: função handleEnterAsGuest - não permitir mais "Convidado"
 
   const handleLogout = async () => {
     try {
@@ -109,7 +103,7 @@ const NameEntryScene: React.FC = () => {
           </div>
 
           {/* Input Section */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="name-entry-form">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                 Seu Nome *

@@ -1,20 +1,21 @@
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import BoardCard from '../components/BoardCard';
-import { CardSkeleton } from '../components/CardSkeleton';
-import { createUnsubscribeCards, createUnsubscribeRefinement } from '../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../services/firestore/firestoreServices';
-import type { Card, Refinement } from '../types/global';
-import { getNextTeam } from '../services/boardServices';
-import { getAvailableTeams } from '../services/teamSelectionServices';
-import VariableTextArea from "../components/VariableTextArea";
-import SyncTimer from '../components/SyncTimer';
-import { returnTimerId } from '../services/globalServices';
-import CollapsibleDescriptionArea from '../components/CollapsibleDescriptionArea';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { Button } from '../components/Button';
+import BoardCard from './components/BoardCard';
+import { CardSkeleton } from './components/CardSkeleton';
+import { createUnsubscribeCards, createUnsubscribeRefinement } from '../../hooks/firestoreUnsubscriber';
+import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
+import type { Card, Refinement } from '../../types/global';
+import { getNextTeam } from '../../services/boardServices';
+import { getAvailableTeams } from '../../services/teamSelectionServices';
+import VariableTextArea from "../../components/VariableTextArea";
+import { returnTimerId } from '../../services/globalServices';
+import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { Button } from '../../components/Button';
 import { useAuth } from '@/contexts/AuthContext';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import SyncTimer from './components/SyncTimer';
 
 const BoardScene: React.FC = () => {
   const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
@@ -119,12 +120,9 @@ const BoardScene: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="mb-4" />
-          <p className="text-gray-600">Carregando sessão...</p>
-        </div>
-      </div>
+      <LoadingOverlay
+        message="Carregando sessão..."
+      />
     );
   }
 

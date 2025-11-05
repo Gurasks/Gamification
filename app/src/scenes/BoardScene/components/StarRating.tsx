@@ -1,5 +1,5 @@
 import React from 'react';
-import { calculateAverageRating } from '../services/globalServices';
+import { calculateAverageRating } from '@/services/globalServices';
 
 interface StarRatingProps {
   ratings: Record<string, number>;

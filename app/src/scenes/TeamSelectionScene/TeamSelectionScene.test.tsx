@@ -111,7 +111,7 @@ jest.mock('../../components/CollapsibleDescriptionArea', () => {
   };
 });
 
-jest.mock('../../components/ExitConfirmationModal', () => {
+jest.mock('./components/ExitConfirmationModal', () => {
   return function MockExitConfirmationModal({
     isOpen,
     onClose,

@@ -5,11 +5,10 @@ import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
 import type { Refinement, UserData } from '../../types/global';
 import ShareButton from '../../components/ShareButton';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
-import ExitConfirmationModal from '../../components/ExitConfirmationModal';
+import ExitConfirmationModal from './components/ExitConfirmationModal';
 import SelectionMethodChooser from './components/SelectionMethodChooser';
 import OwnerTeamAssignment from './components/OwnerTeamAssignment';
 import TeamSelection from './components/TeamSelection';
-import { User } from 'firebase/auth';
 import {
   deleteRefinement,
   removeUserFromRefinement,
@@ -17,6 +16,7 @@ import {
   updateNumOfTeamsToRefinementInFirebase,
   updateSelectionMethodToRefinementInFirebase
 } from '@/services/firestore/firestoreServices';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
 
 const TeamSelectionScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
@@ -31,13 +31,21 @@ const TeamSelectionScene: React.FC = () => {
   const [refinement, setRefinement] = useState<Refinement | null>(null);
   const [showDescription, setShowDescription] = useState(true);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [loadingRefinement, setLoadingRefinement] = useState(true);
 
   useEffect(() => {
-    if (!refinementId || !user) return;
+    if (!refinementId || !user) {
+      setLoadingRefinement(false);
+      return;
+    }
+
     const unsubscribeMembers = createUnsubscribeMembers(
       refinementId,
       user,
-      setRefinement,
+      (refinementData) => {
+        setRefinement(refinementData);
+        setLoadingRefinement(false);
+      },
       setAvailableTeams,
       setIsOwner,
       setNumOfTeams,
@@ -52,7 +60,9 @@ const TeamSelectionScene: React.FC = () => {
   }, [refinementId, user, navigate]);
 
   useEffect(() => {
-    if (refinement) setTeamParticipants(refinement.teams as unknown as Record<string, string>)
+    if (refinement) {
+      setTeamParticipants(refinement.teams as unknown as Record<string, string>);
+    }
   }, [refinement]);
 
   const handleExitRoom = async () => {
@@ -82,12 +92,9 @@ const TeamSelectionScene: React.FC = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando autenticação...</p>
-        </div>
-      </div>
+      <LoadingOverlay
+        message="Carregando autenticação..."
+      />
     );
   }
 
@@ -113,14 +120,11 @@ const TeamSelectionScene: React.FC = () => {
     );
   }
 
-  if (!refinementId || !refinement) {
+  if (!refinementId || loadingRefinement || !refinement) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando sessão...</p>
-        </div>
-      </div>
+      <LoadingOverlay
+        message="Carregando sessão..."
+      />
     );
   }
 

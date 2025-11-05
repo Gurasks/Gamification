@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { createUnsubscribeSyncTimer } from '../hooks/firestoreUnsubscriber';
-import { updateTimeToSyncTimerInFirebase } from '../services/firestore/firestoreServices';
-import { returnToastMessage } from '../services/globalServices';
+import { createUnsubscribeSyncTimer } from '@/hooks/firestoreUnsubscriber';
+import { updateTimeToSyncTimerInFirebase } from '@/services/firestore/firestoreServices';
+import { returnToastMessage } from '@/services/globalServices';
 
 interface SyncTimerProps {
   timerId: string;

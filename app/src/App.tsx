@@ -1,11 +1,11 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import NameEntryScene from './scenes/NameEntryScene';
+import NameEntryScene from './scenes/NameEntryScene/NameEntryScene';
 import { AuthProvider } from './contexts/AuthContext';
 import { LoadingProvider } from './contexts/LoadingContext';
-import BoardScene from './scenes/BoardScene';
+import BoardScene from './scenes/BoardScene/BoardScene';
 import TeamSelectionScene from './scenes/TeamSelectionScene/TeamSelectionScene';
-import HomeScene from './scenes/HomeScene';
+import HomeScene from './scenes/HomeScene/HomeScene';
 import { Toaster } from 'react-hot-toast';
 import LeaderboardScene from './scenes/LeaderboardScene/LeaderboardScene';
 import CreationScene from './scenes/CreationScene/CreationScene';

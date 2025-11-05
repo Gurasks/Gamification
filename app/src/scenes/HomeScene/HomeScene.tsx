@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
 
 const HomeScene: React.FC = () => {
   const { user, anonymousUser, loading } = useAuth();
@@ -18,7 +19,6 @@ const HomeScene: React.FC = () => {
   useEffect(() => {
     const checkAccess = async () => {
       if (!loading) {
-
         const hasValidUser = user && user.uid;
         const hasValidName = user?.displayName &&
           user.displayName.length >= 2 &&
@@ -37,12 +37,7 @@ const HomeScene: React.FC = () => {
 
   if (loading || checkingProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
-        </div>
-      </div>
+      <LoadingOverlay />
     );
   }
 

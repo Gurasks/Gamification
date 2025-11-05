@@ -1,9 +1,9 @@
 import { Check, MessageSquareMore, PencilLine, X } from 'lucide-react';
 import { useState } from 'react';
-import type { Card } from "../types/global";
-import StarRating from "./StarRating";
-import VariableTextArea from "./VariableTextArea";
+import type { Card } from "../../../types/global";
+import VariableTextArea from "../../../components/VariableTextArea";
 import { User } from 'firebase/auth';
+import StarRating from './StarRating';
 
 interface BoardCardProps {
   card: Card;

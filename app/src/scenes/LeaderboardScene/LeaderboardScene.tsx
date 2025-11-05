@@ -8,6 +8,7 @@ import { exportToDOC, exportToPDF } from '../../services/leaderboardServices';
 import TeamLeaderboard from './components/TeamLeaderboard';
 import MembersLeaderboard from './components/MembersLeaderboard';
 import ContributionsModal from './components/ContributionsModal';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
 
 const LeaderboardScene: React.FC = () => {
   const { refinementId } = useParams<{ refinementId: string }>();
@@ -93,12 +94,9 @@ const LeaderboardScene: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando tabela de classificação...</p>
-        </div>
-      </div>
+      <LoadingOverlay
+        message="Carregando tabela de classificação..."
+      />
     );
   }
 
