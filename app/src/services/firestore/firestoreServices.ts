@@ -20,8 +20,8 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "../../config/firebase";
 import type {
   Card,
-  Refinement,
-  RefinementCreationData,
+  Session,
+  SessionCreationData,
   UserData,
 } from "../../types/global";
 import type { UserStats } from "../../types/leaderboard";
@@ -31,11 +31,11 @@ import { getShortenedUUID } from "../globalServices";
 import { getAvailableTeams } from "../teamSelectionServices";
 import { User } from "firebase/auth";
 
-const refinementCache = new Map<string, Refinement>();
+const sessionCache = new Map<string, Session>();
 
-const validateAndCleanRefinementData = (refinement: any): any => {
+const validateAndCleanSessionData = (session: any): any => {
   // Remove qualquer campo que possa conter objetos complexos
-  const cleaned = { ...refinement };
+  const cleaned = { ...session };
 
   // Garante que todos os campos são serializáveis
   return {
@@ -62,104 +62,100 @@ const validateAndCleanRefinementData = (refinement: any): any => {
   };
 };
 
-export const createRefinementInFirestore = async (
-  refinementId: string,
-  refinementData: RefinementCreationData,
+export const createSessionInFirestore = async (
+  sessionId: string,
+  sessionData: SessionCreationData,
   user: User
 ): Promise<string> => {
   try {
-    if (!refinementData.name?.trim()) {
+    if (!sessionData.name?.trim()) {
       throw new Error("Nome da sessão é obrigatório");
-    }
-
-    if (refinementData.requiresPassword && !refinementData.password) {
-      throw new Error("Senha é obrigatória quando a proteção está ativada");
     }
 
     const userData = extractUserData(user);
 
-    const newRefinement = {
-      id: refinementId,
-      title: refinementData.name.trim(),
-      description: refinementData.description?.trim() || "",
-      password: refinementData.password || null,
-      requiresPassword: refinementData.requiresPassword || false,
-      numOfTeams: 2,
+    const newSession = {
+      id: sessionId,
+      title: sessionData.name.trim(), // ← DEVE ser 'title' não 'name'
+      description: sessionData.description?.trim() || "",
+      password: sessionData.password || null,
+      requiresPassword: sessionData.requiresPassword || false,
+      numOfTeams: 2, // ← Campo obrigatório nas regras
       selectionMethod: "OWNER_CHOOSES",
       createdAt: serverTimestamp(),
-      members: [userData],
-      owner: user.uid,
+      members: [userData], // ← DEVE ser array
+      owner: user.uid, // ← Campo obrigatório
       teams: {},
       hasStarted: false,
       updatedAt: serverTimestamp(),
     };
 
-    const cleanedRefinement = validateAndCleanRefinementData(newRefinement);
+    const cleanedSession = validateAndCleanSessionData(newSession);
 
-    const docRef = doc(db, "refinements", refinementId);
-    await setDoc(docRef, cleanedRefinement);
+    const docRef = doc(db, "sessions", sessionId);
+    await setDoc(docRef, cleanedSession);
 
-    return refinementId;
+    return sessionId;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to create refinement: ${error.message}`);
+      throw new Error(`Failed to create session: ${error.message}`);
     } else {
-      throw new Error("Failed to create refinement: Unknown error");
+      throw new Error("Failed to create session: Unknown error");
     }
   }
 };
 
-// Load refinement data by ID
-export const loadRefinementWithId = async (
-  refinementId: string,
-  setRefinement: (refinement: Refinement) => void
+// Load session data by ID
+export const loadSessionWithId = async (
+  sessionId: string,
+  setSession: (session: Session) => void
 ) => {
-  const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
-  if (refinementDoc.exists()) {
-    const refinementData = refinementDoc.data() as Refinement;
-    if (!refinementData) {
-      console.error("Refinement data is undefined");
+  const sessionDoc = await getDoc(doc(db, "sessions", sessionId));
+  if (sessionDoc.exists()) {
+    const sessionData = sessionDoc.data() as Session;
+    if (!sessionData) {
+      console.error("Session data is undefined");
       return;
     }
-    setRefinement(refinementData);
+    setSession(sessionData);
   }
 };
 
-export const getRefinement = async (
-  refinementId: string
-): Promise<Refinement | null> => {
-  if (refinementCache.has(refinementId)) {
-    return refinementCache.get(refinementId)!;
+export const getSession = async (
+  sessionId: string
+): Promise<Session | null> => {
+  if (sessionCache.has(sessionId)) {
+    return sessionCache.get(sessionId)!;
   }
 
   try {
-    const refinementDoc = await getDoc(doc(db, "refinements", refinementId));
-    if (refinementDoc.exists()) {
-      const refinement = {
-        id: refinementDoc.id,
-        ...refinementDoc.data(),
-      } as Refinement;
+    const sessionDoc = await getDoc(doc(db, "sessions", sessionId));
+    if (sessionDoc.exists()) {
+      const session = {
+        id: sessionDoc.id,
+        ...sessionDoc.data(),
+      } as Session;
 
-      refinementCache.set(refinementId, refinement);
-      return refinement;
+      sessionCache.set(sessionId, session);
+      return session;
     }
     return null;
   } catch (error) {
-    console.error("Error getting refinement:", error);
+    console.error("Error getting session:", error);
     return null;
   }
 };
 
 export const updateDocumentListMembers = async (
-  refinementId: string,
+  sessionId: string,
   user: User
 ) => {
-  const docRef = doc(db, "refinements", refinementId);
-  const refinementDoc = await getDoc(docRef);
+  const docRef = doc(db, "sessions", sessionId);
+  const sessionDoc = await getDoc(docRef);
 
-  if (refinementDoc.exists()) {
-    const refinementData = refinementDoc.data();
-    let membersList = refinementData.members || [];
+  if (sessionDoc.exists()) {
+    const sessionData = sessionDoc.data();
+    let membersList = sessionData.members || [];
 
     if (!Array.isArray(membersList)) {
       membersList = [];
@@ -171,7 +167,7 @@ export const updateDocumentListMembers = async (
       (member: UserData) => member.uid === user.uid
     );
 
-    if (!memberExists && !refinementData.hasStarted) {
+    if (!memberExists && !sessionData.hasStarted) {
       membersList.push(userData);
 
       try {
@@ -183,10 +179,10 @@ export const updateDocumentListMembers = async (
       } catch (error) {
         return "error";
       }
-    } else if (!memberExists && refinementData.hasStarted) {
+    } else if (!memberExists && sessionData.hasStarted) {
       return "started";
     } else {
-      return "inRefinement";
+      return "inSession";
     }
   } else {
     return "notFound";
@@ -194,23 +190,23 @@ export const updateDocumentListMembers = async (
 };
 
 // Remove usuário da lista de membros
-export const removeUserFromRefinement = async (
-  refinementId: string,
+export const removeUserFromSession = async (
+  sessionId: string,
   userId: string
 ) => {
   try {
-    const refinementRef = doc(db, "refinements", refinementId);
-    const refinementDoc = await getDoc(refinementRef);
+    const sessionRef = doc(db, "sessions", sessionId);
+    const sessionDoc = await getDoc(sessionRef);
 
-    if (refinementDoc.exists()) {
-      const refinementData = refinementDoc.data();
-      let membersList = refinementData.members || ([] as UserData[]);
+    if (sessionDoc.exists()) {
+      const sessionData = sessionDoc.data();
+      let membersList = sessionData.members || ([] as UserData[]);
 
       const updatedMembers = membersList.filter(
         (member: UserData) => member.uid !== userId
       );
 
-      await updateDoc(refinementRef, {
+      await updateDoc(sessionRef, {
         members: updatedMembers,
       });
     }
@@ -219,11 +215,10 @@ export const removeUserFromRefinement = async (
   }
 };
 
-// Excluir refinamento completo (apenas para dono)
-export const deleteRefinement = async (refinementId: string) => {
+export const deleteSession = async (sessionId: string) => {
   try {
-    const refinementRef = doc(db, "refinements", refinementId);
-    await deleteDoc(refinementRef);
+    const sessionRef = doc(db, "sessions", sessionId);
+    await deleteDoc(sessionRef);
     console.log("Sala excluída com sucesso");
   } catch (error) {
     console.error("Erro ao excluir sala:", error);
@@ -234,17 +229,16 @@ export const deleteRefinement = async (refinementId: string) => {
 // Create a new card
 export const createCardInFirestore = async (
   newCardText: string,
-  refinementId: string | undefined,
+  sessionId: string | undefined,
   user: User,
   teamName: string | undefined,
   setNewCardText: (text: string) => void
 ) => {
-  if (!refinementId || !teamName || !newCardText.trim() || _.isEmpty(user))
-    return;
+  if (!sessionId || !teamName || !newCardText.trim() || _.isEmpty(user)) return;
   try {
     await addDoc(collection(db, "cards"), {
       text: newCardText,
-      refinementId,
+      sessionId,
       createdBy: user.displayName,
       createdById: user.uid,
       teamName,
@@ -290,13 +284,13 @@ export const updateCardInFirestore = async (
   }
 };
 
-export const getCardsByRefinementId = async (
-  refinementId: string
+export const getCardsBySessionId = async (
+  sessionId: string
 ): Promise<Card[]> => {
   try {
     const cardsQuery = query(
       collection(db, "cards"),
-      where("refinementId", "==", refinementId)
+      where("sessionId", "==", sessionId)
     );
     const cardsSnapshot = await getDocs(cardsQuery);
 
@@ -373,54 +367,54 @@ export const updateCommentToCardInFirestore = async (
   }
 };
 
-export const updateSelectionMethodToRefinementInFirebase = async (
-  refinementId: string,
+export const updateSelectionMethodToSessionInFirebase = async (
+  sessionId: string,
   method: SelectionMethod
 ) => {
-  if (!refinementId) return;
-  await updateDoc(doc(db, "refinements", refinementId), {
+  if (!sessionId) return;
+  await updateDoc(doc(db, "sessions", sessionId), {
     selectionMethod: method,
     updatedAt: serverTimestamp(),
   });
 };
 
-export const updateNumOfTeamsToRefinementInFirebase = async (
-  refinementId: string,
+export const updateNumOfTeamsToSessionInFirebase = async (
+  sessionId: string,
   setAvailableTeams: (teams: string[]) => void,
   e: {
     target: { value: SetStateAction<string> };
   }
 ) => {
   const newNumOfTeams = parseInt(e.target.value as string);
-  if (!refinementId) return;
-  await updateDoc(doc(db, "refinements", refinementId), {
+  if (!sessionId) return;
+  await updateDoc(doc(db, "sessions", sessionId), {
     numOfTeams: newNumOfTeams,
     updatedAt: serverTimestamp(),
   });
   setAvailableTeams(getAvailableTeams(newNumOfTeams));
 };
 
-export const startRefinementInFirebase = async (
-  refinement: DocumentData | undefined,
-  refinementId: string | undefined,
+export const startSessionInFirebase = async (
+  session: DocumentData | undefined,
+  sessionId: string | undefined,
   user: User,
   navigate: ReturnType<typeof useNavigate>
 ) => {
   if (
-    refinementId &&
-    refinement &&
-    refinement.teams &&
-    _.size(refinement.teams) === refinement.members.length
+    sessionId &&
+    session &&
+    session.teams &&
+    _.size(session.teams) === session.members.length
   ) {
-    const teamName = refinement.teams[user.uid];
+    const teamName = session.teams[user.uid];
     if (teamName) {
-      const availableTeams = getAvailableTeams(refinement.numOfTeams);
+      const availableTeams = getAvailableTeams(session.numOfTeams);
       const teamTimers = availableTeams.reduce((acc, team) => {
         acc[team] = uuidv4();
         return acc;
       }, {} as Record<string, string>);
 
-      await updateDoc(doc(db, "refinements", refinementId), {
+      await updateDoc(doc(db, "sessions", sessionId), {
         hasStarted: true,
         startTime: serverTimestamp(),
         teamTimers: teamTimers,
@@ -428,8 +422,8 @@ export const startRefinementInFirebase = async (
       });
 
       await initializeTimers(teamTimers, 300);
-      console.log("Refinement started successfully");
-      navigate(`/board/${refinementId}/team/${teamName}`);
+      console.log("Session started successfully");
+      navigate(`/board/${sessionId}/team/${teamName}`);
     }
   }
 };
@@ -470,12 +464,12 @@ export const updateTimeToSyncTimerInFirebase = async (
 };
 
 export const fetchLeaderboardData = async (
-  refinementId: string
+  sessionId: string
 ): Promise<UserStats[]> => {
   try {
     const cardsQuery = query(
       collection(db, "cards"),
-      where("refinementId", "==", refinementId)
+      where("sessionId", "==", sessionId)
     );
     const cardsSnapshot = await getDocs(cardsQuery);
 

@@ -1,10 +1,10 @@
 interface CollapsibleDescriptionAreaProps {
-  refinementDescription: string;
+  sessionDescription: string;
   showDescription: boolean;
   setShowDescription: (show: boolean) => void;
 }
 const CollapsibleDescriptionArea: React.FC<CollapsibleDescriptionAreaProps> = ({
-  refinementDescription,
+  sessionDescription,
   showDescription,
   setShowDescription
 }) => {
@@ -24,7 +24,7 @@ const CollapsibleDescriptionArea: React.FC<CollapsibleDescriptionAreaProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
           <span className="text-sm font-medium text-gray-700">
-            Descrição do Refinamento
+            Descrição da sessão
           </span>
         </div>
         <span className="text-xs text-gray-500">
@@ -35,7 +35,7 @@ const CollapsibleDescriptionArea: React.FC<CollapsibleDescriptionAreaProps> = ({
       {showDescription && (
         <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fadeIn">
           <p className="text-gray-700 leading-relaxed">
-            {refinementDescription}
+            {sessionDescription}
           </p>
         </div>
       )}

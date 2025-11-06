@@ -2,21 +2,21 @@ import { useState } from "react";
 import {
   resolveUUID,
   updateDocumentListMembers,
-  getRefinement,
+  getSession,
 } from "@/services/firestore/firestoreServices";
 import { handleReponse } from "@/services/homeServices";
 import toast from "react-hot-toast";
 import { useGlobalLoading } from "@/contexts/LoadingContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const useRefinementJoin = () => {
+export const useSessionJoin = () => {
   const { user } = useAuth();
   const { setGlobalLoading, setLoadingMessage } = useGlobalLoading();
 
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState("");
   const [requiresPassword, setRequiresPassword] = useState(false);
-  const [refinementData, setRefinementData] = useState<any>(null);
+  const [sessionData, setSessionData] = useState<any>(null);
 
   const joinSession = async (joinCode: string, sessionPassword?: string) => {
     if (!joinCode.trim()) {
@@ -36,23 +36,23 @@ export const useRefinementJoin = () => {
 
       // Fase 1: Resolvendo UUID
       setLoadingMessage("Verificando código da sessão...");
-      const refinementId = await resolveUUID(joinCode.trim());
+      const sessionId = await resolveUUID(joinCode.trim());
 
-      if (!refinementId) {
+      if (!sessionId) {
         setError("Código inválido ou sessão não encontrada");
         return null;
       }
 
       // Fase 2: Buscando dados da sessão
       setLoadingMessage("Carregando dados da sessão...");
-      const session = await getRefinement(refinementId);
+      const session = await getSession(sessionId);
 
       if (!session) {
         setError("Sessão não encontrada");
         return null;
       }
 
-      setRefinementData(session);
+      setSessionData(session);
 
       // Fase 3: Verificando senha
       if (session.requiresPassword && !sessionPassword) {
@@ -67,12 +67,12 @@ export const useRefinementJoin = () => {
 
       // Fase 4: Entrando na sessão
       setLoadingMessage("Entrando na sessão...");
-      const response = await updateDocumentListMembers(refinementId, user);
+      const response = await updateDocumentListMembers(sessionId, user);
       const redirection = handleReponse(response);
 
       if (redirection) {
         toast.success(`Entrou na sessão: ${session.title}`);
-        return { success: true, refinementId };
+        return { success: true, sessionId };
       } else {
         setError("Não foi possível entrar na sessão");
         return null;
@@ -103,7 +103,7 @@ export const useRefinementJoin = () => {
     isJoining,
     error,
     requiresPassword,
-    refinementData,
+    sessionData,
     joinSession,
     resetPasswordState,
     resetError,

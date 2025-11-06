@@ -5,10 +5,10 @@ import userEvent from "@testing-library/user-event";
 import CreationScene from "./CreationScene";
 
 // Mock simplificado do hook - evita problemas de importação
-const mockUseRefinementCreation = jest.fn();
+const mockUseSessionCreation = jest.fn();
 
-jest.mock("../../hooks/useRefinementCreation", () => ({
-  useRefinementCreation: () => mockUseRefinementCreation(),
+jest.mock("../../hooks/useSessionCreation", () => ({
+  useSessionCreation: () => mockUseSessionCreation(),
 }));
 
 // Mock do react-router-dom simplificado
@@ -39,7 +39,7 @@ const defaultMockValues = {
     requiresPassword: false,
   },
   isCreating: false,
-  handleCreateRefinement: jest.fn(),
+  handleCreateSession: jest.fn(),
   updateFormData: jest.fn(),
   validateForm: jest.fn(() => []),
 };
@@ -47,7 +47,7 @@ const defaultMockValues = {
 describe("CreationScene", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseRefinementCreation.mockReturnValue(defaultMockValues);
+    mockUseSessionCreation.mockReturnValue(defaultMockValues);
   });
 
   // Teste 1: Renderização básica
@@ -56,13 +56,13 @@ describe("CreationScene", () => {
 
     expect(screen.getByText("Criar Nova Sessão")).toBeInTheDocument();
     expect(
-      screen.getByText("Configure uma nova sessão de refinamento para sua equipe")
+      screen.getByText("Configure uma nova sessão para sua equipe")
     ).toBeInTheDocument();
 
     // Campos de input
     expect(screen.getByLabelText(/nome da sessão \*/i)).toBeInTheDocument();
     expect(
-      screen.getByLabelText(/descrição do que será refinado/i)
+      screen.getByLabelText(/descrição do que será abordado na sessão/i)
     ).toBeInTheDocument();
     expect(screen.getByText(/proteger sessão com senha/i)).toBeInTheDocument();
 
@@ -83,7 +83,7 @@ describe("CreationScene", () => {
 
   // Teste 3: Habilitar botão quando formulário é válido
   it("should enable create button when form is valid", () => {
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       formData: {
         name: "Sprint 15 - Refinamento",
@@ -104,7 +104,7 @@ describe("CreationScene", () => {
     const user = userEvent.setup();
     const mockUpdateFormData = jest.fn();
 
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       updateFormData: mockUpdateFormData,
     });
@@ -125,7 +125,7 @@ describe("CreationScene", () => {
     const user = userEvent.setup();
     const mockUpdateFormData = jest.fn();
 
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       updateFormData: mockUpdateFormData,
     });
@@ -140,7 +140,7 @@ describe("CreationScene", () => {
 
   // Teste 6: Mostrar campos de senha quando proteção está ativa
   it("should show password fields when password protection is enabled", () => {
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       formData: {
         ...defaultMockValues.formData,
@@ -156,7 +156,7 @@ describe("CreationScene", () => {
 
   // Teste 7: Loading state durante a criação
   it("should show loading state when creating", () => {
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       formData: {
         name: "Sprint 15",
@@ -198,7 +198,7 @@ describe("CreationScene - Validação de Senha", () => {
     const user = userEvent.setup();
     const mockUpdateFormData = jest.fn();
 
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       formData: {
         name: "Test Session",
@@ -226,7 +226,7 @@ describe("CreationScene - Validação de Senha", () => {
     const user = userEvent.setup();
     const mockUpdateFormData = jest.fn();
 
-    mockUseRefinementCreation.mockReturnValue({
+    mockUseSessionCreation.mockReturnValue({
       ...defaultMockValues,
       formData: {
         name: "Test Session",

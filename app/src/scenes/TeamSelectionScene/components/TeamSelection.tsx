@@ -5,14 +5,14 @@ import type { SelectionMethod } from '../../../types/teamSelection';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface TeamSelectionProps {
-  refinementId: string;
+  sessionId: string;
   selectionMethod: SelectionMethod;
   availableTeams: string[];
   currentTeam?: string;
 }
 
 const TeamSelection: React.FC<TeamSelectionProps> = ({
-  refinementId,
+  sessionId,
   selectionMethod,
   availableTeams,
   currentTeam,
@@ -24,14 +24,14 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
   // Listen for team assignments
   useEffect(() => {
-    if (!refinementId) return;
+    if (!sessionId) return;
 
-    const unsubscribe = onSnapshot(doc(db, 'refinements', refinementId), (doc) => {
+    const unsubscribe = onSnapshot(doc(db, 'sessions', sessionId), (doc) => {
       setAssignedTeams(doc.data()?.teams || {});
     });
 
     return () => unsubscribe();
-  }, [refinementId]);
+  }, [sessionId]);
 
   // Handle random assignment
   useEffect(() => {
@@ -49,11 +49,11 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   }, [selectionMethod, currentTeam, availableTeams, user]);
 
   const assignTeam = async (team: string) => {
-    if (!user || !refinementId) return;
+    if (!user || !sessionId) return;
 
     setIsAssigning(true);
     try {
-      await updateDoc(doc(db, 'refinements', refinementId), {
+      await updateDoc(doc(db, 'sessions', sessionId), {
         [`teams.${user.uid}`]: team,
       });
       setSelectedTeam(team);

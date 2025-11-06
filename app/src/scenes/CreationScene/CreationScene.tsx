@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useRefinementCreation } from '../../hooks/useRefinementCreation';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
+import { useSessionCreation } from '@/hooks/useSessionCreation';
 
 const CreationScene: React.FC = () => {
   const {
     formData,
     isCreating,
-    handleCreateRefinement,
+    handleCreateSession,
     updateFormData
-  } = useRefinementCreation();
+  } = useSessionCreation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -72,7 +72,7 @@ const CreationScene: React.FC = () => {
       return;
     }
 
-    await handleCreateRefinement();
+    await handleCreateSession();
   };
 
   const isFormValid = formData.name.trim() &&
@@ -86,7 +86,7 @@ const CreationScene: React.FC = () => {
             Criar Nova Sessão
           </h1>
           <p className="text-gray-600">
-            Configure uma nova sessão de refinamento para sua equipe
+            Configure uma nova sessão para sua equipe
           </p>
         </div>
 
@@ -98,7 +98,7 @@ const CreationScene: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Nova Sessão de Refinamento
+              Nova Sessão de levantamento de requisitos
             </h3>
             <p className="text-gray-600 text-sm">
               Configure os detalhes da sua sessão
@@ -108,11 +108,11 @@ const CreationScene: React.FC = () => {
           <div className="space-y-4">
             {/* Nome da Sessão */}
             <div>
-              <label htmlFor="refinementName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="sessionName" className="block text-sm font-medium text-gray-700 mb-2">
                 Nome da Sessão *
               </label>
               <input
-                id="refinementName"
+                id="sessionName"
                 type="text"
                 placeholder="Ex: Sprint 15 - Refinamento de Histórias"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -126,13 +126,12 @@ const CreationScene: React.FC = () => {
               </p>
             </div>
 
-            {/* Descrição do Refinamento */}
             <div>
-              <label htmlFor="refinementDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                Descrição do que será refinado
+              <label htmlFor="sessionDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                Descrição do que será abordado na sessão
               </label>
               <textarea
-                id="refinementDescription"
+                id="sessionDescription"
                 placeholder="Descreva o objetivo desta sessão, quais histórias serão refinadas, critérios de aceitação, etc."
                 rows={4}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"

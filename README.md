@@ -1,13 +1,13 @@
 # 🎯 Gamification - Sistema Gamificado de Levantamento de Requisitos (SGLR)
 
-Uma plataforma colaborativa inspirada no EasyRetro com elementos de gamificação para tornar as sessões de refinamento mais engajantes e produtivas.
+Uma plataforma colaborativa com elementos de gamificação para tornar as sessões de levantamento de requisitos mais engajantes e produtivas.
 ---
 
 ### 🛠️ Tecnologias e Integrações
 
 ![React](https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-11.7.3-FFCA28?logo=firebase&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-12.5.0-FFCA28?logo=firebase&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.7-06B6D4?logo=tailwindcss&logoColor=white)
 <!-- ![CI/CD](https://github.com/gurasks/Gamification/workflows/SonarCloud%20Analysis/badge.svg) -->
 
@@ -34,7 +34,7 @@ Uma plataforma colaborativa inspirada no EasyRetro com elementos de gamificaçã
 
 ### 👥 Funcionalidades de Colaboração
 
-- **Sessões de Refinamento**: Crie salas para discussão de histórias e tarefas
+- **Sessões de levantamento de requisitos**: Crie salas para discussão de histórias e tarefas
 - **Sugestões em Tempo Real**: Adicione e vote em ideias colaborativamente
 - **Sistema de Comentários**: Discussões organizadas por card
 - **Múltiplos Times**: Organize participantes em diferentes equipes
@@ -79,6 +79,13 @@ Uma plataforma colaborativa inspirada no EasyRetro com elementos de gamificaçã
     ```bash
     npm run dev
     ```
+
+### 🔥 Firebase
+
+```bash
+# Atualizar regras da firestore
+firebase deploy --only firestore:rules
+```
 
 ### 📊 Análise de Qualidade
 

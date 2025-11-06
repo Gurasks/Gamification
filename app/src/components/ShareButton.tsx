@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { getShortenedUUID } from '../services/globalServices';
 
 interface ShareButtonProps {
-  refinementId: string;
+  sessionId: string;
   sessionTitle?: string;
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, sessionTitle }) => {
+const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipMessage, setTooltipMessage] = useState('Copie o link');
-  const shortenedUUID = getShortenedUUID(refinementId);
+  const shortenedUUID = getShortenedUUID(sessionId);
   const shareUrl = `${window.location.origin}/join-a-session/${shortenedUUID}`;
 
   const handleCopyLink = async () => {
@@ -45,8 +45,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({ refinementId, sessionTitle })
     if (navigator.share) {
       try {
         await navigator.share({
-          title: sessionTitle || 'Junte-se a minha sessão de refinamento ',
-          text: `Junte-se a minha sessão de refinamento: ${shortenedUUID}`,
+          title: sessionTitle || 'Junte-se a minha sessão',
+          text: `Junte-se a minha sessão: ${shortenedUUID}`,
           url: shareUrl,
         });
       } catch (err) {

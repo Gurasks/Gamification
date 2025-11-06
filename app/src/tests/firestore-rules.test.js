@@ -17,7 +17,7 @@ describe('Firestore Rules Validation', () => {
     const rules = fs.readFileSync(rulesPath, 'utf8');
 
     // Verifica collections essenciais
-    expect(rules).toContain('match /refinements/{refinementId}');
+    expect(rules).toContain('match /sessions/{sessionId}');
     expect(rules).toContain('match /cards/{cardId}');
     expect(rules).toContain('match /users/{userId}');
     expect(rules).toContain('match /timers/{timerId}');
@@ -30,19 +30,19 @@ describe('Firestore Rules Validation', () => {
     // Verifica funções de segurança
     expect(rules).toContain('function isSignedIn()');
     expect(rules).toContain('function isOwner(userId)');
-    expect(rules).toContain('function isRefinementOwner()');
+    expect(rules).toContain('function isSessionOwner()');
     expect(rules).toContain('function isCardOwner()');
-    expect(rules).toContain('function hasValidRefinementStructure()');
+    expect(rules).toContain('function hasValidSessionStructure()');
     expect(rules).toContain('function hasValidUserStructure()');
   });
 
-  test('refinements collection has proper rules', () => {
+  test('sessions collection has proper rules', () => {
     const rules = fs.readFileSync(rulesPath, 'utf8');
 
-    // Verifica regras específicas para refinements
+    // Verifica regras específicas para sessions
     expect(rules).toContain('allow read: if isSignedIn()');
-    expect(rules).toContain('allow create: if isSignedIn() && hasValidRefinementStructure()');
-    expect(rules).toContain('allow delete: if isSignedIn() && isRefinementOwner()');
+    expect(rules).toContain('allow create: if isSignedIn() && hasValidSessionStructure()');
+    expect(rules).toContain('allow delete: if isSignedIn() && isSessionOwner()');
   });
 
   test('cards collection has proper rules', () => {
@@ -77,7 +77,7 @@ describe('Firestore Rules Validation', () => {
       'service cloud.firestore',
       'match /databases/{database}/documents',
       'function isSignedIn()',
-      'match /refinements/{refinementId}',
+      'match /sessions/{sessionId}',
       'match /cards/{cardId}',
       'match /users/{userId}'
     ];

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
-import type { Refinement, UserData } from '../../types/global';
+import type { Session, UserData } from '../../types/global';
 import ShareButton from '../../components/ShareButton';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
 import ExitConfirmationModal from './components/ExitConfirmationModal';
@@ -10,16 +10,16 @@ import SelectionMethodChooser from './components/SelectionMethodChooser';
 import OwnerTeamAssignment from './components/OwnerTeamAssignment';
 import TeamSelection from './components/TeamSelection';
 import {
-  deleteRefinement,
-  removeUserFromRefinement,
-  startRefinementInFirebase,
-  updateNumOfTeamsToRefinementInFirebase,
-  updateSelectionMethodToRefinementInFirebase
+  deleteSession,
+  removeUserFromSession,
+  startSessionInFirebase,
+  updateNumOfTeamsToSessionInFirebase,
+  updateSelectionMethodToSessionInFirebase
 } from '@/services/firestore/firestoreServices';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 
 const TeamSelectionScene: React.FC = () => {
-  const { refinementId } = useParams<{ refinementId: string }>();
+  const { sessionId } = useParams<{ sessionId: string }>();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
@@ -28,23 +28,23 @@ const TeamSelectionScene: React.FC = () => {
   const [numOfTeams, setNumOfTeams] = useState<number>(2);
   const [owner, setOwner] = useState<string>('');
   const [teamParticipants, setTeamParticipants] = useState<Record<string, string>>({});
-  const [refinement, setRefinement] = useState<Refinement | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [showDescription, setShowDescription] = useState(true);
   const [showExitModal, setShowExitModal] = useState(false);
-  const [loadingRefinement, setLoadingRefinement] = useState(true);
+  const [loadingSession, setLoadingSession] = useState(true);
 
   useEffect(() => {
-    if (!refinementId || !user) {
-      setLoadingRefinement(false);
+    if (!sessionId || !user) {
+      setLoadingSession(false);
       return;
     }
 
     const unsubscribeMembers = createUnsubscribeMembers(
-      refinementId,
+      sessionId,
       user,
-      (refinementData) => {
-        setRefinement(refinementData);
-        setLoadingRefinement(false);
+      (sessionData) => {
+        setSession(sessionData);
+        setLoadingSession(false);
       },
       setAvailableTeams,
       setIsOwner,
@@ -57,22 +57,22 @@ const TeamSelectionScene: React.FC = () => {
     return () => {
       unsubscribeMembers();
     };
-  }, [refinementId, user, navigate]);
+  }, [sessionId, user, navigate]);
 
   useEffect(() => {
-    if (refinement) {
-      setTeamParticipants(refinement.teams as unknown as Record<string, string>);
+    if (session) {
+      setTeamParticipants(session.teams as unknown as Record<string, string>);
     }
-  }, [refinement]);
+  }, [session]);
 
   const handleExitRoom = async () => {
-    if (!refinementId || !user) return;
+    if (!sessionId || !user) return;
 
     try {
       if (isOwner) {
-        await deleteRefinement(refinementId);
+        await deleteSession(sessionId);
       } else {
-        await removeUserFromRefinement(refinementId, user.uid);
+        await removeUserFromSession(sessionId, user.uid);
       }
 
       setShowExitModal(false);
@@ -120,7 +120,7 @@ const TeamSelectionScene: React.FC = () => {
     );
   }
 
-  if (!refinementId || loadingRefinement || !refinement) {
+  if (!sessionId || loadingSession || !session) {
     return (
       <LoadingOverlay
         message="Carregando sessão..."
@@ -137,7 +137,7 @@ const TeamSelectionScene: React.FC = () => {
             Configuração dos Times
           </h1>
           <p className="text-gray-600">
-            Organize os participantes e configure os times para o refinamento
+            Organize os participantes e configure os times para a sessão
           </p>
         </div>
 
@@ -151,7 +151,7 @@ const TeamSelectionScene: React.FC = () => {
                 </svg>
               </div>
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                {refinement.title}
+                {session.title}
               </h2>
               <p className="text-gray-600 text-sm">
                 {isOwner ? 'Você é o organizador desta sessão' : 'Aguardando configuração do organizador'}
@@ -160,7 +160,7 @@ const TeamSelectionScene: React.FC = () => {
           </div>
 
           <div className="flex justify-center gap-4 mb-6">
-            <ShareButton refinementId={refinementId} sessionTitle={refinement.title} />
+            <ShareButton sessionId={sessionId} sessionTitle={session.title} />
             <button
               onClick={openExitModal}
               className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors duration-200"
@@ -172,9 +172,9 @@ const TeamSelectionScene: React.FC = () => {
             </button>
           </div>
 
-          {refinement.description && (
+          {session.description && (
             <CollapsibleDescriptionArea
-              refinementDescription={refinement.description}
+              sessionDescription={session.description}
               showDescription={showDescription}
               setShowDescription={setShowDescription}
             />
@@ -195,7 +195,7 @@ const TeamSelectionScene: React.FC = () => {
                       min="2"
                       max="10"
                       defaultValue={numOfTeams}
-                      onChange={e => updateNumOfTeamsToRefinementInFirebase(refinementId, setAvailableTeams, e)}
+                      onChange={e => updateNumOfTeamsToSessionInFirebase(sessionId, setAvailableTeams, e)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-2xl font-bold"
                     />
                   ) : (
@@ -212,9 +212,9 @@ const TeamSelectionScene: React.FC = () => {
             {isOwner && (
               <div className="border-b pb-4">
                 <SelectionMethodChooser
-                  currentMethod={refinement.selectionMethod || 'RANDOM'}
+                  currentMethod={session.selectionMethod || 'RANDOM'}
                   onMethodChange={(method) =>
-                    updateSelectionMethodToRefinementInFirebase(refinementId, method)}
+                    updateSelectionMethodToSessionInFirebase(sessionId, method)}
                   isOwner={isOwner}
                 />
               </div>
@@ -222,19 +222,19 @@ const TeamSelectionScene: React.FC = () => {
 
             {/* Team Assignment Section */}
             <div>
-              {refinement.selectionMethod === 'OWNER_CHOOSES' && isOwner ? (
+              {session.selectionMethod === 'OWNER_CHOOSES' && isOwner ? (
                 <OwnerTeamAssignment
-                  refinementId={refinementId}
+                  sessionId={sessionId}
                   members={members}
                   availableTeams={availableTeams}
-                  currentAssignments={refinement.teams || {}}
+                  currentAssignments={session.teams || {}}
                 />
               ) : (
                 <TeamSelection
-                  refinementId={refinementId}
-                  selectionMethod={refinement.selectionMethod || 'RANDOM'}
+                  sessionId={sessionId}
+                  selectionMethod={session.selectionMethod || 'RANDOM'}
                   availableTeams={availableTeams}
-                  currentTeam={user ? refinement.teams?.[user.uid] : undefined}
+                  currentTeam={user ? session.teams?.[user.uid] : undefined}
                 />
               )}
             </div>
@@ -291,14 +291,14 @@ const TeamSelectionScene: React.FC = () => {
             <div className="flex gap-3 pt-4">
               {isOwner && (
                 <button
-                  onClick={() => startRefinementInFirebase(refinement, refinementId, user, navigate)}
-                  disabled={!refinementId}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!refinementId
+                  onClick={() => startSessionInFirebase(session, sessionId, user, navigate)}
+                  disabled={!sessionId}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${!sessionId
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 hover:bg-blue-600 text-white transform hover:scale-105'
                     }`}
                 >
-                  Iniciar Refinamento
+                  Iniciar Sessão
                 </button>
               )}
             </div>
@@ -321,7 +321,7 @@ const TeamSelectionScene: React.FC = () => {
         onClose={closeExitModal}
         onConfirm={handleExitRoom}
         isOwner={isOwner}
-        sessionTitle={refinement.title}
+        sessionTitle={session.title}
       />
     </div>
   );

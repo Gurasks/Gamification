@@ -1,4 +1,4 @@
-import type { Card, Refinement } from "../types/global";
+import type { Card, Session } from "../types/global";
 import type {
   TeamMetrics,
   UserContributions,
@@ -7,14 +7,14 @@ import type {
 import { calculateAverageRating } from "./globalServices";
 
 export const generateExportContent = (
-  refinement: Refinement,
+  session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
   allCards: Card[]
 ) => {
   return `
-      <h1>Relatório da Sessão: ${refinement?.title || "N/A"}</h1>
-      <p><strong>Descrição:</strong> ${refinement?.description || "N/A"}</p>
+      <h1>Relatório da Sessão: ${session?.title || "N/A"}</h1>
+      <p><strong>Descrição:</strong> ${session?.description || "N/A"}</p>
       <p><strong>Data de Geração:</strong> ${new Date().toLocaleString()}</p>
 
       <div class="section">
@@ -74,7 +74,7 @@ export const generateExportContent = (
                 <td>${user.averageRating}</td>
                 <td>${user.totalReplies}</td>
                 <td>${user.totalCardsCreated}</td>
-                <td>${refinement?.teams?.[user.userId] || "N/A"}</td>
+                <td>${session?.teams?.[user.userId] || "N/A"}</td>
               </tr>
             `
               )
@@ -130,13 +130,13 @@ export const generateExportContent = (
 };
 
 export const exportToPDF = (
-  refinement: Refinement,
+  session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
   allCards: Card[]
 ) => {
   const printContent = generateExportContent(
-    refinement,
+    session,
     teamMetrics,
     sortedData,
     allCards
@@ -147,7 +147,7 @@ export const exportToPDF = (
         <!DOCTYPE html>
         <html>
           <head>
-            <title>Relatório - ${refinement?.title || "Sessão"}</title>
+            <title>Relatório - ${session?.title || "Sessão"}</title>
             <style>
               body { font-family: Arial, sans-serif; margin: 20px; }
               h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
@@ -170,13 +170,13 @@ export const exportToPDF = (
 };
 
 export const exportToDOC = (
-  refinement: Refinement,
+  session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
   allCards: Card[]
 ) => {
   const content = generateExportContent(
-    refinement,
+    session,
     teamMetrics,
     sortedData,
     allCards
@@ -188,7 +188,7 @@ export const exportToDOC = (
       <html>
         <head>
           <meta charset="UTF-8">
-          <title>Relatório - ${refinement?.title || "Sessão"}</title>
+          <title>Relatório - ${session?.title || "Sessão"}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
@@ -212,7 +212,7 @@ export const exportToDOC = (
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `relatorio-${refinement?.title || "sessao"}.doc`;
+  link.download = `relatorio-${session?.title || "sessao"}.doc`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

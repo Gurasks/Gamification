@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalLoading } from "@/contexts/LoadingContext";
 import {
-  createRefinementInFirestore,
+  createSessionInFirestore,
   shortenUUID,
 } from "@/services/firestore/firestoreServices";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const useRefinementCreation = () => {
+export const useSessionCreation = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { setGlobalLoading, setLoadingMessage } = useGlobalLoading();
@@ -40,7 +40,7 @@ export const useRefinementCreation = () => {
     return errors;
   };
 
-  const handleCreateRefinement = async () => {
+  const handleCreateSession = async () => {
     const errors = validateForm();
     if (errors.length > 0) {
       errors.forEach((error) => toast.error(error));
@@ -57,13 +57,13 @@ export const useRefinementCreation = () => {
     setLoadingMessage("Criando sua sessão...");
 
     try {
-      const newRefinementId = uuidv4();
+      const newSessionId = uuidv4();
 
       // Loading específico para encurtamento de UUID
       setLoadingMessage("Configurando sessão...");
-      await shortenUUID(newRefinementId);
+      await shortenUUID(newSessionId);
 
-      const refinementData = {
+      const sessionData = {
         name: formData.name,
         description: formData.description,
         password: formData.requiresPassword ? formData.password : null,
@@ -71,12 +71,12 @@ export const useRefinementCreation = () => {
       };
 
       setLoadingMessage("Salvando dados...");
-      await createRefinementInFirestore(newRefinementId, refinementData, user);
+      await createSessionInFirestore(newSessionId, sessionData, user);
 
       toast.success("Sessão criada com sucesso!");
-      navigate(`/team-selection/${newRefinementId}`);
+      navigate(`/team-selection/${newSessionId}`);
     } catch (error) {
-      console.error("Error creating refinement:", error);
+      console.error("Error creating session:", error);
       toast.error("Erro ao criar sessão. Tente novamente.");
     } finally {
       setIsCreating(false);
@@ -94,7 +94,7 @@ export const useRefinementCreation = () => {
   return {
     formData,
     isCreating,
-    handleCreateRefinement,
+    handleCreateSession,
     updateFormData,
     validateForm,
   };

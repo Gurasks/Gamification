@@ -96,8 +96,8 @@ describe('NameEntryScene', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('Bem-vindo ao Refinamento')).toBeInTheDocument();
-      expect(screen.getByText('Identifique-se para participar das sessões de refinamento')).toBeInTheDocument();
+      expect(screen.getByText('Bem-vindo ao Gamification!')).toBeInTheDocument();
+      expect(screen.getByText('Identifique-se para participar das sessões')).toBeInTheDocument();
       expect(screen.getByText('Identificação Obrigatória')).toBeInTheDocument();
       expect(screen.getByText('Digite seu nome para continuar como convidado')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Ex: João Silva')).toBeInTheDocument();

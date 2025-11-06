@@ -4,14 +4,14 @@ import { db } from '../../../config/firebase';
 import { UserData } from '@/types/global';
 
 interface OwnerTeamAssignmentProps {
-  refinementId: string;
+  sessionId: string;
   members: UserData[];
   availableTeams: string[];
   currentAssignments: Record<string, string>;
 }
 
 const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
-  refinementId,
+  sessionId,
   members,
   availableTeams,
   currentAssignments,
@@ -19,12 +19,12 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
   const [assigningUser, setAssigningUser] = useState<string | null>(null);
 
   const assignParticipantToTeam = async (userId: string, team: string) => {
-    if (!refinementId) return;
+    if (!sessionId) return;
 
     setAssigningUser(userId);
 
     try {
-      await updateDoc(doc(db, 'refinements', refinementId), {
+      await updateDoc(doc(db, 'sessions', sessionId), {
         [`teams.${userId}`]: team,
       });
     } catch (error) {

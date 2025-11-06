@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import type { LeaderboardSortTypes, TabType, TeamMetrics, UserContributions, UserStats } from '../../types/leaderboard';
-import { fetchLeaderboardData, getRefinement, getCardsByRefinementId } from '../../services/firestore/firestoreServices';
+import { fetchLeaderboardData, getSession, getCardsBySessionId } from '../../services/firestore/firestoreServices';
 import { useParams } from 'react-router-dom';
-import type { Refinement, Card } from '../../types/global';
+import type { Session, Card } from '../../types/global';
 import { getAvailableTeams } from '../../services/teamSelectionServices';
 import { exportToDOC, exportToPDF } from '../../services/leaderboardServices';
 import TeamLeaderboard from './components/TeamLeaderboard';
@@ -11,9 +11,9 @@ import ContributionsModal from './components/ContributionsModal';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 
 const LeaderboardScene: React.FC = () => {
-  const { refinementId } = useParams<{ refinementId: string }>();
+  const { sessionId } = useParams<{ sessionId: string }>();
   const [leaderboardData, setLeaderboardData] = useState<UserStats[]>([]);
-  const [refinement, setRefinement] = useState<Refinement | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<LeaderboardSortTypes>('comments');
   const [activeTab, setActiveTab] = useState<TabType>('participants');
@@ -24,23 +24,23 @@ const LeaderboardScene: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!refinementId) return;
-    loadLeaderboardData(refinementId);
-  }, [refinementId]);
+    if (!sessionId) return;
+    loadLeaderboardData(sessionId);
+  }, [sessionId]);
 
-  const loadLeaderboardData = async (refinementId: string) => {
+  const loadLeaderboardData = async (sessionId: string) => {
     setLoading(true);
     try {
-      const [fetchedLeaderboardData, refinementData, cardsData] = await Promise.all([
-        fetchLeaderboardData(refinementId),
-        getRefinement(refinementId),
-        getCardsByRefinementId(refinementId)
+      const [fetchedLeaderboardData, sessionData, cardsData] = await Promise.all([
+        fetchLeaderboardData(sessionId),
+        getSession(sessionId),
+        getCardsBySessionId(sessionId)
       ]);
 
       setLeaderboardData(fetchedLeaderboardData);
-      setRefinement(refinementData);
+      setSession(sessionData);
       setAllCards(cardsData);
-      calculateTeamMetrics(fetchedLeaderboardData, refinementData, cardsData);
+      calculateTeamMetrics(fetchedLeaderboardData, sessionData, cardsData);
     } catch (error) {
       console.error('Error loading leaderboard:', error);
     } finally {
@@ -48,18 +48,18 @@ const LeaderboardScene: React.FC = () => {
     }
   };
 
-  const calculateTeamMetrics = (users: UserStats[], refinementData: Refinement | null, cards: Card[]) => {
-    if (!refinementData || !refinementData.teams) {
+  const calculateTeamMetrics = (users: UserStats[], sessionData: Session | null, cards: Card[]) => {
+    if (!sessionData || !sessionData.teams) {
       setTeamMetrics([]);
       return;
     }
 
-    const teams = getAvailableTeams(refinementData.numOfTeams || 2);
+    const teams = getAvailableTeams(sessionData.numOfTeams || 2);
     const metrics: TeamMetrics[] = [];
 
     teams.forEach(teamName => {
       const teamMembers = users.filter(user =>
-        refinementData.teams && refinementData.teams[user.userId] === teamName
+        sessionData.teams && sessionData.teams[user.userId] === teamName
       );
 
       const teamCards = cards.filter(card => card.teamName === teamName);
@@ -112,11 +112,11 @@ const LeaderboardScene: React.FC = () => {
               Tabela de Classificação
             </h1>
             <p className="text-gray-600 text-lg">
-              {refinement?.title || 'Sessão de Refinamento'}
+              {session?.title || 'Sessão de levantamento de requisitos'}
             </p>
-            {refinement?.description && (
+            {session?.description && (
               <p className="text-gray-500 text-sm mt-2 max-w-2xl mx-auto">
-                {refinement.description}
+                {session.description}
               </p>
             )}
           </div>
@@ -124,7 +124,7 @@ const LeaderboardScene: React.FC = () => {
           {/* Export Buttons */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <button
-              onClick={() => refinement && exportToPDF(refinement, teamMetrics, sortedData, allCards)}
+              onClick={() => session && exportToPDF(session, teamMetrics, sortedData, allCards)}
               className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@ const LeaderboardScene: React.FC = () => {
               Exportar PDF
             </button>
             <button
-              onClick={() => refinement && exportToDOC(refinement, teamMetrics, sortedData, allCards)}
+              onClick={() => session && exportToDOC(session, teamMetrics, sortedData, allCards)}
               className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,9 +165,9 @@ const LeaderboardScene: React.FC = () => {
             </button>
           </div>
 
-          {activeTab === 'participants' && refinement &&
+          {activeTab === 'participants' && session &&
             <MembersLeaderboard
-              refinement={refinement}
+              session={session}
               sortedData={sortedData}
               allCards={allCards}
               sortBy={sortBy}
@@ -188,7 +188,7 @@ const LeaderboardScene: React.FC = () => {
           {/* Refresh Button */}
           <div className="mt-8 text-center">
             <button
-              onClick={() => refinementId && loadLeaderboardData(refinementId)}
+              onClick={() => sessionId && loadLeaderboardData(sessionId)}
               className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium"
             >
               Atualizar Tabela
@@ -200,7 +200,7 @@ const LeaderboardScene: React.FC = () => {
       {/* Modal de Contribuições do Usuário */}
       {isModalOpen && selectedUser &&
         <ContributionsModal
-          refinement={refinement}
+          session={session}
           selectedUser={selectedUser}
           sortedData={sortedData}
           setIsModalOpen={setIsModalOpen}

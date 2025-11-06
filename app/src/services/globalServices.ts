@@ -1,14 +1,14 @@
 import toast from "react-hot-toast";
 import { CheckCircle, XCircle } from "lucide-react";
 import React from "react";
-import type { Refinement } from "../types/global";
+import type { Session } from "../types/global";
 import { User } from "firebase/auth";
 
 export const returnTimerId = (
   teamName: string | undefined,
-  refinement: Refinement
+  session: Session
 ) => {
-  return (teamName && refinement.teamTimers?.[teamName]) || "";
+  return (teamName && session.teamTimers?.[teamName]) || "";
 };
 
 export const returnToastMessage = (message: string, type: string) => {

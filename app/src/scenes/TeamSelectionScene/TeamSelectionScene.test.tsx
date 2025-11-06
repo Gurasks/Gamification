@@ -3,11 +3,11 @@ import { BrowserRouter } from 'react-router-dom';
 import TeamSelectionScene from './TeamSelectionScene';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
 import {
-  startRefinementInFirebase,
-  removeUserFromRefinement,
-  deleteRefinement,
-  updateNumOfTeamsToRefinementInFirebase,
-  updateSelectionMethodToRefinementInFirebase
+  startSessionInFirebase,
+  removeUserFromSession,
+  deleteSession,
+  updateNumOfTeamsToSessionInFirebase,
+  updateSelectionMethodToSessionInFirebase
 } from '../../services/firestore/firestoreServices';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -17,11 +17,11 @@ jest.mock('../../hooks/firestoreUnsubscriber', () => ({
 }));
 
 jest.mock('../../services/firestore/firestoreServices', () => ({
-  startRefinementInFirebase: jest.fn(),
-  updateNumOfTeamsToRefinementInFirebase: jest.fn(),
-  updateSelectionMethodToRefinementInFirebase: jest.fn(),
-  removeUserFromRefinement: jest.fn(),
-  deleteRefinement: jest.fn(),
+  startSessionInFirebase: jest.fn(),
+  updateNumOfTeamsToSessionInFirebase: jest.fn(),
+  updateSelectionMethodToSessionInFirebase: jest.fn(),
+  removeUserFromSession: jest.fn(),
+  deleteSession: jest.fn(),
 }));
 
 jest.mock('../../contexts/AuthContext', () => ({
@@ -81,10 +81,10 @@ jest.mock('./components/TeamSelection', () => {
 });
 
 jest.mock('../../components/ShareButton', () => {
-  return function MockShareButton({ refinementId, sessionTitle }: { refinementId: string; sessionTitle: string }) {
+  return function MockShareButton({ sessionId, sessionTitle }: { sessionId: string; sessionTitle: string }) {
     return (
       <button data-testid="share-button">
-        Share {sessionTitle} ({refinementId})
+        Share {sessionTitle} ({sessionId})
       </button>
     );
   };
@@ -92,17 +92,17 @@ jest.mock('../../components/ShareButton', () => {
 
 jest.mock('../../components/CollapsibleDescriptionArea', () => {
   return function MockCollapsibleDescriptionArea({
-    refinementDescription,
+    sessionDescription,
     showDescription,
     setShowDescription
   }: {
-    refinementDescription: string;
+    sessionDescription: string;
     showDescription: boolean;
     setShowDescription: (show: boolean) => void;
   }) {
     return (
       <div data-testid="collapsible-description">
-        <p>{refinementDescription}</p>
+        <p>{sessionDescription}</p>
         <button onClick={() => setShowDescription(!showDescription)}>
           {showDescription ? 'Hide' : 'Show'} Description
         </button>
@@ -144,7 +144,7 @@ interface MockUser {
   email: string;
 }
 
-interface MockRefinement {
+interface MockSession {
   id: string;
   title: string;
   description: string;
@@ -165,10 +165,10 @@ describe('TeamSelectionScene', () => {
     email: 'test@example.com'
   };
 
-  const mockRefinement: MockRefinement = {
-    id: 'refinement-123',
-    title: 'Test Refinement Session',
-    description: 'This is a test refinement session',
+  const mockSession: MockSession = {
+    id: 'session-123',
+    title: 'Test Session Session',
+    description: 'This is a test session session',
     numOfTeams: 2,
     selectionMethod: 'RANDOM',
     owner: 'user-123',
@@ -187,7 +187,7 @@ describe('TeamSelectionScene', () => {
 
     // Mock do useParams
     const { useParams } = require('react-router-dom');
-    useParams.mockReturnValue({ refinementId: 'refinement-123' });
+    useParams.mockReturnValue({ sessionId: 'session-123' });
 
     // Mock do useNavigate
     const { useNavigate } = require('react-router-dom');
@@ -204,7 +204,7 @@ describe('TeamSelectionScene', () => {
   });
 
   // Teste 1: Estado de carregamento inicial
-  it('should render loading state initially when refinement is null', () => {
+  it('should render loading state initially when session is null', () => {
     (createUnsubscribeMembers as jest.Mock).mockImplementation(() => {
       return mockUnsubscribe;
     });
@@ -253,13 +253,13 @@ describe('TeamSelectionScene', () => {
   });
 
   // Teste 4: Renderização completa com dados
-  it('should render the team selection scene with refinement data', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+  it('should render the team selection scene with session data', async () => {
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -267,7 +267,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -284,13 +284,13 @@ describe('TeamSelectionScene', () => {
 
     // Simula o carregamento dos dados
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     await waitFor(() => {
       expect(screen.getByText('Configuração dos Times')).toBeInTheDocument();
-      expect(screen.getByText('Test Refinement Session')).toBeInTheDocument();
-      expect(screen.getByText('Organize os participantes e configure os times para o refinamento')).toBeInTheDocument();
+      expect(screen.getByText('Test Session Session')).toBeInTheDocument();
+      expect(screen.getByText('Organize os participantes e configure os times para a sessão')).toBeInTheDocument();
     });
 
     expect(screen.getByTestId('share-button')).toBeInTheDocument();
@@ -302,12 +302,12 @@ describe('TeamSelectionScene', () => {
 
   // Teste 5: Elementos específicos do owner
   it('should show owner-specific elements when user is owner', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -315,7 +315,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -331,12 +331,12 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     await waitFor(() => {
       expect(screen.getByText('Você é o organizador desta sessão')).toBeInTheDocument();
-      expect(screen.getByText('Iniciar Refinamento')).toBeInTheDocument();
+      expect(screen.getByText('Iniciar Sessão')).toBeInTheDocument();
     });
 
     // Verifica se o input de quantidade de times está presente para o owner
@@ -347,12 +347,12 @@ describe('TeamSelectionScene', () => {
 
   // Teste 6: Visualização do participante
   it('should show participant view when user is not owner', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -360,7 +360,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(false);
       setNumOfTeams(2);
@@ -380,7 +380,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     await waitFor(() => {
@@ -388,8 +388,8 @@ describe('TeamSelectionScene', () => {
       expect(screen.getByText('Aguardando o organizador iniciar a sessão')).toBeInTheDocument();
     });
 
-    // Verifica se o botão de iniciar refinamento não está presente
-    expect(screen.queryByText('Iniciar Refinamento')).not.toBeInTheDocument();
+    // Verifica se o botão de iniciar sessão não está presente
+    expect(screen.queryByText('Iniciar Sessão')).not.toBeInTheDocument();
 
     // Verifica se mostra o número de times como texto (não input)
     expect(screen.getByText('2')).toBeInTheDocument();
@@ -398,12 +398,12 @@ describe('TeamSelectionScene', () => {
 
   // Teste 7: Saída da sala como participante
   it('should handle exit room for participant', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -411,7 +411,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(false);
       setNumOfTeams(2);
@@ -427,7 +427,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     // Abre o modal de confirmação
@@ -443,19 +443,19 @@ describe('TeamSelectionScene', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(removeUserFromRefinement).toHaveBeenCalledWith('refinement-123', 'user-123');
+      expect(removeUserFromSession).toHaveBeenCalledWith('session-123', 'user-123');
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
 
   // Teste 8: Saída da sala como owner
   it('should handle exit room for owner', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -463,7 +463,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -479,7 +479,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     // Abre o modal de confirmação
@@ -495,25 +495,25 @@ describe('TeamSelectionScene', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(deleteRefinement).toHaveBeenCalledWith('refinement-123');
+      expect(deleteSession).toHaveBeenCalledWith('session-123');
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
 
-  // Teste 9: Iniciar refinamento como owner
-  it('should start refinement when owner clicks start button', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+  // Teste 9: Iniciar sessão como owner
+  it('should start session when owner clicks start button', async () => {
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
-    const refinementWithTeams: MockRefinement = {
-      ...mockRefinement,
+    const sessionWithTeams: MockSession = {
+      ...mockSession,
       teams: { 'user-123': 'Time 1' },
       members: [mockUser]
     };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -521,7 +521,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -537,16 +537,16 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(refinementWithTeams);
+      setSessionCallback(sessionWithTeams);
     });
 
-    const startButton = screen.getByText('Iniciar Refinamento');
+    const startButton = screen.getByText('Iniciar Sessão');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(startRefinementInFirebase).toHaveBeenCalledWith(
-        refinementWithTeams,
-        'refinement-123',
+      expect(startSessionInFirebase).toHaveBeenCalledWith(
+        sessionWithTeams,
+        'session-123',
         mockUser,
         mockNavigate
       );
@@ -554,13 +554,13 @@ describe('TeamSelectionScene', () => {
   });
 
   // Teste 10: Descrição recolhível
-  it('should show collapsible description when refinement has description', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+  it('should show collapsible description when session has description', async () => {
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -568,7 +568,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -584,21 +584,21 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     await waitFor(() => {
       expect(screen.getByTestId('collapsible-description')).toBeInTheDocument();
-      expect(screen.getByText('This is a test refinement session')).toBeInTheDocument();
+      expect(screen.getByText('This is a test session session')).toBeInTheDocument();
     });
   });
 
   // Teste 11: Lista de participantes
   it('should display participants list correctly', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
-    const refinementWithMultipleMembers: MockRefinement = {
-      ...mockRefinement,
+    const sessionWithMultipleMembers: MockSession = {
+      ...mockSession,
       members: [
         mockUser,
         { uid: 'user-456', displayName: 'Another User', email: 'another@example.com' },
@@ -611,9 +611,9 @@ describe('TeamSelectionScene', () => {
     };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -621,12 +621,12 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
       setOwner('user-123');
-      setMembers(refinementWithMultipleMembers.members);
+      setMembers(sessionWithMultipleMembers.members);
       return mockUnsubscribe;
     });
 
@@ -637,7 +637,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(refinementWithMultipleMembers);
+      setSessionCallback(sessionWithMultipleMembers);
     });
 
     await waitFor(() => {
@@ -652,12 +652,12 @@ describe('TeamSelectionScene', () => {
 
   // Teste 12: Cleanup no unmount
   it('should cleanup unsubscribe on unmount', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -665,7 +665,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -681,7 +681,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     unmount();
@@ -691,12 +691,12 @@ describe('TeamSelectionScene', () => {
 
   // Teste 13: Cancelar saída da sala
   it('should cancel exit when user clicks cancel in modal', async () => {
-    let setRefinementCallback: (refinement: MockRefinement) => void = () => { };
+    let setSessionCallback: (session: MockSession) => void = () => { };
 
     (createUnsubscribeMembers as jest.Mock).mockImplementation((
-      refinementId: string,
+      sessionId: string,
       user: MockUser,
-      setRefinement: (refinement: MockRefinement) => void,
+      setSession: (session: MockSession) => void,
       setAvailableTeams: (teams: string[]) => void,
       setIsOwner: (isOwner: boolean) => void,
       setNumOfTeams: (num: number) => void,
@@ -704,7 +704,7 @@ describe('TeamSelectionScene', () => {
       setMembers: (members: MockUser[]) => void,
       navigate: jest.Mock
     ) => {
-      setRefinementCallback = setRefinement;
+      setSessionCallback = setSession;
       setAvailableTeams(['Time 1', 'Time 2']);
       setIsOwner(true);
       setNumOfTeams(2);
@@ -720,7 +720,7 @@ describe('TeamSelectionScene', () => {
     );
 
     await act(async () => {
-      setRefinementCallback(mockRefinement);
+      setSessionCallback(mockSession);
     });
 
     // Abre o modal de confirmação
@@ -737,15 +737,15 @@ describe('TeamSelectionScene', () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId('exit-confirmation-modal')).not.toBeInTheDocument();
-      expect(deleteRefinement).not.toHaveBeenCalled();
+      expect(deleteSession).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
 
-  // Teste 14: RefinementId ausente
-  it('should handle missing refinementId', async () => {
+  // Teste 14: SessionId ausente
+  it('should handle missing sessionId', async () => {
     const { useParams } = require('react-router-dom');
-    useParams.mockReturnValue({ refinementId: undefined });
+    useParams.mockReturnValue({ sessionId: undefined });
 
     render(
       <BrowserRouter>

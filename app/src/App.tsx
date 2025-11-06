@@ -43,17 +43,17 @@ const AppContent: React.FC = () => {
                 <JoinScene />
               </AppLayout>
             } />
-            <Route path="/board/:refinementId/team/:teamName" element={
+            <Route path="/board/:sessionId/team/:teamName" element={
               <AppLayout>
                 <BoardScene />
               </AppLayout>
             } />
-            <Route path="/team-selection/:refinementId" element={
+            <Route path="/team-selection/:sessionId" element={
               <AppLayout>
                 <TeamSelectionScene />
               </AppLayout>
             } />
-            <Route path="/leaderboard/:refinementId" element={
+            <Route path="/leaderboard/:sessionId" element={
               <AppLayout>
                 <LeaderboardScene />
               </AppLayout>

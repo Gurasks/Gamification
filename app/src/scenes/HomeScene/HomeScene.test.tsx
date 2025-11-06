@@ -71,7 +71,7 @@ describe('HomeScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Bem vindo Test User ao jogo de refinamento!/)).toBeInTheDocument();
+      expect(screen.getByText(/Bem vindo Test User ao gamification!/)).toBeInTheDocument();
     });
 
     it('should go through checkingProfile state before showing content', async () => {
@@ -163,7 +163,7 @@ describe('HomeScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Bem vindo João Silva ao jogo de refinamento!')).toBeInTheDocument();
+      expect(screen.getByText('Bem vindo João Silva ao gamification!')).toBeInTheDocument();
       expect(screen.getByText('Colabore e jogue com sua equipe em tempo real.')).toBeInTheDocument();
       expect(screen.getByText('Crie uma nova sessão')).toBeInTheDocument();
       expect(screen.getByText('Junte-se a uma sessão')).toBeInTheDocument();
@@ -223,7 +223,7 @@ describe('HomeScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Bem vindo Maria Santos ao jogo de refinamento!')).toBeInTheDocument();
+      expect(screen.getByText('Bem vindo Maria Santos ao gamification!')).toBeInTheDocument();
     });
   });
 
@@ -261,7 +261,7 @@ describe('HomeScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Bem vindo Jo ao jogo de refinamento!')).toBeInTheDocument();
+      expect(screen.getByText('Bem vindo Jo ao gamification!')).toBeInTheDocument();
       expect(mockNavigate).not.toHaveBeenCalledWith('/name-entry');
     });
   });

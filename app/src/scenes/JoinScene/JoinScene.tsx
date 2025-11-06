@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
-import { useRefinementJoin } from "../../hooks/useRefinimentJoin";
+import { useSessionJoin } from "../../hooks/useRefinimentJoin";
 
 const JoinScene: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
@@ -13,11 +13,11 @@ const JoinScene: React.FC = () => {
     isJoining,
     error,
     requiresPassword,
-    refinementData,
+    sessionData,
     joinSession,
     resetPasswordState,
     resetError,
-  } = useRefinementJoin();
+  } = useSessionJoin();
 
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const JoinScene: React.FC = () => {
     const result = await joinSession(joinCode, password);
 
     if (result?.success) {
-      navigate(`/team-selection/${result.refinementId}`);
+      navigate(`/team-selection/${result.sessionId}`);
     } else if (result?.requiresPassword) {
       // Mantém o estado de requiresPassword true e aguarda a senha
       return;
@@ -74,8 +74,8 @@ const JoinScene: React.FC = () => {
           </h1>
           <p className="text-gray-600">
             {requiresPassword
-              ? `A sessão "${refinementData?.title}" é protegida por senha`
-              : 'Junte-se a uma sessão de refinamento existente'
+              ? `A sessão "${sessionData?.title}" é protegida por senha`
+              : 'Junte-se a uma sessão existente'
             }
           </p>
         </div>
@@ -100,7 +100,7 @@ const JoinScene: React.FC = () => {
             <p className="text-gray-600 text-sm">
               {requiresPassword
                 ? 'Digite a senha para acessar esta sessão'
-                : 'Insira o código da sessão para se juntar ao refinamento'
+                : 'Insira o código da sessão para se juntar a ela'
               }
             </p>
           </div>

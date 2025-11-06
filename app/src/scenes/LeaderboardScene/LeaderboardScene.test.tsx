@@ -6,8 +6,8 @@ import LeaderboardScene from './LeaderboardScene';
 // Mock dos serviços e componentes
 jest.mock('../../services/firestore/firestoreServices', () => ({
   fetchLeaderboardData: jest.fn(),
-  getRefinement: jest.fn(),
-  getCardsByRefinementId: jest.fn(),
+  getSession: jest.fn(),
+  getCardsBySessionId: jest.fn(),
 }));
 
 jest.mock('../../services/teamSelectionServices', () => ({
@@ -30,9 +30,9 @@ jest.mock('./components/TeamLeaderboard', () => ({
 
 jest.mock('./components/MembersLeaderboard', () => ({
   __esModule: true,
-  default: ({ refinement, sortedData }: any) => (
+  default: ({ session, sortedData }: any) => (
     <div data-testid="members-leaderboard">
-      Members Leaderboard - {refinement?.title} - {sortedData.length} members
+      Members Leaderboard - {session?.title} - {sortedData.length} members
     </div>
   ),
 }));
@@ -54,8 +54,8 @@ jest.mock('../../components/LoadingOverlay', () => ({
 }));
 
 const mockFetchLeaderboardData = require('../../services/firestore/firestoreServices').fetchLeaderboardData;
-const mockGetRefinement = require('../../services/firestore/firestoreServices').getRefinement;
-const mockGetCardsByRefinementId = require('../../services/firestore/firestoreServices').getCardsByRefinementId;
+const mockGetSession = require('../../services/firestore/firestoreServices').getSession;
+const mockGetCardsBySessionId = require('../../services/firestore/firestoreServices').getCardsBySessionId;
 const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
 const mockExportToPDF = require('../../services/leaderboardServices').exportToPDF;
 const mockExportToDOC = require('../../services/leaderboardServices').exportToDOC;
@@ -64,15 +64,15 @@ const mockExportToDOC = require('../../services/leaderboardServices').exportToDO
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({
-    refinementId: 'test-refinement-123',
+    sessionId: 'test-session-123',
   }),
 }));
 
 describe('LeaderboardScene', () => {
-  const mockRefinement = {
-    id: 'test-refinement-123',
-    title: 'Test Refinement Session',
-    description: 'Test description for refinement session',
+  const mockSession = {
+    id: 'test-session-123',
+    title: 'Test Session Session',
+    description: 'Test description for session session',
     teams: {
       'user1': 'Time A',
       'user2': 'Time A',
@@ -127,8 +127,8 @@ describe('LeaderboardScene', () => {
     mockGetAvailableTeams.mockReturnValue(['Time A', 'Time B']);
 
     mockFetchLeaderboardData.mockResolvedValue(mockLeaderboardData);
-    mockGetRefinement.mockResolvedValue(mockRefinement);
-    mockGetCardsByRefinementId.mockResolvedValue(mockCards);
+    mockGetSession.mockResolvedValue(mockSession);
+    mockGetCardsBySessionId.mockResolvedValue(mockCards);
   });
 
   describe('Loading state', () => {
@@ -161,8 +161,8 @@ describe('LeaderboardScene', () => {
       });
 
       expect(screen.getByText('Tabela de Classificação')).toBeInTheDocument();
-      expect(screen.getByText('Test Refinement Session')).toBeInTheDocument();
-      expect(screen.getByText('Test description for refinement session')).toBeInTheDocument();
+      expect(screen.getByText('Test Session Session')).toBeInTheDocument();
+      expect(screen.getByText('Test description for session session')).toBeInTheDocument();
     });
 
     it('should render export buttons', async () => {
@@ -267,7 +267,7 @@ describe('LeaderboardScene', () => {
       fireEvent.click(pdfButton);
 
       expect(mockExportToPDF).toHaveBeenCalledWith(
-        mockRefinement,
+        mockSession,
         expect.any(Array), // teamMetrics
         expect.any(Array), // sortedData
         mockCards
@@ -289,7 +289,7 @@ describe('LeaderboardScene', () => {
       fireEvent.click(docButton);
 
       expect(mockExportToDOC).toHaveBeenCalledWith(
-        mockRefinement,
+        mockSession,
         expect.any(Array), // teamMetrics
         expect.any(Array), // sortedData
         mockCards
@@ -320,8 +320,8 @@ describe('LeaderboardScene', () => {
       });
 
       expect(mockFetchLeaderboardData).toHaveBeenCalledTimes(2);
-      expect(mockGetRefinement).toHaveBeenCalledTimes(2);
-      expect(mockGetCardsByRefinementId).toHaveBeenCalledTimes(2);
+      expect(mockGetSession).toHaveBeenCalledTimes(2);
+      expect(mockGetCardsBySessionId).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -343,8 +343,8 @@ describe('LeaderboardScene', () => {
       expect(screen.getByText('Tabela de Classificação')).toBeInTheDocument();
     });
 
-    it('should handle missing refinement data', async () => {
-      mockGetRefinement.mockResolvedValue(null);
+    it('should handle missing session data', async () => {
+      mockGetSession.mockResolvedValue(null);
 
       render(
         <BrowserRouter>
@@ -356,7 +356,7 @@ describe('LeaderboardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Sessão de Refinamento')).toBeInTheDocument();
+      expect(screen.getByText('Sessão de levantamento de requisitos')).toBeInTheDocument();
     });
   });
 

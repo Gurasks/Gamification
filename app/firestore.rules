@@ -9,12 +9,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
-    function isRefinementOwner() {
+    function isSessionOwner() {
       return request.auth.uid == resource.data.owner;
     }
 
-    function isRefinementMember() {
-      return request.auth.uid in resource.data.members;
+    function isSessionMember() {
+      return isSignedIn() && request.auth.uid in resource.data.members;
     }
 
     function isCardOwner() {
@@ -29,13 +29,14 @@ service cloud.firestore {
       request.resource.data.displayName.size() <= 50;
     }
 
-    function hasValidRefinementStructure() {
-      return request.resource.data.keys().hasAll(['title', 'owner', 'members']) &&
+    function hasValidSessionStructure() {
+      return request.resource.data.keys().hasAll(['title', 'owner', 'members', 'numOfTeams']) &&
       request.resource.data.title is string &&
       request.resource.data.title.size() >= 3 &&
       request.resource.data.title.size() <= 100 &&
       request.resource.data.owner is string &&
-      request.resource.data.members is list;
+      request.resource.data.members is list &&
+      request.resource.data.numOfTeams is number;
     }
 
     function isValidAuthProvider() {
@@ -44,12 +45,12 @@ service cloud.firestore {
 
     // ===== REGRAS PRINCIPAIS =====
 
-    // Refinements (salas/sessões)
-    match /refinements/{refinementId} {
+    // Sessions (salas/sessões)
+    match /sessions/{sessionId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && hasValidRefinementStructure();
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn() && isRefinementOwner();
+      allow create: if isSignedIn() && hasValidSessionStructure();
+      allow update: if isSignedIn() && (isSessionOwner() || isSessionMember());
+      allow delete: if isSignedIn() && isSessionOwner();
     }
 
     // Cards (cartões de refinamento)
@@ -63,7 +64,7 @@ service cloud.firestore {
     // Perfis de usuário
     match /users/{userId} {
       allow read: if isSignedIn() && isOwner(userId);
-      allow create: if true;
+      allow create: if isSignedIn() && isOwner(userId);
       allow update: if isSignedIn() && isOwner(userId) && hasValidUserStructure();
       allow delete: if isSignedIn() && isOwner(userId);
     }

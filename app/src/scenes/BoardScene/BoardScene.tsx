@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
-import { createUnsubscribeCards, createUnsubscribeRefinement } from '../../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, getRefinement, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
-import type { Card, Refinement } from '../../types/global';
+import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
+import { addCommentToCardInFirestore, createCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
+import type { Card, Session } from '../../types/global';
 import { getNextTeam } from '../../services/boardServices';
 import { getAvailableTeams } from '../../services/teamSelectionServices';
 import VariableTextArea from "../../components/VariableTextArea";
@@ -18,9 +18,9 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import SyncTimer from './components/SyncTimer';
 
 const BoardScene: React.FC = () => {
-  const { refinementId, teamName } = useParams<{ refinementId: string, teamName: string }>();
+  const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
   const { user } = useAuth();
-  const [refinement, setRefinement] = useState<Refinement>({} as Refinement);
+  const [session, setSession] = useState<Session>({} as Session);
   const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [_myTeam, setMyTeam] = useState<string>('');
   const [cards, setCards] = useState<Card[]>([]);
@@ -33,9 +33,9 @@ const BoardScene: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!refinementId || !user) return;
+    if (!sessionId || !user) return;
 
-    let unsubscribeRefinement: (() => void) | undefined;
+    let unsubscribeSession: (() => void) | undefined;
     let unsubscribeCards: (() => void) | undefined;
 
     const fetchData = async () => {
@@ -43,19 +43,19 @@ const BoardScene: React.FC = () => {
       setCardsLoading(true);
 
       try {
-        const refinementData = await getRefinement(refinementId);
-        if (refinementData) {
-          setRefinement(refinementData);
-          setAvailableTeams(getAvailableTeams(refinementData.numOfTeams || 2));
+        const sessionData = await getSession(sessionId);
+        if (sessionData) {
+          setSession(sessionData);
+          setAvailableTeams(getAvailableTeams(sessionData.numOfTeams || 2));
         }
 
-        unsubscribeRefinement = createUnsubscribeRefinement(refinementId, setRefinement);
-        unsubscribeCards = createUnsubscribeCards(refinementId, (newCards) => {
+        unsubscribeSession = createUnsubscribeSession(sessionId, setSession);
+        unsubscribeCards = createUnsubscribeCards(sessionId, (newCards) => {
           setCards(newCards);
           setCardsLoading(false);
         });
       } catch (error) {
-        console.error('Error loading refinement:', error);
+        console.error('Error loading session:', error);
         setCardsLoading(false);
       } finally {
         setLoading(false);
@@ -65,27 +65,27 @@ const BoardScene: React.FC = () => {
     fetchData();
 
     return () => {
-      if (unsubscribeRefinement) unsubscribeRefinement();
+      if (unsubscribeSession) unsubscribeSession();
       if (unsubscribeCards) unsubscribeCards();
     };
-  }, [refinementId, user]);
+  }, [sessionId, user]);
 
   useEffect(() => {
-    if (refinementId && refinement.teams && user) {
-      setMyTeam(refinement.teams[user.uid] || '');
-      setAvailableTeams(getAvailableTeams(refinement.numOfTeams || 2));
+    if (sessionId && session.teams && user) {
+      setMyTeam(session.teams[user.uid] || '');
+      setAvailableTeams(getAvailableTeams(session.numOfTeams || 2));
     }
-  }, [refinementId, refinement.teams, user, refinement.numOfTeams]);
+  }, [sessionId, session.teams, user, session.numOfTeams]);
 
   const handleChangeBoard = async () => {
-    if (!refinementId || !teamName) return;
+    if (!sessionId || !teamName) return;
 
     setIsChangingTeam(true);
 
     await new Promise(resolve => setTimeout(resolve, 500));
 
     const nextTeam = getNextTeam(teamName, availableTeams);
-    navigate(`/board/${refinementId}/team/${nextTeam}`);
+    navigate(`/board/${sessionId}/team/${nextTeam}`);
   };
 
   const handleCreateCard = async () => {
@@ -102,7 +102,7 @@ const BoardScene: React.FC = () => {
 
       await createCardInFirestore(
         newCardText,
-        refinementId,
+        sessionId,
         user,
         teamName,
         setNewCardText
@@ -126,7 +126,7 @@ const BoardScene: React.FC = () => {
     );
   }
 
-  if (!refinement || !refinement.id) {
+  if (!session || !session.id) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center">
@@ -147,7 +147,7 @@ const BoardScene: React.FC = () => {
     return null;
   }
 
-  const teamTimerId = returnTimerId(teamName, refinement);
+  const teamTimerId = returnTimerId(teamName, session);
   const teamCards = cards.filter(card => card.teamName === teamName);
 
   return (
@@ -158,11 +158,11 @@ const BoardScene: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                {refinement.title}
+                {session.title}
               </h1>
-              {refinement.description && (
+              {session.description && (
                 <CollapsibleDescriptionArea
-                  refinementDescription={refinement.description}
+                  sessionDescription={session.description}
                   showDescription={showDescription}
                   setShowDescription={setShowDescription}
                 />
@@ -173,7 +173,7 @@ const BoardScene: React.FC = () => {
               </div>
             </div>
 
-            {refinement.hasStarted && teamTimerId && (
+            {session.hasStarted && teamTimerId && (
               <div className="flex-shrink-0">
                 <SyncTimer timerId={teamTimerId} />
               </div>

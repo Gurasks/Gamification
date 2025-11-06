@@ -8,7 +8,7 @@ export interface UserData {
   isAnonymous: boolean;
 }
 
-export interface Refinement {
+export interface Session {
   id: string;
   createdAt: Timestamp;
   members: UserData[];
@@ -26,7 +26,7 @@ export interface Refinement {
   teamTimers?: Record<string, string>;
 }
 
-export interface RefinementCreationData {
+export interface SessionCreationData {
   name: string;
   description?: string;
   password?: string | null;
@@ -45,7 +45,7 @@ export interface Card {
   id: string;
   text: string;
   columnId: string;
-  refinementId: string;
+  sessionId: string;
   teamName: string;
   createdBy: string;
   createdById: string;

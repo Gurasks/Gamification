@@ -5,7 +5,7 @@ import BoardScene from './BoardScene';
 
 // Mock dos serviços e hooks
 jest.mock('../../services/firestore/firestoreServices', () => ({
-  getRefinement: jest.fn(),
+  getSession: jest.fn(),
   createCardInFirestore: jest.fn(),
   updateRatingToCardInFirestore: jest.fn(),
   updateCardInFirestore: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock('../../services/firestore/firestoreServices', () => ({
 }));
 
 jest.mock('../../hooks/firestoreUnsubscriber', () => ({
-  createUnsubscribeRefinement: jest.fn(),
+  createUnsubscribeSession: jest.fn(),
   createUnsubscribeCards: jest.fn(),
 }));
 
@@ -78,9 +78,9 @@ jest.mock('./components/SyncTimer', () => ({
 
 jest.mock('../../components/CollapsibleDescriptionArea', () => ({
   __esModule: true,
-  default: ({ refinementDescription, showDescription }: any) => (
+  default: ({ sessionDescription, showDescription }: any) => (
     <div data-testid="collapsible-description">
-      {showDescription && <p>{refinementDescription}</p>}
+      {showDescription && <p>{sessionDescription}</p>}
     </div>
   ),
 }));
@@ -117,15 +117,15 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({
-    refinementId: 'refinement123',
+    sessionId: 'session123',
     teamName: 'Time A',
   }),
   useNavigate: () => mockNavigate,
 }));
 
-const mockGetRefinement = require('../../services/firestore/firestoreServices').getRefinement;
+const mockGetSession = require('../../services/firestore/firestoreServices').getSession;
 const mockCreateCardInFirestore = require('../../services/firestore/firestoreServices').createCardInFirestore;
-const mockCreateUnsubscribeRefinement = require('../../hooks/firestoreUnsubscriber').createUnsubscribeRefinement;
+const mockCreateUnsubscribeSession = require('../../hooks/firestoreUnsubscriber').createUnsubscribeSession;
 const mockCreateUnsubscribeCards = require('../../hooks/firestoreUnsubscriber').createUnsubscribeCards;
 const mockGetNextTeam = require('../../services/boardServices').getNextTeam;
 const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
@@ -147,10 +147,10 @@ describe('BoardScene', () => {
     email: 'joao@example.com',
   };
 
-  const mockRefinement = {
-    id: 'refinement123',
-    title: 'Test Refinement Session',
-    description: 'Test description for the refinement session',
+  const mockSession = {
+    id: 'session123',
+    title: 'Test Session Session',
+    description: 'Test description for the session session',
     teams: {
       'user123': 'Time A',
     },
@@ -186,11 +186,11 @@ describe('BoardScene', () => {
       user: mockUser,
     });
 
-    mockGetRefinement.mockResolvedValue(mockRefinement);
+    mockGetSession.mockResolvedValue(mockSession);
     mockGetAvailableTeams.mockReturnValue(['Time A', 'Time B']);
     mockReturnTimerId.mockReturnValue('timer123');
-    mockCreateUnsubscribeRefinement.mockReturnValue(jest.fn());
-    mockCreateUnsubscribeCards.mockImplementation((_refinementId: string, callback: (arg0: { id: string; text: string; teamName: string; createdBy: string; createdById: string; ratings: {}; comments: never[]; }[]) => void) => {
+    mockCreateUnsubscribeSession.mockReturnValue(jest.fn());
+    mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (arg0: { id: string; text: string; teamName: string; createdBy: string; createdById: string; ratings: {}; comments: never[]; }[]) => void) => {
       // Simula o callback sendo chamado com os cards
       callback(mockCards);
       return jest.fn();
@@ -200,7 +200,7 @@ describe('BoardScene', () => {
   describe('Loading state', () => {
     it('should show LoadingOverlay when loading session data', async () => {
       // Mock para simular loading
-      mockGetRefinement.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockRefinement), 100)));
+      mockGetSession.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockSession), 100)));
 
       render(
         <TestWrapper>
@@ -229,7 +229,7 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Test Refinement Session')).toBeInTheDocument();
+      expect(screen.getByText('Test Session Session')).toBeInTheDocument();
       expect(screen.getByText(/Time:/)).toBeInTheDocument();
 
       // Correção: Use query mais específica para evitar múltiplos elementos
@@ -246,7 +246,7 @@ describe('BoardScene', () => {
       expect(participantElement).toBeInTheDocument();
     });
 
-    it('should render SyncTimer when refinement has started', async () => {
+    it('should render SyncTimer when session has started', async () => {
       render(
         <TestWrapper>
           <BoardScene />
@@ -312,7 +312,7 @@ describe('BoardScene', () => {
       await waitFor(() => {
         expect(mockCreateCardInFirestore).toHaveBeenCalledWith(
           'New test card',
-          'refinement123',
+          'session123',
           mockUser,
           'Time A',
           expect.any(Function)
@@ -362,7 +362,7 @@ describe('BoardScene', () => {
 
       // Verifica se a navegação ocorreu
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/board/refinement123/team/Time B');
+        expect(mockNavigate).toHaveBeenCalledWith('/board/session123/team/Time B');
       });
     });
   });
@@ -390,7 +390,7 @@ describe('BoardScene', () => {
 
     it('should show empty state when no cards', async () => {
       // Mock para retornar array vazio de cards
-      mockCreateUnsubscribeCards.mockImplementation((_refinementId: string, callback: (arg0: never[]) => void) => {
+      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (arg0: never[]) => void) => {
         callback([]);
         return jest.fn();
       });
@@ -414,8 +414,8 @@ describe('BoardScene', () => {
   });
 
   describe('Error handling', () => {
-    it('should show session not found when refinement is not available', async () => {
-      mockGetRefinement.mockResolvedValue(null);
+    it('should show session not found when session is not available', async () => {
+      mockGetSession.mockResolvedValue(null);
 
       render(
         <TestWrapper>
@@ -437,8 +437,8 @@ describe('BoardScene', () => {
         user: {}, // Objeto vazio
       });
 
-      // Mock para getRefinement retornar rápido
-      mockGetRefinement.mockResolvedValue(mockRefinement);
+      // Mock para getSession retornar rápido
+      mockGetSession.mockResolvedValue(mockSession);
 
       render(
         <TestWrapper>

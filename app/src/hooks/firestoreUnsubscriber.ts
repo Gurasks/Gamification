@@ -1,40 +1,40 @@
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
-import type { Card, Refinement, UserData } from "../types/global";
+import type { Card, Session, UserData } from "../types/global";
 import { getAvailableTeams } from "../services/teamSelectionServices";
 import { User } from "firebase/auth";
 
-export const createUnsubscribeRefinement = (
-  refinementId: string,
-  setRefinement: (refinement: Refinement) => void
+export const createUnsubscribeSession = (
+  sessionId: string,
+  setSession: (session: Session) => void
 ) => {
-  const refinementQuery = query(
-    collection(db, "refinements"),
-    where("refinementId", "==", refinementId)
+  const sessionQuery = query(
+    collection(db, "sessions"),
+    where("sessionId", "==", sessionId)
   );
 
-  const unsubscribeRefinement = onSnapshot(refinementQuery, (snapshot) => {
-    const refinementDataArray = snapshot.docs.map((doc) => ({
+  const unsubscribeSession = onSnapshot(sessionQuery, (snapshot) => {
+    const sessionDataArray = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Refinement[];
-    if (refinementDataArray.length === 1) {
-      const refinementData = refinementDataArray[0];
-      setRefinement(refinementData);
+    })) as Session[];
+    if (sessionDataArray.length === 1) {
+      const sessionData = sessionDataArray[0];
+      setSession(sessionData);
     }
   });
 
-  return unsubscribeRefinement;
+  return unsubscribeSession;
 };
 
 export const createUnsubscribeCards = (
-  refinementId: string,
+  sessionId: string,
   setCards: (arg0: Card[]) => void
 ) => {
   const cardsQuery = query(
     collection(db, "cards"),
-    where("refinementId", "==", refinementId)
+    where("sessionId", "==", sessionId)
   );
   const unsubscribeCards = onSnapshot(cardsQuery, (snapshot) => {
     const cards = snapshot.docs.map((doc) => ({
@@ -48,9 +48,9 @@ export const createUnsubscribeCards = (
 };
 
 export const createUnsubscribeMembers = (
-  refinementId: string,
+  sessionId: string,
   user: User,
-  setRefinement: (arg0: Refinement) => void,
+  setSession: (arg0: Session) => void,
   setAvailableTeams: (arg0: string[]) => void,
   setIsOwner: (arg0: boolean) => void,
   setNumOfTeams: (arg0: number) => void,
@@ -58,31 +58,31 @@ export const createUnsubscribeMembers = (
   setMembers: (arg0: UserData[]) => void,
   navigate: ReturnType<typeof useNavigate>
 ) => {
-  const refinementQuery = query(
-    collection(db, "refinements"),
-    where("id", "==", refinementId)
+  const sessionQuery = query(
+    collection(db, "sessions"),
+    where("id", "==", sessionId)
   );
-  const unsubscribeMembers = onSnapshot(refinementQuery, (snapshot) => {
-    const refinementDataArray = snapshot.docs.map((doc) => ({
+  const unsubscribeMembers = onSnapshot(sessionQuery, (snapshot) => {
+    const sessionDataArray = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Refinement[];
-    if (refinementDataArray.length === 1) {
-      const refinementData = refinementDataArray[0];
-      const teamName = refinementData.teams?.[user.uid];
-      if (refinementData.hasStarted) {
+    })) as Session[];
+    if (sessionDataArray.length === 1) {
+      const sessionData = sessionDataArray[0];
+      const teamName = sessionData.teams?.[user.uid];
+      if (sessionData.hasStarted) {
         if (teamName) {
-          navigate(`/board/${refinementId}/team/${teamName}`);
+          navigate(`/board/${sessionId}/team/${teamName}`);
         } else {
           navigate("/");
         }
       }
-      setAvailableTeams(getAvailableTeams(refinementData.numOfTeams));
-      setIsOwner(refinementData.owner === user.uid);
-      setMembers(refinementData.members);
-      setNumOfTeams(refinementData.numOfTeams);
-      setOwner(refinementData.owner);
-      setRefinement(refinementData);
+      setAvailableTeams(getAvailableTeams(sessionData.numOfTeams));
+      setIsOwner(sessionData.owner === user.uid);
+      setMembers(sessionData.members);
+      setNumOfTeams(sessionData.numOfTeams);
+      setOwner(sessionData.owner);
+      setSession(sessionData);
     }
   });
 

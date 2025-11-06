@@ -4,15 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import JoinScene from "./JoinScene";
 
-// Mock do hook useRefinementJoin
-const mockUseRefinementJoin = jest.fn();
+// Mock do hook useSessionJoin
+const mockUseSessionJoin = jest.fn();
 
 // Mock do react-router-dom
 const mockNavigate = jest.fn();
 const mockUseParams = jest.fn();
 
 jest.mock("../../hooks/useRefinimentJoin", () => ({
-  useRefinementJoin: () => mockUseRefinementJoin(),
+  useSessionJoin: () => mockUseSessionJoin(),
 }));
 
 jest.mock("react-router-dom", () => ({
@@ -57,7 +57,7 @@ describe("JoinScene", () => {
     isJoining: false,
     error: null,
     requiresPassword: false,
-    refinementData: null,
+    sessionData: null,
     joinSession: jest.fn(),
     resetPasswordState: jest.fn(),
     resetError: jest.fn(),
@@ -65,7 +65,7 @@ describe("JoinScene", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseRefinementJoin.mockReturnValue(defaultMockValues);
+    mockUseSessionJoin.mockReturnValue(defaultMockValues);
     mockUseParams.mockReturnValue({ sessionCode: undefined });
   });
 
@@ -74,7 +74,7 @@ describe("JoinScene", () => {
     renderWithRouter(<JoinScene />);
 
     expect(screen.getByText("Entrar em uma Sessão")).toBeInTheDocument();
-    expect(screen.getByText("Junte-se a uma sessão de refinamento existente")).toBeInTheDocument();
+    expect(screen.getByText("Junte-se a uma sessão existente")).toBeInTheDocument();
     expect(screen.getByLabelText(/código da sessão \*/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /voltar/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /participar/i })).toBeInTheDocument();
@@ -93,10 +93,10 @@ describe("JoinScene", () => {
 
   // Teste 3: Tela de senha quando requiresPassword é true
   it("should render password screen when requiresPassword is true", () => {
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
-      refinementData: {
+      sessionData: {
         title: "Sprint 15 Refinamento"
       }
     });
@@ -130,7 +130,7 @@ describe("JoinScene", () => {
 
   // Teste 6: Botão verificar senha desabilitado quando senha está vazia
   it("should disable verify password button when password is empty", () => {
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
     });
@@ -157,7 +157,7 @@ describe("JoinScene", () => {
   it("should update password when typing", async () => {
     const user = userEvent.setup();
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
     });
@@ -188,7 +188,7 @@ describe("JoinScene", () => {
     const user = userEvent.setup();
     const mockResetError = jest.fn();
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       resetError: mockResetError,
     });
@@ -206,7 +206,7 @@ describe("JoinScene", () => {
     const user = userEvent.setup();
     const mockResetError = jest.fn();
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
       resetError: mockResetError,
@@ -237,7 +237,7 @@ describe("JoinScene", () => {
     const user = userEvent.setup();
     const mockResetPasswordState = jest.fn();
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
       resetPasswordState: mockResetPasswordState,
@@ -254,9 +254,9 @@ describe("JoinScene", () => {
   // Teste 14: Tentativa de entrar na sessão com código
   it("should call joinSession when join button is clicked", async () => {
     const user = userEvent.setup();
-    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, refinementId: "123" });
+    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, sessionId: "123" });
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       joinSession: mockJoinSession,
     });
@@ -276,9 +276,9 @@ describe("JoinScene", () => {
     const user = userEvent.setup();
     const mockJoinSession = jest.fn()
       .mockResolvedValueOnce({ requiresPassword: true }) // Primeira chamada pede senha
-      .mockResolvedValueOnce({ success: true, refinementId: "123" }); // Segunda chamada com senha
+      .mockResolvedValueOnce({ success: true, sessionId: "123" }); // Segunda chamada com senha
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       joinSession: mockJoinSession,
     });
@@ -292,10 +292,10 @@ describe("JoinScene", () => {
     await user.click(joinButton);
 
     // Agora mocka o estado de requiresPassword true
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
-      refinementData: { title: "Test Session" },
+      sessionData: { title: "Test Session" },
       joinSession: mockJoinSession,
     });
 
@@ -316,10 +316,10 @@ describe("JoinScene", () => {
     const user = userEvent.setup();
     const mockJoinSession = jest.fn().mockResolvedValue({
       success: true,
-      refinementId: "123"
+      sessionId: "123"
     });
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       joinSession: mockJoinSession,
     });
@@ -336,7 +336,7 @@ describe("JoinScene", () => {
 
   // Teste 17: Exibição de mensagem de erro
   it("should display error message when error exists", () => {
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       error: "Código inválido ou sessão não encontrada",
     });
@@ -348,7 +348,7 @@ describe("JoinScene", () => {
 
   // Teste 18: Estado de loading durante o join
   it("should show loading state when isJoining is true", () => {
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       isJoining: true,
     });
@@ -361,7 +361,7 @@ describe("JoinScene", () => {
 
   // Teste 19: Estado de loading durante verificação de senha
   it("should show loading state for password verification", () => {
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       isJoining: true,
       requiresPassword: true,
@@ -375,9 +375,9 @@ describe("JoinScene", () => {
   // Teste 20: Enter key para submeter formulário
   it("should submit form when Enter key is pressed", async () => {
     const user = userEvent.setup();
-    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, refinementId: "123" });
+    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, sessionId: "123" });
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       joinSession: mockJoinSession,
     });
@@ -393,9 +393,9 @@ describe("JoinScene", () => {
   // Teste 21: Enter key para submeter senha
   it("should submit password when Enter key is pressed", async () => {
     const user = userEvent.setup();
-    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, refinementId: "123" });
+    const mockJoinSession = jest.fn().mockResolvedValue({ success: true, sessionId: "123" });
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       requiresPassword: true,
       joinSession: mockJoinSession,
@@ -416,7 +416,7 @@ describe("JoinScene", () => {
       requiresPassword: true
     });
 
-    mockUseRefinementJoin.mockReturnValue({
+    mockUseSessionJoin.mockReturnValue({
       ...defaultMockValues,
       joinSession: mockJoinSession,
     });

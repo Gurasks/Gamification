@@ -1,9 +1,9 @@
 import { calculateAverageRating } from "../../../services/globalServices";
-import type { Refinement } from "../../../types/global";
+import type { Session } from "../../../types/global";
 import type { UserContributions, UserStats } from "../../../types/leaderboard";
 
 interface ContributionsModalProps {
-  refinement: Refinement | null;
+  session: Session | null;
   selectedUser: UserContributions;
   sortedData: UserStats[];
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,7 +11,7 @@ interface ContributionsModalProps {
 }
 
 const ContributionsModal: React.FC<ContributionsModalProps> = ({
-  refinement,
+  session,
   selectedUser,
   sortedData,
   setIsModalOpen,
@@ -32,7 +32,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                 Contribuições de {selectedUser.user.userName}
               </h2>
               <p className="text-blue-100">
-                Time: {refinement?.teams?.[selectedUser.user.userId] || 'N/A'} •
+                Time: {session?.teams?.[selectedUser.user.userId] || 'N/A'} •
                 Posição: #{sortedData.findIndex(u => u.userId === selectedUser.user.userId) + 1}
               </p>
             </div>

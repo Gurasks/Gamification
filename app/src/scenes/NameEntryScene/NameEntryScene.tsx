@@ -73,12 +73,12 @@ const NameEntryScene: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            {user ? 'Configurar Nome' : 'Bem-vindo ao Refinamento'}
+            {user ? 'Configurar Nome' : 'Bem-vindo ao Gamification!'}
           </h1>
           <p className="text-gray-600">
             {user
               ? 'Escolha como deseja ser identificado'
-              : 'Identifique-se para participar das sessões de refinamento'
+              : 'Identifique-se para participar das sessões'
             }
           </p>
         </div>

@@ -136,31 +136,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async (): Promise<{ success: boolean; isNewUser?: boolean }> => {
     const provider = new GoogleAuthProvider();
 
-    // Opcional: adicionar escopos adicionais se necessário
-    provider.addScope('email');
-    provider.addScope('profile');
-
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
       const isNewUser = getAdditionalUserInfo(result)?.isNewUser || false;
 
-      // Se for novo usuário, criar documento no Firestore
       if (isNewUser) {
-        await setDoc(doc(db, 'users', user.uid), {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          createdAt: new Date(),
-          lastLogin: new Date(),
-          provider: 'google'
-        });
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            createdAt: new Date(),
+            lastLogin: new Date(),
+            provider: 'google'
+          });
+        } catch (firestoreError) {
+          console.error('Error creating user document:', firestoreError);
+        }
       } else {
-        // Atualizar último login para usuários existentes
-        await setDoc(doc(db, 'users', user.uid), {
-          lastLogin: new Date()
-        }, { merge: true });
+
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            lastLogin: new Date()
+          }, { merge: true });
+        } catch (firestoreError) {
+          console.error('Error updating user document:', firestoreError);
+        }
       }
 
       setUser(user);
@@ -177,6 +181,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (error.code === 'auth/popup-blocked') {
         toast.error('Popup bloqueado. Permita popups para este site.');
         throw new Error('Popup bloqueado. Permita popups para este site.');
+      } else if (error.code === 'permission-denied') {
+        toast.error('Erro de permissão. Verifique as configurações do Firestore.');
+        throw new Error('Erro de permissão no Firestore');
       } else {
         toast.error('Erro ao fazer login com Google, tente novamente.');
         throw new Error('Erro ao fazer login com Google');

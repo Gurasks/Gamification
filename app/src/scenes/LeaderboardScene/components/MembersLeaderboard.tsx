@@ -1,9 +1,9 @@
 import { openUserContributions } from "../../../services/leaderboardServices";
-import type { Card, Refinement } from "../../../types/global";
+import type { Card, Session } from "../../../types/global";
 import type { LeaderboardSortTypes, UserContributions, UserStats } from "../../../types/leaderboard";
 
 interface MembersLeaderboardProps {
-  refinement: Refinement;
+  session: Session;
   sortedData: UserStats[];
   allCards: Card[],
   sortBy: LeaderboardSortTypes,
@@ -15,7 +15,7 @@ interface MembersLeaderboardProps {
 }
 
 const MembersLeaderboard: React.FC<MembersLeaderboardProps> = ({
-  refinement,
+  session,
   sortedData,
   allCards,
   sortBy,
@@ -123,7 +123,7 @@ const MembersLeaderboard: React.FC<MembersLeaderboardProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-600">
-                    {refinement?.teams?.[user.userId] || 'N/A'}
+                    {session?.teams?.[user.userId] || 'N/A'}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
