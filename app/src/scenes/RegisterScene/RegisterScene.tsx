@@ -39,9 +39,9 @@ const RegisterScene: React.FC = () => {
 
     if (!formData.email.trim()) {
       errors.push('Email é obrigatório');
-    }
-
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (formData.email.length > 254) {
+      errors.push('Email muito longo');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.push('Email inválido');
     }
 
@@ -149,7 +149,7 @@ const RegisterScene: React.FC = () => {
           </div>
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
             {/* Display Name */}
             <div>
               <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">

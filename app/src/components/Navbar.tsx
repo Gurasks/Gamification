@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -8,6 +8,16 @@ const Navbar: React.FC = () => {
   const { user, anonymousUser, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDropdown) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showDropdown]);
 
   const handleLogout = async () => {
     try {
@@ -46,9 +56,17 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-16">
           {/* Logo e Nome do App */}
           <div className="flex items-center">
-            <div
+            <button
               className="flex items-center cursor-pointer"
               onClick={handleHomeClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleHomeClick();
+                }
+              }}
+              aria-label="Ir para página inicial"
+              tabIndex={0}
             >
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                 <img
@@ -60,14 +78,17 @@ const Navbar: React.FC = () => {
               <span className="text-xl font-bold text-gray-800">
                 Gamification
               </span>
-            </div>
+            </button>
           </div>
 
           {/* Menu do Usuário */}
           <div className="flex items-center space-x-4">
             {/* Indicador de Usuário Anônimo */}
             {anonymousUser && (
-              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+              <span
+                className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full"
+                aria-label="Modo convidado ativo"
+              >
                 Modo Convidado
               </span>
             )}
@@ -76,7 +97,10 @@ const Navbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center space-x-3 text-sm rounded-full focus:outline-none"
+                className="flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 p-1 transition-all duration-200 hover:bg-gray-100"
+                aria-label="Menu do usuário"
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
               >
                 <div className="flex items-center space-x-2">
                   <div className="text-right">
@@ -99,10 +123,16 @@ const Navbar: React.FC = () => {
 
               {/* Dropdown Menu */}
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200">
+                <div
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
                   <button
                     onClick={handleProfileClick}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                    role="menuitem"
+                    tabIndex={0}
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -110,11 +140,13 @@ const Navbar: React.FC = () => {
                     {anonymousUser ? 'Alterar Nome' : 'Meu Perfil'}
                   </button>
 
-                  <div className="border-t border-gray-100 my-1"></div>
+                  <div className="border-t border-gray-100 my-1" role="separator"></div>
 
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                    role="menuitem"
+                    tabIndex={0}
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -130,10 +162,17 @@ const Navbar: React.FC = () => {
 
       {/* Overlay para fechar dropdown ao clicar fora */}
       {showDropdown && (
-        <div
-          className="fixed inset-0 z-40"
+        <button
+          className="fixed inset-0 z-40 cursor-default focus:outline-none"
           onClick={() => setShowDropdown(false)}
-        ></div>
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setShowDropdown(false);
+            }
+          }}
+          aria-label="Fechar menu"
+          tabIndex={0}
+        />
       )}
     </nav>
   );
