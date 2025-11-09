@@ -49,7 +49,7 @@ service cloud.firestore {
     match /sessions/{sessionId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && hasValidSessionStructure();
-      allow update: if isSignedIn() && (isSessionOwner() || isSessionMember());
+      allow update: if isSignedIn();
       allow delete: if isSignedIn() && isSessionOwner();
     }
 

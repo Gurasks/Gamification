@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/Button';
 import toast from 'react-hot-toast';
+import { validateEmailStepByStep } from '@/services/globalServices';
 
 const RegisterScene: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -37,12 +38,9 @@ const RegisterScene: React.FC = () => {
       errors.push('Nome deve ter pelo menos 2 caracteres');
     }
 
-    if (!formData.email.trim()) {
-      errors.push('Email é obrigatório');
-    } else if (formData.email.length > 254) {
-      errors.push('Email muito longo');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.push('Email inválido');
+    const emailError = validateEmailStepByStep(formData.email);
+    if (emailError) {
+      errors.push(emailError);
     }
 
     if (formData.password.length < 6) {

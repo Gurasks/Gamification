@@ -140,8 +140,6 @@ const Navbar: React.FC = () => {
                     {anonymousUser ? 'Alterar Nome' : 'Meu Perfil'}
                   </button>
 
-                  <div className="border-t border-gray-100 my-1" role="separator"></div>
-
                   <button
                     onClick={handleLogout}
                     className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"

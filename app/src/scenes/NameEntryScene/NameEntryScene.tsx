@@ -31,15 +31,12 @@ const NameEntryScene: React.FC = () => {
       if (!user) {
         await signInAnonymously(name.trim());
         toast.success(`Bem-vindo, ${name.trim()}!`);
-
-        await new Promise(resolve => setTimeout(resolve, 100));
-
       } else if (anonymousUser) {
         await updateUserProfile(name.trim());
         toast.success(`Nome atualizado para ${name.trim()}!`);
-
-        await new Promise(resolve => setTimeout(resolve, 100));
       }
+
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const currentAuth = auth.currentUser;
 
@@ -52,7 +49,15 @@ const NameEntryScene: React.FC = () => {
       }
 
     } catch (error: any) {
-      toast.error('Erro ao configurar usuário. Tente novamente.');
+      console.error('Erro ao configurar usuário:', error);
+
+      if (error.code === 'auth/network-request-failed') {
+        toast.error('Erro de conexão. Verifique sua internet e tente novamente.');
+      } else if (error.code === 'auth/too-many-requests') {
+        toast.error('Muitas tentativas. Tente novamente em alguns minutos.');
+      } else {
+        toast.error('Erro ao configurar usuário. Tente novamente.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +68,7 @@ const NameEntryScene: React.FC = () => {
       await logout();
       toast.success('Sessão encerrada');
     } catch (error) {
+      console.error('Erro ao fazer logout:', error);
       toast.error('Erro ao sair');
     }
   };

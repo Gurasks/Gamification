@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import {
   addDoc,
   arrayUnion,
@@ -26,10 +27,12 @@ import type {
 } from "../../types/global";
 import type { UserStats } from "../../types/leaderboard";
 import type { SelectionMethod } from "../../types/teamSelection";
-import { calculateAverageRating, extractUserData } from "../globalServices";
-import { getShortenedUUID } from "../globalServices";
+import {
+  calculateAverageRating,
+  extractUserData,
+  getShortenedUUID,
+} from "../globalServices";
 import { getAvailableTeams } from "../teamSelectionServices";
-import { User } from "firebase/auth";
 
 const sessionCache = new Map<string, Session>();
 
@@ -402,8 +405,7 @@ export const startSessionInFirebase = async (
 ) => {
   if (
     sessionId &&
-    session &&
-    session.teams &&
+    session?.teams &&
     _.size(session.teams) === session.members.length
   ) {
     const teamName = session.teams[user.uid];

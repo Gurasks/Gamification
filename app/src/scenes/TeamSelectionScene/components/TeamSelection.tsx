@@ -95,6 +95,13 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
     );
   }
 
+  const getAssignedStyles = (isAssigning: boolean) => {
+    return isAssigning
+      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+      : 'bg-gray-200 hover:bg-gray-300 text-gray-800';
+
+  }
+
   return (
     <div className="space-y-4">
       {selectionMethod === 'CHOOSE_YOUR_TEAM' && (
@@ -108,10 +115,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
                 disabled={isAssigning}
                 className={`px-4 py-2 rounded transition-colors ${selectedTeam === team
                   ? 'bg-indigo-600 text-white'
-                  : isAssigning
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                  }`}
+                  : getAssignedStyles(isAssigning)}`}
               >
                 {team} {isAssigning && '...'}
               </button>

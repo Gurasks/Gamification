@@ -19,7 +19,7 @@ const HomeScene: React.FC = () => {
   useEffect(() => {
     const checkAccess = async () => {
       if (!loading) {
-        const hasValidUser = user && user.uid;
+        const hasValidUser = user?.uid;
         const hasValidName = user?.displayName &&
           user.displayName.length >= 2 &&
           user.displayName !== 'Convidado';

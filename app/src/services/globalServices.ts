@@ -84,3 +84,45 @@ export const extractUserData = (user: User) => {
     isAnonymous: user.isAnonymous || false,
   };
 };
+
+export const validateEmailStepByStep = (email: string): string | null => {
+  const trimmedEmail = email.trim().toLowerCase();
+
+  // Etapa 1: Verificações básicas de estrutura
+  if (trimmedEmail.length === 0) return "Email é obrigatório";
+  if (trimmedEmail.length > 254)
+    return "Email muito longo (máx. 254 caracteres)";
+  if (!trimmedEmail.includes("@")) return "Email deve conter @";
+
+  const parts = trimmedEmail.split("@");
+  if (parts.length !== 2) return "Email deve conter apenas um @";
+
+  const [localPart, domain] = parts;
+
+  // Etapa 2: Validação da parte local
+  if (localPart.length === 0) return "Parte antes do @ não pode estar vazia";
+  if (localPart.length > 64) return "Parte antes do @ muito longa";
+  if (localPart.startsWith(".") || localPart.endsWith(".")) {
+    return "Parte antes do @ não pode começar ou terminar com ponto";
+  }
+
+  // Etapa 3: Validação do domínio
+  if (domain.length === 0) return "Domínio não pode estar vazio";
+  if (!domain.includes(".")) return "Domínio deve conter ponto";
+
+  const domainParts = domain.split(".");
+  const tld = domainParts[domainParts.length - 1];
+
+  if (tld.length < 2) return "Domínio muito curto";
+  if (domain.startsWith("-") || domain.endsWith("-")) {
+    return "Domínio não pode começar ou terminar com hífen";
+  }
+
+  // Etapa 4: Verificação de domínios inválidos comuns
+  const invalidDomains = ["example.com", "test.com", "localhost"];
+  if (invalidDomains.includes(domain)) {
+    return "Domínio de email não é válido";
+  }
+
+  return null;
+};

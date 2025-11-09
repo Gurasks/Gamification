@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, use, useContext, useEffect, useMemo, useState } from 'react';
 import {
   User,
   signInAnonymously as firebaseSignInAnonymously,
@@ -45,6 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (user.isAnonymous) {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
+            const data = userDoc.data();
+            if (data && data.displayName) {
+              await updateProfile(user, { displayName: data.displayName });
+              await user.reload();
+              setUser(auth.currentUser);
+            }
           }
         }
       } else {
@@ -217,7 +223,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     anonymousUser,
     loading,
@@ -228,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     linkWithGoogle,
     logout,
     updateUserProfile
-  };
+  }), [user, anonymousUser, loading]);
 
   return (
     <AuthContext.Provider value={value}>

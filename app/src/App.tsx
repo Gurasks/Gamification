@@ -2,7 +2,7 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import NameEntryScene from './scenes/NameEntryScene/NameEntryScene';
 import { AuthProvider } from './contexts/AuthContext';
-import { LoadingProvider } from './contexts/LoadingContext';
+import { useGlobalLoading, LoadingProvider } from './contexts/LoadingContext';
 import BoardScene from './scenes/BoardScene/BoardScene';
 import TeamSelectionScene from './scenes/TeamSelectionScene/TeamSelectionScene';
 import HomeScene from './scenes/HomeScene/HomeScene';
@@ -11,7 +11,6 @@ import LeaderboardScene from './scenes/LeaderboardScene/LeaderboardScene';
 import CreationScene from './scenes/CreationScene/CreationScene';
 import JoinScene from './scenes/JoinScene/JoinScene';
 import { LoadingOverlay } from './components/LoadingOverlay';
-import { useGlobalLoading } from './contexts/LoadingContext';
 import LoginScene from './scenes/LoginScene/LoginScene';
 import RegisterScene from './scenes/RegisterScene/RegisterScene';
 import { AppLayout } from './components/AppLayout';

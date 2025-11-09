@@ -48,7 +48,7 @@ const LoginScene: React.FC = () => {
     setIsGoogleLoading(true);
 
     try {
-      const result = await signInWithGoogle();
+      await signInWithGoogle();
       toast.success('Login realizado com Google!');
       navigate('/');
     } catch (error: any) {
