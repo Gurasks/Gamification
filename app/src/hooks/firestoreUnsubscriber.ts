@@ -91,33 +91,40 @@ export const createUnsubscribeMembers = (
 
 export const createUnsubscribeSyncTimer = (
   timerId: string,
-  setTimeLeft: (arg0: number) => void,
-  setIsRunning: (arg0: boolean) => void,
-  setEndTime: (arg0: Date | null) => void
+  setTimeLeft: (time: number) => void,
+  setIsRunning: (running: boolean) => void,
+  setEndTime: (date: Date | null) => void
 ) => {
   const timerRef = doc(db, "timers", timerId);
-  const unsubscribe = onSnapshot(timerRef, (doc) => {
-    const data = doc.data();
-    if (!data) return;
 
-    const { startTime, duration, isRunning } = data;
-    setIsRunning(isRunning);
+  return onSnapshot(timerRef, (doc) => {
+    if (doc.exists()) {
+      const timerData = doc.data();
+      const isRunning = timerData.isRunning || false;
+      const startTime = timerData.startTime?.toDate();
+      const duration = timerData.duration || 0;
 
-    if (isRunning && startTime) {
-      const start = startTime.toDate();
-      const end = new Date(start.getTime() + duration * 1000);
-      setEndTime(end);
+      if (startTime && isRunning) {
+        const now = new Date();
+        const elapsed = Math.floor(
+          (now.getTime() - startTime.getTime()) / 1000
+        );
+        const remaining = Math.max(0, duration - elapsed);
 
-      const now = new Date();
-      const remaining = Math.max(
-        0,
-        Math.floor((end.getTime() - now.getTime()) / 1000)
-      );
-      setTimeLeft(remaining);
+        setTimeLeft(remaining);
+        setIsRunning(true);
+
+        const end = new Date(startTime.getTime() + duration * 1000);
+        setEndTime(end);
+      } else {
+        setTimeLeft(duration);
+        setIsRunning(false);
+        setEndTime(null);
+      }
     } else {
-      setTimeLeft(duration);
+      setTimeLeft(0);
+      setIsRunning(false);
       setEndTime(null);
     }
   });
-  return unsubscribe;
 };

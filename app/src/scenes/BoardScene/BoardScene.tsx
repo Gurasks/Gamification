@@ -16,6 +16,7 @@ import { Button } from '../../components/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import SyncTimer from './components/SyncTimer';
+import toast from 'react-hot-toast';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -30,7 +31,38 @@ const BoardScene: React.FC = () => {
   const [showDescription, setShowDescription] = useState(false);
   const [isCreatingCard, setIsCreatingCard] = useState(false);
   const [isChangingTeam, setIsChangingTeam] = useState(false);
+  const [timeEnded, setTimeEnded] = useState<boolean>(false);
+  const [showLeaderboardButton, setShowLeaderboardButton] = useState<boolean>(false);
+  const [timerLoaded, setTimerLoaded] = useState<boolean>(false);
+
   const navigate = useNavigate();
+
+  const handleTimerLoaded = () => {
+    setTimerLoaded(true);
+  };
+
+  const handleTimerStateChange = (hasEnded: boolean) => {
+    setTimeEnded(hasEnded);
+    if (hasEnded) {
+      setShowLeaderboardButton(true);
+    }
+  };
+
+  const handleTimeEnd = () => {
+    setTimeEnded(true);
+    setShowLeaderboardButton(true);
+  };
+
+  useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      if (!timerLoaded && session.hasStarted) {
+        console.log('Safety timeout - marcando timer como carregado');
+        setTimerLoaded(true);
+      }
+    }, 5000);
+
+    return () => clearTimeout(safetyTimeout);
+  }, [timerLoaded, session.hasStarted])
 
   useEffect(() => {
     if (!sessionId || !user) return;
@@ -77,15 +109,41 @@ const BoardScene: React.FC = () => {
     }
   }, [sessionId, session.teams, user, session.numOfTeams]);
 
+  useEffect(() => {
+    setIsChangingTeam(false);
+  }, [sessionId, teamName]);
+
+  useEffect(() => {
+    return () => {
+      setIsChangingTeam(false);
+    };
+  }, []);
+
   const handleChangeBoard = async () => {
-    if (!sessionId || !teamName) return;
+    if (!sessionId || !teamName || !availableTeams.length) {
+      setIsChangingTeam(false);
+      return;
+    }
 
     setIsChangingTeam(true);
 
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    const nextTeam = getNextTeam(teamName, availableTeams);
-    navigate(`/board/${sessionId}/team/${nextTeam}`);
+      const nextTeam = getNextTeam(teamName, availableTeams);
+
+      if (nextTeam && nextTeam !== teamName) {
+        navigate(`/board/${sessionId}/team/${nextTeam}`);
+      } else {
+        console.error('Próximo time inválido:', nextTeam);
+        toast.error('Erro ao mudar de time');
+      }
+    } catch (error) {
+      console.error('Error changing team:', error);
+      toast.error('Erro ao mudar de time');
+    } finally {
+      setIsChangingTeam(false);
+    }
   };
 
   const handleCreateCard = async () => {
@@ -149,6 +207,8 @@ const BoardScene: React.FC = () => {
 
   const teamTimerId = returnTimerId(teamName, session);
   const teamCards = cards.filter(card => card.teamName === teamName);
+  const userTeam = session.teams[user.uid];
+  const isUserInTeam = userTeam === teamName;
 
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -173,61 +233,108 @@ const BoardScene: React.FC = () => {
               </div>
             </div>
 
-            {session.hasStarted && teamTimerId && (
+            {session.hasStarted && teamTimerId && teamName && (
               <div className="flex-shrink-0">
-                <SyncTimer timerId={teamTimerId} />
+                <SyncTimer
+                  timerId={teamTimerId}
+                  user={user}
+                  currentTeam={teamName}
+                  sessionTeams={session.teams || {}}
+                  onTimeEnd={handleTimeEnd}
+                  onTimerStateChange={handleTimerStateChange}
+                  onTimerLoaded={handleTimerLoaded}
+                />
               </div>
             )}
           </div>
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                Adicionar Nova Sugestão
-              </h2>
-              <VariableTextArea
-                text={newCardText}
-                setText={setNewCardText}
-                handleSubmit={handleCreateCard}
-                disabled={isCreatingCard}
-                placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
-              />
+        {!timeEnded && isUserInTeam ? (
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">
+                  Adicionar Nova Sugestão
+                </h2>
+                <VariableTextArea
+                  text={newCardText}
+                  setText={setNewCardText}
+                  handleSubmit={handleCreateCard}
+                  disabled={isCreatingCard}
+                  placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
+                />
+                {isCreatingCard && (
+                  <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
+                    <LoadingSpinner size="sm" />
+                    <span>Criando sugestão...</span>
+                  </div>
+                )}
+              </div>
 
-              {/* Loading para criar card */}
-              {isCreatingCard && (
-                <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
-                  <LoadingSpinner size="sm" />
-                  <span>Criando sugestão...</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={handleChangeBoard}
-                loading={isChangingTeam}
-                variant="primary"
-                className="flex items-center gap-2"
-                title="Mudar para outro time"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                Mudar Time
-              </Button>
-
-              <Button
-                onClick={handleGoBack}
-                variant="secondary"
-              >
-                Sair
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleGoBack}
+                  variant="secondary"
+                >
+                  Sair
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl shadow-lg p-6 mb-6">
+              <div className="text-center">
+                {isUserInTeam ? (
+                  <>
+                    <h2 className="text-2xl font-bold text-yellow-800 mb-4">
+                      ⏰ Tempo Esgotado!
+                    </h2>
+                    <p className="text-yellow-700 mb-4">
+                      A fase de sugestões e votos foi encerrada.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-bold text-yellow-800 mb-4">
+                      ⚠️ Seu time é o <strong>{userTeam || 'Não definido'}</strong>:
+                    </h2>
+                    <p className="text-yellow-700 mb-4">
+                      Apenas membros do <strong>{teamName}</strong> podem adicionar sugestões e votar
+                    </p>
+                  </>
+                )}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button
+                    onClick={handleChangeBoard}
+                    loading={isChangingTeam}
+                    disabled={isChangingTeam || !sessionId || !teamName || availableTeams.length === 0}
+                    variant="primary"
+                    className="flex items-center gap-2"
+                    title={availableTeams.length === 0 ? "Nenhum time disponível" : "Mudar para outro time"}
+                    data-testid="change-team-button"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    Mudar Time
+                  </Button>
+
+                  {showLeaderboardButton && (
+                    <Button
+                      onClick={() => navigate(`/leaderboard/${sessionId}`)}
+                      variant="primary"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    >
+                      📊 Ver tabela de classificação
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Cards Grid */}
         <div className="bg-white rounded-xl shadow-lg p-6">
@@ -275,17 +382,26 @@ const BoardScene: React.FC = () => {
                   card={card}
                   user={user}
                   handleRate={(cardId, rating) => {
-                    updateRatingToCardInFirestore(cardId, rating, user);
+                    if (!timeEnded) {
+                      updateRatingToCardInFirestore(cardId, rating, user);
+                    }
                   }}
                   onEdit={async (cardId, newText) => {
-                    await updateCardInFirestore(cardId, newText);
+                    if (!timeEnded) {
+                      await updateCardInFirestore(cardId, newText);
+                    }
                   }}
                   onComment={async (cardId, commentText) => {
-                    await addCommentToCardInFirestore(cardId, commentText, user);
+                    if (!timeEnded) {
+                      await addCommentToCardInFirestore(cardId, commentText, user);
+                    }
                   }}
                   onCommentEdit={async (cardId, commentId, commentText) => {
-                    await updateCommentToCardInFirestore(cardId, commentId, commentText);
+                    if (!timeEnded) {
+                      await updateCommentToCardInFirestore(cardId, commentId, commentText);
+                    }
                   }}
+                  timeEnded={timeEnded}
                 />
               ))}
             </div>

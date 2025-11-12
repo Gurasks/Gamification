@@ -1,20 +1,20 @@
-import React, { createContext, use, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  User,
-  signInAnonymously as firebaseSignInAnonymously,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
   GoogleAuthProvider,
+  User,
+  createUserWithEmailAndPassword,
+  signInAnonymously as firebaseSignInAnonymously,
+  getAdditionalUserInfo,
   linkWithPopup,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signInWithPopup,
-  getAdditionalUserInfo
+  signOut,
+  updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { auth, db } from '../config/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
-            if (data && data.displayName) {
+            if (data?.displayName) {
               await updateProfile(user, { displayName: data.displayName });
               await user.reload();
               setUser(auth.currentUser);

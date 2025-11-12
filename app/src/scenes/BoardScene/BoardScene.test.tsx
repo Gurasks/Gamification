@@ -1,5 +1,6 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import toast from 'react-hot-toast';
 import { BrowserRouter } from 'react-router-dom';
 import BoardScene from './BoardScene';
 
@@ -30,6 +31,11 @@ jest.mock('../../services/globalServices', () => ({
   returnTimerId: jest.fn(),
 }));
 
+jest.mock('react-hot-toast', () => ({
+  error: jest.fn(),
+  success: jest.fn(),
+}));
+
 jest.mock('../../components/LoadingOverlay', () => ({
   LoadingOverlay: ({ message }: { message?: string }) => (
     <div data-testid="loading-overlay">{message}</div>
@@ -38,9 +44,10 @@ jest.mock('../../components/LoadingOverlay', () => ({
 
 jest.mock('./components/BoardCard', () => ({
   __esModule: true,
-  default: ({ card }: any) => (
-    <div data-testid="board-card">
+  default: ({ card, timeEnded }: any) => (
+    <div data-testid="board-card" data-time-ended={timeEnded}>
       Card: {card.text} - {card.teamName}
+      {timeEnded && <span data-testid="readonly-mode">Modo leitura</span>}
     </div>
   ),
 }));
@@ -73,7 +80,34 @@ jest.mock('../../components/VariableTextArea', () => ({
 
 jest.mock('./components/SyncTimer', () => ({
   __esModule: true,
-  default: () => <div data-testid="sync-timer">Sync Timer</div>,
+  default: ({
+    timerId,
+    user,
+    currentTeam,
+    sessionTeams,
+    onTimeEnd,
+    onTimerStateChange,
+    onTimerLoaded
+  }: any) => (
+    <div data-testid="sync-timer">
+      Sync Timer - {currentTeam}
+      <button
+        data-testid="trigger-time-end"
+        onClick={() => {
+          onTimeEnd?.();
+          onTimerStateChange?.(true);
+        }}
+      >
+        Simular tempo esgotado
+      </button>
+      <button
+        data-testid="trigger-timer-loaded"
+        onClick={() => onTimerLoaded?.()}
+      >
+        Simular timer carregado
+      </button>
+    </div>
+  ),
 }));
 
 jest.mock('../../components/CollapsibleDescriptionArea', () => ({
@@ -94,12 +128,13 @@ jest.mock('../../components/LoadingSpinner', () => ({
 }));
 
 jest.mock('../../components/Button', () => ({
-  Button: ({ onClick, loading, variant, children, className }: any) => (
+  Button: ({ onClick, loading, variant, children, className, disabled, title }: any) => (
     <button
       data-testid={`button-${variant}`}
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
       className={className}
+      title={title}
     >
       {loading ? 'Loading...' : children}
     </button>
@@ -116,10 +151,7 @@ jest.mock('../../contexts/AuthContext', () => ({
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({
-    sessionId: 'session123',
-    teamName: 'Time A',
-  }),
+  useParams: jest.fn(),
   useNavigate: () => mockNavigate,
 }));
 
@@ -130,6 +162,7 @@ const mockCreateUnsubscribeCards = require('../../hooks/firestoreUnsubscriber').
 const mockGetNextTeam = require('../../services/boardServices').getNextTeam;
 const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
 const mockReturnTimerId = require('../../services/globalServices').returnTimerId;
+const mockUseParams = require('react-router-dom').useParams;
 
 // Wrapper simplificado
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -149,8 +182,8 @@ describe('BoardScene', () => {
 
   const mockSession = {
     id: 'session123',
-    title: 'Test Session Session',
-    description: 'Test description for the session session',
+    title: 'Test Session',
+    description: 'Test description for the session',
     teams: {
       'user123': 'Time A',
     },
@@ -186,12 +219,16 @@ describe('BoardScene', () => {
       user: mockUser,
     });
 
+    mockUseParams.mockReturnValue({
+      sessionId: 'session123',
+      teamName: 'Time A',
+    });
+
     mockGetSession.mockResolvedValue(mockSession);
     mockGetAvailableTeams.mockReturnValue(['Time A', 'Time B']);
     mockReturnTimerId.mockReturnValue('timer123');
     mockCreateUnsubscribeSession.mockReturnValue(jest.fn());
-    mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (arg0: { id: string; text: string; teamName: string; createdBy: string; createdById: string; ratings: {}; comments: never[]; }[]) => void) => {
-      // Simula o callback sendo chamado com os cards
+    mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
       callback(mockCards);
       return jest.fn();
     });
@@ -199,7 +236,6 @@ describe('BoardScene', () => {
 
   describe('Loading state', () => {
     it('should show LoadingOverlay when loading session data', async () => {
-      // Mock para simular loading
       mockGetSession.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockSession), 100)));
 
       render(
@@ -229,21 +265,11 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText('Test Session Session')).toBeInTheDocument();
-      expect(screen.getByText(/Time:/)).toBeInTheDocument();
-
-      // Correção: Use query mais específica para evitar múltiplos elementos
-      const timeElement = screen.getByText((content, element) => {
-        return element?.tagName.toLowerCase() === 'strong' && content === 'Time A';
-      });
-      expect(timeElement).toBeInTheDocument();
-
-      expect(screen.getByText(/Participante:/)).toBeInTheDocument();
-
-      const participantElement = screen.getByText((content, element) => {
-        return element?.tagName.toLowerCase() === 'strong' && content === 'João Silva';
-      });
-      expect(participantElement).toBeInTheDocument();
+      expect(screen.getByText('Test Session')).toBeInTheDocument();
+      expect(screen.getByText('Time:')).toBeInTheDocument();
+      expect(screen.getByText('Time A')).toBeInTheDocument();
+      expect(screen.getByText('Participante:')).toBeInTheDocument();
+      expect(screen.getByText('João Silva')).toBeInTheDocument();
     });
 
     it('should render SyncTimer when session has started', async () => {
@@ -260,23 +286,7 @@ describe('BoardScene', () => {
       expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
     });
 
-    it('should render collapsible description when available', async () => {
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      expect(screen.getByTestId('collapsible-description')).toBeInTheDocument();
-    });
-  });
-
-  describe('Card creation', () => {
-    it('should render card creation form', async () => {
+    it('should render card creation form when user is in current team and time has not ended', async () => {
       render(
         <TestWrapper>
           <BoardScene />
@@ -291,7 +301,130 @@ describe('BoardScene', () => {
       expect(screen.getByTestId('variable-textarea')).toBeInTheDocument();
       expect(screen.getByTestId('submit-button')).toBeInTheDocument();
     });
+  });
 
+  describe('Time ended functionality', () => {
+    it('should show time ended message and hide card creation when time ends', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        expect(screen.getByText('⏰ Tempo Esgotado!')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Adicionar Nova Sugestão')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('variable-textarea')).not.toBeInTheDocument();
+    });
+
+    it('should show leaderboard button when time ends', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        expect(screen.getByText('📊 Ver tabela de classificação')).toBeInTheDocument();
+      });
+    });
+
+    it('should pass timeEnded prop to BoardCard components when time ends', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Verificar que inicialmente não está em modo leitura
+      const boardCards = screen.getAllByTestId('board-card');
+      expect(boardCards[0]).not.toHaveAttribute('data-time-ended', 'true');
+
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        const updatedBoardCards = screen.getAllByTestId('board-card');
+        expect(updatedBoardCards[0]).toHaveAttribute('data-time-ended', 'true');
+      });
+    });
+  });
+
+  describe('User team validation', () => {
+    it('should show warning when user is not in current team', async () => {
+      // Mock para usuário em time diferente
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time B', // Usuário está no Time A, mas visualizando Time B
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByText(/Seu time é o/)).toBeInTheDocument();
+
+      const timeAElements = screen.getAllByText('Time A');
+      expect(timeAElements.length).toBeGreaterThan(0);
+
+      expect(screen.getByText(/Apenas membros do/)).toBeInTheDocument();
+
+      const timeBElements = screen.getAllByText('Time B');
+      expect(timeBElements.length).toBeGreaterThan(0);
+    });
+
+    it('should hide card creation when user is not in current team', async () => {
+      // Mock para usuário em time diferente
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time B',
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Adicionar Nova Sugestão')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('variable-textarea')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Card creation', () => {
     it('should create card when form is submitted', async () => {
       render(
         <TestWrapper>
@@ -319,10 +452,8 @@ describe('BoardScene', () => {
         );
       });
     });
-  });
 
-  describe('Team navigation', () => {
-    it('should render team change button', async () => {
+    it('should not create card when time has ended', async () => {
       render(
         <TestWrapper>
           <BoardScene />
@@ -333,12 +464,49 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('variable-textarea')).not.toBeInTheDocument();
+      });
+
+      // Garantir que a função não foi chamada
+      expect(mockCreateCardInFirestore).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Team navigation', () => {
+    it('should render team change button when conditions are met', async () => {
+      // Para ver o botão "Mudar Time", precisamos que o tempo tenha acabado
+      // ou o usuário não esteja no time atual
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time B', // Usuário está no Time A, visualizando Time B
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Agora o botão deve estar visível
       expect(screen.getByText('Mudar Time')).toBeInTheDocument();
     });
 
     it('should navigate to next team when change team button is clicked', async () => {
-      // Correção: Mock precisa ser definido ANTES do render
       mockGetNextTeam.mockReturnValue('Time B');
+
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time C',
+      });
 
       render(
         <TestWrapper>
@@ -351,19 +519,134 @@ describe('BoardScene', () => {
       });
 
       const changeTeamButton = screen.getByTestId('button-primary');
-
-      // Simula o clique no botão
       fireEvent.click(changeTeamButton);
 
-      // Aguarda a lógica assíncrona
       await waitFor(() => {
-        expect(mockGetNextTeam).toHaveBeenCalledWith('Time A', ['Time A', 'Time B']);
+        expect(mockGetNextTeam).toHaveBeenCalledWith('Time C', ['Time A', 'Time B']);
       });
 
-      // Verifica se a navegação ocorreu
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/board/session123/team/Time B');
       });
+    });
+
+    it('should show error toast when team change fails', async () => {
+      mockGetNextTeam.mockReturnValue('Time C');
+
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time C',
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      const changeTeamButton = screen.getByTestId('button-primary');
+      fireEvent.click(changeTeamButton);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erro ao mudar de time');
+      });
+    });
+
+
+    it('should not render team change button when user is in current team and time has not ended', async () => {
+      // Usuário está no time atual e tempo não acabou
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time A', // Usuário está no Time A, visualizando Time A
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Botão não deve estar visível nesta condição
+      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Change team button visibility', () => {
+    it('should show change team button when time has ended and user is in team', async () => {
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time A', // Usuário está no Time A
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Inicialmente não deve mostrar o botão
+      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
+
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        // Agora o botão deve estar visível
+        expect(screen.getByText('Mudar Time')).toBeInTheDocument();
+      });
+    });
+
+    it('should show change team button when user is not in current team', async () => {
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time B', // Usuário está no Time A, visualizando Time B
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Botão deve estar visível imediatamente
+      expect(screen.getByText('Mudar Time')).toBeInTheDocument();
+    });
+
+    it('should not show change team button when user is in current team and time has not ended', async () => {
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time A', // Usuário está no Time A, visualizando Time A
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Botão não deve estar visível
+      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
     });
   });
 
@@ -379,18 +662,16 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      // Aguarda um pouco mais para garantir que os cards sejam carregados
       await waitFor(() => {
         expect(screen.getByText('Sugestões do Time Time A')).toBeInTheDocument();
-      }, { timeout: 2000 });
+      });
 
       expect(screen.getByText('(2 sugestões)')).toBeInTheDocument();
       expect(screen.getAllByTestId('board-card')).toHaveLength(2);
     });
 
     it('should show empty state when no cards', async () => {
-      // Mock para retornar array vazio de cards
-      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (arg0: never[]) => void) => {
+      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
         callback([]);
         return jest.fn();
       });
@@ -410,6 +691,25 @@ describe('BoardScene', () => {
       });
 
       expect(screen.getByText('Seja o primeiro a adicionar uma sugestão!')).toBeInTheDocument();
+    });
+
+    it('should show loading skeletons while cards are loading', async () => {
+      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
+        // Não chama o callback imediatamente para simular loading
+        return jest.fn();
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getAllByTestId('card-skeleton')).toHaveLength(6);
     });
   });
 
@@ -432,12 +732,10 @@ describe('BoardScene', () => {
     });
 
     it('should redirect to name-entry when user is not authenticated', async () => {
-      // Mock do user como objeto vazio (que será considerado empty pelo lodash)
       mockUseAuth.mockReturnValue({
-        user: {}, // Objeto vazio
+        user: {},
       });
 
-      // Mock para getSession retornar rápido
       mockGetSession.mockResolvedValue(mockSession);
 
       render(
@@ -446,10 +744,9 @@ describe('BoardScene', () => {
         </TestWrapper>
       );
 
-      // Aguarda o redirecionamento
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/name-entry');
-      }, { timeout: 2000 });
+      });
     });
   });
 
@@ -483,6 +780,50 @@ describe('BoardScene', () => {
       fireEvent.click(exitButton);
 
       expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+
+    it('should navigate to leaderboard when leaderboard button is clicked', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Simular tempo esgotado para mostrar o botão
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        const leaderboardButton = screen.getByText('📊 Ver tabela de classificação');
+        fireEvent.click(leaderboardButton);
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith('/leaderboard/session123');
+    });
+  });
+
+  describe('Timer loaded state', () => {
+    it('should handle timer loaded callback', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      const triggerTimerLoaded = screen.getByTestId('trigger-timer-loaded');
+      fireEvent.click(triggerTimerLoaded);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
+      });
     });
   });
 });

@@ -5,29 +5,66 @@ interface StarRatingProps {
   ratings: Record<string, number>;
   onRate: (rating: number) => void;
   userRating?: number;
+  showReadonly?: boolean;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ ratings, onRate, userRating }) => {
+const StarRating: React.FC<StarRatingProps> = ({
+  ratings,
+  onRate,
+  userRating,
+  showReadonly = false
+}) => {
   const rating = calculateAverageRating(ratings);
   const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
 
+  if (showReadonly) {
+    return (
+      <div className="flex items-center">
+        <div className="flex">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`text-xl ${rating >= star ? 'text-yellow-500' : 'text-gray-300'
+                }`}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+        <span className="ml-2 text-sm text-gray-600">
+          {rating.toFixed(1)} ({Object.keys(ratings).length})
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          key={star}
-          onClick={() => onRate(star)}
-          onMouseEnter={() => setHoveredStar(star)}
-          onMouseLeave={() => setHoveredStar(null)}
-          className={`text-xl transition-colors duration-100 focus:outline-none ${((hoveredStar !== null && star <= hoveredStar) ||
-            (hoveredStar === null && (userRating ?? 0) >= star))
-            ? 'text-yellow-500'
-            : 'text-gray-300'
-            } hover:text-yellow-400`}
-        >
-          ★
-        </button>
-      ))}
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => {
+              onRate(star);
+            }}
+            onMouseEnter={() => {
+              setHoveredStar(star);
+            }}
+            onMouseLeave={() => {
+              setHoveredStar(null);
+            }}
+            className={`text-xl transition-colors duration-100 focus:outline-none
+              ${((hoveredStar !== null && star <= hoveredStar) ||
+                (hoveredStar === null && (userRating ?? 0) >= star))
+                ? 'text-yellow-500'
+                : 'text-gray-300 hover:text-yellow-400'
+              }`}
+            title={`Dar ${star} estrela(s)`}
+          >
+            ★
+          </button>
+        ))}
+      </div>
       <span className="ml-2 text-sm text-gray-600">
         {rating.toFixed(1)} ({Object.keys(ratings).length})
       </span>

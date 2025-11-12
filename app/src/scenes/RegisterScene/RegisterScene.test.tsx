@@ -5,7 +5,13 @@ import RegisterScene from './RegisterScene';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
-jest.mock('../../contexts/AuthContext', () => ({
+jest.mock('@/services/globalServices', () => ({
+  validateEmailStepByStep: jest.fn(),
+}));
+
+const mockValidateEmailStepByStep = require('@/services/globalServices').validateEmailStepByStep;
+
+jest.mock('@/contexts/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
@@ -85,6 +91,9 @@ describe('RegisterScene', () => {
       signInWithGoogle: mockSignInWithGoogle,
       user: null,
     });
+
+    // Reset do mock da validação de email para retornar null (válido) por padrão
+    mockValidateEmailStepByStep.mockReturnValue(null);
   });
 
   describe('Rendering', () => {
@@ -209,18 +218,20 @@ describe('RegisterScene', () => {
     });
 
     it('should show validation error for invalid email', async () => {
+      mockValidateEmailStepByStep.mockReturnValueOnce('Email inválido');
+
       render(
         <BrowserRouter>
           <RegisterScene />
         </BrowserRouter>
       );
 
-      // Preenche todos os campos corretamente primeiro
+      // Preenche o formulário
       fireEvent.change(screen.getByLabelText('Nome Completo *'), {
         target: { value: 'João Silva' }
       });
       fireEvent.change(screen.getByLabelText('Email *'), {
-        target: { value: 'valid@example.com' } // Email válido primeiro
+        target: { value: 'invalid-email' }
       });
       fireEvent.change(screen.getByLabelText('Senha *'), {
         target: { value: 'password123' }
@@ -229,21 +240,19 @@ describe('RegisterScene', () => {
         target: { value: 'password123' }
       });
 
-      // Agora muda para email inválido
-      fireEvent.change(screen.getByLabelText('Email *'), {
-        target: { value: 'invalid-email' }
-      });
-
       const form = screen.getByTestId('register-form');
-
       fireEvent.submit(form);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Email inválido');
       });
+
+      expect(mockValidateEmailStepByStep).toHaveBeenCalledWith('invalid-email');
     });
 
     it('should show validation error for long email', async () => {
+      mockValidateEmailStepByStep.mockReturnValueOnce('Email muito longo');
+
       render(
         <BrowserRouter>
           <RegisterScene />
@@ -265,11 +274,14 @@ describe('RegisterScene', () => {
         target: { value: 'password123' }
       });
 
-      fireEvent.click(screen.getByRole('button', { name: 'Criar Conta' }));
+      const form = screen.getByTestId('register-form');
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Email muito longo');
       });
+
+      expect(mockValidateEmailStepByStep).toHaveBeenCalledWith(longEmail);
     });
 
     it('should show validation error for short password', async () => {
@@ -380,6 +392,7 @@ describe('RegisterScene', () => {
         </BrowserRouter>
       );
 
+      // Use fireEvent.submit no formulário em vez de click no botão
       fireEvent.change(screen.getByLabelText('Nome Completo *'), {
         target: { value: 'João Silva' }
       });
@@ -393,7 +406,8 @@ describe('RegisterScene', () => {
         target: { value: 'password123' }
       });
 
-      fireEvent.click(screen.getByRole('button', { name: 'Criar Conta' }));
+      const form = screen.getByTestId('register-form');
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(mockSignUp).toHaveBeenCalledWith('joao@example.com', 'password123', 'João Silva');
@@ -419,7 +433,9 @@ describe('RegisterScene', () => {
       );
 
       fillForm();
-      fireEvent.click(screen.getByRole('button', { name: 'Criar Conta' }));
+
+      const form = screen.getByTestId('register-form');
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Este email já está em uso.');
@@ -605,18 +621,24 @@ describe('RegisterScene', () => {
       );
 
       fillForm();
-      fireEvent.click(screen.getByRole('button', { name: 'Criar Conta' }));
+
+      const form = screen.getByTestId('register-form');
+      fireEvent.submit(form);
+
+      // Aguarde o loading ser ativado
+      await waitFor(() => {
+        expect(screen.getByTestId('button-submit')).toHaveTextContent('Carregando...');
+      });
 
       await waitFor(() => {
-        const submitButton = screen.getByTestId('button-submit');
-        expect(submitButton).toHaveTextContent('Carregando...');
-        expect(submitButton).toBeDisabled();
+        expect(screen.getByTestId('button-submit')).toBeDisabled();
       });
 
       await act(async () => {
         resolveSignUp!();
       });
 
+      // Aguarde o loading ser desativado
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Criar Conta' })).toBeInTheDocument();
       });
@@ -666,13 +688,28 @@ describe('RegisterScene', () => {
       );
 
       fillForm();
-      fireEvent.click(screen.getByRole('button', { name: 'Criar Conta' }));
 
+      const form = screen.getByTestId('register-form');
+      fireEvent.submit(form);
+
+      // Aguarde o loading ser ativado e os campos serem desabilitados
       await waitFor(() => {
         expect(screen.getByLabelText('Nome Completo *')).toBeDisabled();
+      });
+
+      await waitFor(() => {
         expect(screen.getByLabelText('Email *')).toBeDisabled();
+      });
+
+      await waitFor(() => {
         expect(screen.getByLabelText('Senha *')).toBeDisabled();
+      });
+
+      await waitFor(() => {
         expect(screen.getByLabelText('Confirmar Senha *')).toBeDisabled();
+      });
+
+      await waitFor(() => {
         expect(screen.getByTestId('button-google')).toBeDisabled();
       });
 

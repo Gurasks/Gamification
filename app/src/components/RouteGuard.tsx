@@ -11,17 +11,15 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Rotas que não precisam de verificação
-  const publicRoutes = ['/login', '/register', '/name-entry'];
+  const publicRoutes = new Set(['/login', '/register', '/name-entry']);
 
   useEffect(() => {
     if (!loading && user && anonymousUser) {
-      // Verificar se usuário anônimo tem nome válido
       const hasValidName = user.displayName &&
         user.displayName.length >= 2 &&
         user.displayName !== 'Convidado';
 
-      if (!hasValidName && !publicRoutes.includes(location.pathname)) {
+      if (!hasValidName && !publicRoutes.has(location.pathname)) {
         navigate('/name-entry');
       }
     }

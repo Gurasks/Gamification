@@ -446,22 +446,43 @@ export const initializeTimers = async (
 
 export const updateTimeToSyncTimerInFirebase = async (
   timerId: string,
-  timeLeft: number,
-  seconds: number
+  secondsToAdd: number,
+  userTeam?: string,
+  currentTeam?: string
 ) => {
-  if (!timerId || seconds <= 0) return;
+  if (!timerId || secondsToAdd <= 0) return;
+
+  if (userTeam && currentTeam && userTeam !== currentTeam) {
+    throw new Error("Usuário não pertence ao time atual");
+  }
 
   try {
     const timerRef = doc(db, "timers", timerId);
+
+    const timerDoc = await getDoc(timerRef);
+    if (!timerDoc.exists()) {
+      throw new Error("Timer não encontrado");
+    }
+
+    const timerData = timerDoc.data();
+    const currentDuration = timerData.duration || 0;
+
+    const totalDuration = currentDuration + secondsToAdd;
+
     await updateDoc(timerRef, {
-      duration: timeLeft + seconds,
+      duration: secondsToAdd,
       startTime: serverTimestamp(),
       isRunning: true,
       lastUpdated: serverTimestamp(),
+      totalDuration: totalDuration,
     });
-    console.log("Time added successfully");
+
+    console.log(
+      `Tempo adicionado: +${secondsToAdd}s. Novo total: ${secondsToAdd}s`
+    );
   } catch (error) {
     console.error("Error adding time to sync timer:", error);
+    throw error;
   }
 };
 
