@@ -1,3 +1,5 @@
+import { getAdditionalTimeDisplay } from "@/services/boardServices";
+
 export const AddTimeInput: React.FC<{
   additionalTime: number;
   setAdditionalTime: (time: number) => void;
@@ -17,23 +19,16 @@ export const AddTimeInput: React.FC<{
   setTimeUnit,
   handleAddTime
 }) => {
+
+    const additionalTimeDisplay = getAdditionalTimeDisplay(additionalTime);
     return (
       <>
-        {/* Input customizado */}
-        {!showTimeInput ? (
-          <button
-            onClick={() => setShowTimeInput(true)}
-            disabled={isAddingTime}
-            className="px-3 py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
-          >
-            Adicionar tempo
-          </button>
-        ) : (
+        {showTimeInput ? (
           <div className="bg-white p-3 rounded-lg shadow-md border border-gray-200">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-medium text-gray-700">
+              <span className="text-xs font-medium text-gray-700">
                 Adicionar tempo:
-              </label>
+              </span>
 
               <div className="flex gap-2">
                 <input
@@ -76,12 +71,20 @@ export const AddTimeInput: React.FC<{
 
               <div className="text-xs text-gray-500 text-center">
                 {timeUnit === 'minutes'
-                  ? `${additionalTime} minuto${additionalTime > 1 ? 's' : ''} = ${additionalTime * 60} segundos`
-                  : `${additionalTime} segundo${additionalTime > 1 ? 's' : ''}`
+                  ? `${additionalTime} minuto${additionalTimeDisplay} = ${additionalTime * 60} segundos`
+                  : `${additionalTime} segundo${additionalTimeDisplay}`
                 }
               </div>
             </div>
           </div>
+        ) : (
+          <button
+            onClick={() => setShowTimeInput(true)}
+            disabled={isAddingTime}
+            className="px-3 py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+          >
+            Adicionar tempo
+          </button>
         )}
       </>
     )

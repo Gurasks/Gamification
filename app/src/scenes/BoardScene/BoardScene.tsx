@@ -283,57 +283,55 @@ const BoardScene: React.FC = () => {
             </div>
           </div>
         ) : (
-          <>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl shadow-lg p-6 mb-6">
-              <div className="text-center">
-                {isUserInTeam ? (
-                  <>
-                    <h2 className="text-2xl font-bold text-yellow-800 mb-4">
-                      ⏰ Tempo Esgotado!
-                    </h2>
-                    <p className="text-yellow-700 mb-4">
-                      A fase de sugestões e votos foi encerrada.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-2xl font-bold text-yellow-800 mb-4">
-                      ⚠️ Seu time é o <strong>{userTeam || 'Não definido'}</strong>:
-                    </h2>
-                    <p className="text-yellow-700 mb-4">
-                      Apenas membros do <strong>{teamName}</strong> podem adicionar sugestões e votar
-                    </p>
-                  </>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <Button
-                    onClick={handleChangeBoard}
-                    loading={isChangingTeam}
-                    disabled={isChangingTeam || !sessionId || !teamName || availableTeams.length === 0}
-                    variant="primary"
-                    className="flex items-center gap-2"
-                    title={availableTeams.length === 0 ? "Nenhum time disponível" : "Mudar para outro time"}
-                    data-testid="change-team-button"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                    Mudar Time
-                  </Button>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl shadow-lg p-6 mb-6">
+            <div className="text-center">
+              {isUserInTeam ? (
+                <>
+                  <h2 className="text-2xl font-bold text-yellow-800 mb-4">
+                    ⏰ Tempo Esgotado!
+                  </h2>
+                  <p className="text-yellow-700 mb-4">
+                    A fase de sugestões e votos foi encerrada.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-yellow-800 mb-4">
+                    ⚠️ Seu time é o <strong>{userTeam || 'Não definido'}</strong>:
+                  </h2>
+                  <p className="text-yellow-700 mb-4">
+                    Apenas membros do <strong>{teamName}</strong> podem adicionar sugestões e votar
+                  </p>
+                </>
+              )}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  onClick={handleChangeBoard}
+                  loading={isChangingTeam}
+                  disabled={isChangingTeam || !sessionId || !teamName || availableTeams.length === 0}
+                  variant="primary"
+                  className="flex items-center gap-2"
+                  title={availableTeams.length === 0 ? "Nenhum time disponível" : "Mudar para outro time"}
+                  data-testid="change-team-button"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  Mudar Time
+                </Button>
 
-                  {showLeaderboardButton && (
-                    <Button
-                      onClick={() => navigate(`/leaderboard/${sessionId}`)}
-                      variant="primary"
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                    >
-                      📊 Ver tabela de classificação
-                    </Button>
-                  )}
-                </div>
+                {showLeaderboardButton && (
+                  <Button
+                    onClick={() => navigate(`/leaderboard/${sessionId}`)}
+                    variant="primary"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  >
+                    📊 Ver tabela de classificação
+                  </Button>
+                )}
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* Cards Grid */}

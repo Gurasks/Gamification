@@ -5,6 +5,7 @@ import { returnToastMessage } from '@/services/globalServices';
 import { User } from 'firebase/auth';
 import { SyncTimerSkelleton } from './SyncTimerSkelleton';
 import { AddTimeInput } from './AddTimeInput';
+import { getAdditionalTimeDisplay } from '@/services/boardServices';
 
 interface SyncTimerProps {
   timerId: string;
@@ -105,9 +106,11 @@ const SyncTimer = ({
       setShowTimeInput(false);
       onTimerStateChange?.(false);
 
+      const additionalTimeDisplay = getAdditionalTimeDisplay(additionalTime);
+
       const timeText = timeUnit === 'minutes'
-        ? `${additionalTime} minuto${additionalTime > 1 ? 's' : ''}`
-        : `${additionalTime} segundo${additionalTime > 1 ? 's' : ''}`;
+        ? `${additionalTime} minuto${additionalTimeDisplay}`
+        : `${additionalTime} segundo${additionalTimeDisplay}`;
 
       returnToastMessage(`+${timeText} adicionado!`, 'success');
     } catch (error) {
@@ -132,11 +135,12 @@ const SyncTimer = ({
     return <SyncTimerSkelleton />;
   }
 
+  const isLowTimeStyle = isLowTime ? 'bg-red-400' : 'bg-indigo-500';
+
   return (
     <div className="flex flex-col items-center justify-center gap-3">
       {/* Timer Circle */}
-      <div className={`relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden ${hasEnded ? 'bg-gray-500' : isLowTime ? 'bg-red-400' : 'bg-indigo-500'
-        } shadow-lg`}>
+      <div className={`relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden ${hasEnded ? 'bg-gray-500' : isLowTimeStyle} shadow-lg`}>
         <svg
           className="absolute bottom-0 w-full h-2/5"
           viewBox="0 0 100 20"

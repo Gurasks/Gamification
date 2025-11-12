@@ -14,3 +14,7 @@ export const getNextTeam = (
 
   return availableTeams[nextIndex];
 };
+
+export const getAdditionalTimeDisplay = (additionalTime: number) => {
+  return additionalTime > 1 ? "s" : "";
+};
