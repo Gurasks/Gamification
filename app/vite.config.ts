@@ -3,11 +3,22 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: {
     "process.env": process.env,
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+        },
+      },
+    },
   },
   resolve: {
     alias: {
@@ -15,4 +26,6 @@ export default defineConfig({
     },
     extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
   },
+  // Configuração específica para Firebase Hosting
+  base: "/", // ou '/' para domínio raiz
 });

@@ -85,6 +85,15 @@ Uma plataforma colaborativa com elementos de gamificação para tornar as sessõ
 ```bash
 # Atualizar regras da firestore
 firebase deploy --only firestore:rules
+
+# Build da aplicação
+npm run build
+
+# Deploy para Firebase Hosting
+npm run deploy
+
+# Ou para deploy completo
+npm run deploy:all
 ```
 
 ### 📊 Análise de Qualidade
