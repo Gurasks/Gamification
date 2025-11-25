@@ -34,13 +34,16 @@ const CollapsibleDescriptionArea: React.FC<CollapsibleDescriptionAreaProps> = ({
 
       {showDescription && (
         <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-fadeIn">
-          <p className="text-gray-700 leading-relaxed">
+          <p
+            className="text-gray-700 leading-relaxed whitespace-pre-wrap text-left"
+            style={{ wordWrap: 'break-word' }}
+          >
             {sessionDescription}
           </p>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default CollapsibleDescriptionArea;

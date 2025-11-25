@@ -137,12 +137,12 @@ const CreationScene: React.FC = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 value={formData.description}
                 onChange={(e) => updateFormData('description', (e.target as HTMLTextAreaElement).value)}
-                maxLength={500}
+                maxLength={1000}
                 disabled={isCreating}
               />
               <p className="text-xs text-gray-500 mt-1 flex justify-between">
                 <span>Opcional: Esta descrição ajudará os participantes</span>
-                <span>{formData.description.length}/500</span>
+                <span>{formData.description.length}/1000</span>
               </p>
             </div>
 
