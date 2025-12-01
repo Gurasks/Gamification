@@ -6,7 +6,7 @@ import { CardSkeleton } from './components/CardSkeleton';
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
 import { addCommentToCardInFirestore, createCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
 import type { Card, Session } from '../../types/global';
-import { getNextTeam } from '../../services/boardServices';
+import { getNextTeam, getSortedCards } from '../../services/boardServices';
 import { getAvailableTeams } from '../../services/teamSelectionServices';
 import VariableTextArea from "../../components/VariableTextArea";
 import { returnTimerId } from '../../services/globalServices';
@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import SyncTimer from './components/SyncTimer';
 import toast from 'react-hot-toast';
+import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -34,6 +35,7 @@ const BoardScene: React.FC = () => {
   const [timeEnded, setTimeEnded] = useState<boolean>(false);
   const [showLeaderboardButton, setShowLeaderboardButton] = useState<boolean>(false);
   const [timerLoaded, setTimerLoaded] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
   const navigate = useNavigate();
 
@@ -209,6 +211,7 @@ const BoardScene: React.FC = () => {
   const teamCards = cards.filter(card => card.teamName === teamName);
   const userTeam = session.teams[user.uid];
   const isUserInTeam = userTeam === teamName;
+  const sortedTeamCards = getSortedCards(teamCards, sortBy);
 
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -228,7 +231,7 @@ const BoardScene: React.FC = () => {
                 />
               )}
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>Time: <strong>{teamName}</strong></span>
+                <span><strong>{teamName}</strong></span>
                 <span>Participante: <strong>{user.displayName}</strong></span>
               </div>
             </div>
@@ -336,13 +339,23 @@ const BoardScene: React.FC = () => {
 
         {/* Cards Grid */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-gray-800">
-              Sugestões do Time {teamName}
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                ({teamCards.length} sugestões)
-              </span>
-            </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div className="w-full">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Sugestões do {teamName}
+                <span className="text-sm font-normal text-gray-500 ml-2">
+                  ({teamCards.length} sugestões)
+                </span>
+              </h3>
+              {teamCards.length > 0 && !cardsLoading && (
+                <div>
+                  <CardSortingSelector
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Loading indicator para cards */}
             {cardsLoading && (
@@ -372,9 +385,9 @@ const BoardScene: React.FC = () => {
               <p className="text-gray-400 text-sm">Seja o primeiro a adicionar uma sugestão!</p>
             </div>
           ) : (
-            // Cards carregados
+            // Cards carregados e ordenados
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {teamCards.map(card => (
+              {sortedTeamCards.map(card => (
                 <BoardCard
                   key={card.id}
                   card={card}

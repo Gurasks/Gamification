@@ -4,6 +4,7 @@ import type { Card } from "../../../types/global";
 import VariableTextArea from "../../../components/VariableTextArea";
 import { User } from 'firebase/auth';
 import StarRating from './StarRating';
+import { stringToPastelBg } from '@/services/boardServices';
 
 interface BoardCardProps {
   card: Card;
@@ -30,6 +31,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const [editCommentText, setEditCommentText] = useState("");
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const pastelBgClass = stringToPastelBg(card.createdBy);
 
   const handleCommentSubmit = async () => {
     if (commentText.trim() && !timeEnded) {
@@ -53,7 +55,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
   };
 
   return (
-    <div className={`text-sm [text-align:justify] p-4 bg-white rounded-lg shadow border border-gray-200 hover:border-indigo-200 transition-colors ${timeEnded ? 'opacity-90' : ''
+    <div className={`text-sm [text-align:justify] p-4 ${pastelBgClass} rounded-lg shadow border border-gray-200 hover:border-indigo-200 transition-colors ${timeEnded ? 'opacity-90' : ''
       }`}>
       {/* Card Content */}
       {isEditing ? (
@@ -104,7 +106,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
         {/* Botão para mostrar/ocultar comentários */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className={`text-xs flex items-center gap-1 mb-2 ${timeEnded ? 'text-gray-500 cursor-pointer' : 'text-gray-500 hover:text-gray-700'
+          className={`text-xs flex items-center gap-1 mb-2 ${timeEnded ? 'text-gray-700 cursor-pointer' : 'text-gray-700 hover:text-gray-700'
             }`}
           title={timeEnded ? "Visualizar comentários" : "Comentários"}
         >
@@ -116,7 +118,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
           <div className="mt-2 space-y-2">
             {/* Lista de comentários existentes */}
             {card.comments?.map((comment) => (
-              <div key={comment.id} className="flex justify-between items-start p-2 bg-gray-50 rounded text-sm">
+              <div key={comment.id} className="flex justify-between items-start p-2 bg-white/40 rounded text-sm">
                 <div className="flex-grow">
                   {commentIdToEdit === comment.id ? (
                     <div className="mb-3 w-full">
@@ -149,7 +151,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                   ) : (
                     <>
                       <p className="text-gray-800">{comment.text}</p>
-                      <p className="text-xs text-gray-400 mt-1">- {comment.createdBy}</p>
+                      <p className="text-xs text-gray-600 mt-1">- {comment.createdBy}</p>
                     </>
                   )}
                 </div>
@@ -170,7 +172,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
 
             {!timeEnded && (
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-xs text-gray-500 mb-2">Adicionar comentário:</p>
+                <p className="text-xs text-gray-700 mb-2">Adicionar comentário:</p>
                 <VariableTextArea
                   text={commentText}
                   setText={setCommentText}
@@ -185,7 +187,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
 
       {/* Rating and Author */}
       <div className="flex justify-between items-center mt-3">
-        <p className="text-xs text-gray-500">- {card.createdBy}</p>
+        <p className="text-xs font-semibold text-gray-800">- {card.createdBy}</p>
         <StarRating
           ratings={card.ratings || {}}
           onRate={(rating) => {

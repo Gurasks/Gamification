@@ -70,6 +70,7 @@ export const getShortenedUUID = (uuid: string): string => {
 export const calculateAverageRating = (
   ratings: Record<string, number>
 ): number => {
+  if (!ratings || Object.keys(ratings).length === 0) return 0;
   const values = Object.values(ratings);
   return values.length > 0
     ? values.reduce((a, b) => a + b, 0) / values.length

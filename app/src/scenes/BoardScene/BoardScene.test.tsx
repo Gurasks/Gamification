@@ -155,6 +155,34 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+jest.mock('./components/CardSorteningSelector', () => ({
+  __esModule: true,
+  default: ({ sortBy, onSortChange }: any) => (
+    <div data-testid="card-sorting-selector">
+      <select
+        data-testid="sort-select"
+        value={sortBy}
+        onChange={(e) => onSortChange(e.target.value)}
+      >
+        <option value="newest">Mais Recentes</option>
+        <option value="oldest">Mais Antigos</option>
+        <option value="highest">Maior Avaliação</option>
+        <option value="lowest">Menor Avaliação</option>
+        <option value="mostComments">Mais Comentários</option>
+        <option value="leastComments">Menos Comentários</option>
+        <option value="author">Por Autor</option>
+      </select>
+    </div>
+  ),
+  SortOption: {}
+}));
+
+jest.mock('../../services/boardServices', () => ({
+  getNextTeam: jest.fn(),
+  getSortedCards: jest.fn((cards) => cards),
+}));
+
+
 const mockGetSession = require('../../services/firestore/firestoreServices').getSession;
 const mockCreateCardInFirestore = require('../../services/firestore/firestoreServices').createCardInFirestore;
 const mockCreateUnsubscribeSession = require('../../hooks/firestoreUnsubscriber').createUnsubscribeSession;
@@ -163,6 +191,7 @@ const mockGetNextTeam = require('../../services/boardServices').getNextTeam;
 const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
 const mockReturnTimerId = require('../../services/globalServices').returnTimerId;
 const mockUseParams = require('react-router-dom').useParams;
+const mockGetSortedCards = require('../../services/boardServices').getSortedCards;
 
 // Wrapper simplificado
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -266,7 +295,6 @@ describe('BoardScene', () => {
       });
 
       expect(screen.getByText('Test Session')).toBeInTheDocument();
-      expect(screen.getByText('Time:')).toBeInTheDocument();
       expect(screen.getByText('Time A')).toBeInTheDocument();
       expect(screen.getByText('Participante:')).toBeInTheDocument();
       expect(screen.getByText('João Silva')).toBeInTheDocument();
@@ -663,8 +691,8 @@ describe('BoardScene', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Sugestões do Time Time A')).toBeInTheDocument();
-      });
+        expect(screen.getByText('Sugestões do Time A')).toBeInTheDocument();
+      }, { timeout: 2000 });
 
       expect(screen.getByText('(2 sugestões)')).toBeInTheDocument();
       expect(screen.getAllByTestId('board-card')).toHaveLength(2);
@@ -824,6 +852,188 @@ describe('BoardScene', () => {
       await waitFor(() => {
         expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Card sorting functionality', () => {
+    it('should render CardSortingSelector when there are cards', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByTestId('card-sorting-selector')).toBeInTheDocument();
+      expect(screen.getByTestId('sort-select')).toBeInTheDocument();
+    });
+
+    it('should not render CardSortingSelector when there are no cards', async () => {
+      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
+        callback([]);
+        return jest.fn();
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.queryByTestId('card-sorting-selector')).not.toBeInTheDocument();
+    });
+
+    it('should call getSortedCards with correct parameters', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // getSortedCards deve ser chamado com os cards do time e a opção de ordenação padrão
+      expect(mockGetSortedCards).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ teamName: 'Time A' }),
+          expect.objectContaining({ teamName: 'Time A' })
+        ]),
+        'newest'
+      );
+    });
+
+    it('should update sorting when user changes sort option', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      const sortSelect = screen.getByTestId('sort-select');
+
+      // Mudar para ordenação por autor
+      fireEvent.change(sortSelect, { target: { value: 'author' } });
+
+      // getSortedCards deve ser chamado novamente com a nova opção
+      expect(mockGetSortedCards).toHaveBeenCalledWith(
+        expect.any(Array),
+        'author'
+      );
+    });
+
+    it('should display sorted cards when getSortedCards returns sorted array', async () => {
+      // Mock para retornar cards ordenados de forma específica
+      const mockSortedCards = [
+        {
+          id: 'card2',
+          text: 'Second test card',
+          teamName: 'Time A',
+          createdBy: 'Maria Santos',
+          createdById: 'user456',
+          ratings: {},
+          comments: [],
+        },
+        {
+          id: 'card1',
+          text: 'First test card',
+          teamName: 'Time A',
+          createdBy: 'João Silva',
+          createdById: 'user123',
+          ratings: {},
+          comments: [],
+        },
+      ];
+
+      mockGetSortedCards.mockReturnValue(mockSortedCards);
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Verificar que getSortedCards foi chamado
+      expect(mockGetSortedCards).toHaveBeenCalled();
+
+      // Os cards devem ser renderizados (embora o mock do BoardCard não mostre a ordem)
+      const boardCards = screen.getAllByTestId('board-card');
+      expect(boardCards).toHaveLength(2);
+    });
+  });
+
+  // Adicione também testes para as mudanças no header
+  describe('Header display', () => {
+    it('should display team name without "Time:" label', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Verificar que "Time:" não está mais no header
+      expect(screen.queryByText('Time:')).not.toBeInTheDocument();
+
+      // Verificar que o nome do time ainda está presente
+      expect(screen.getByText('Time A')).toBeInTheDocument();
+    });
+
+    it('should display "Sugestões do Time X" without "Time" before do', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Verificar o novo formato do título
+      expect(screen.getByText('Sugestões do Time A')).toBeInTheDocument();
+    });
+  });
+
+  // Atualize o teste que verifica a renderização do header
+  describe('Main content rendering', () => {
+    it('should display cards when loaded', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        // CORRIGIDO: Novo formato sem "Time" duplicado
+        expect(screen.getByText('Sugestões do Time A')).toBeInTheDocument();
+      }, { timeout: 2000 }); // Adicionar timeout maior se necessário
+
+      expect(screen.getByText('(2 sugestões)')).toBeInTheDocument();
+      expect(screen.getAllByTestId('board-card')).toHaveLength(2);
     });
   });
 });
