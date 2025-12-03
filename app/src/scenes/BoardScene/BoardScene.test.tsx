@@ -628,6 +628,32 @@ describe('BoardScene', () => {
 
       expect(screen.getAllByTestId('card-skeleton')).toHaveLength(6);
     });
+
+    it('should show loading spinner while creating card', async () => {
+      mockCreateCardInFirestore.mockImplementation(() =>
+        new Promise(resolve => setTimeout(resolve, 100))
+      );
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      const textarea = screen.getByTestId('variable-textarea');
+      const submitButton = screen.getByTestId('submit-button');
+
+      fireEvent.change(textarea, { target: { value: 'Test card' } });
+      fireEvent.click(submitButton);
+
+      // Deve mostrar spinner de carregamento
+      expect(screen.getByTestId('loading-spinner-sm')).toBeInTheDocument();
+      expect(screen.getByText('Criando sugestão...')).toBeInTheDocument();
+    });
   });
 
   describe('Error handling', () => {
@@ -967,6 +993,71 @@ describe('BoardScene', () => {
       });
 
       expect(screen.getByTestId('masonry-grid')).toBeInTheDocument();
+    });
+  });
+
+  describe('Timer safety timeout', () => {
+    it('should set timer loaded after safety timeout', async () => {
+      // Simular timer não carregando
+      mockReturnTimerId.mockReturnValue('timer123');
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Aguardar timeout de segurança
+      await waitFor(() => {
+        expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
+      }, { timeout: 6000 }); // 5 segundos + margem
+    });
+  });
+
+  describe('User team validation', () => {
+    it('should show warning when user tries to view other team', async () => {
+      // Usuário está no Time A, mas tentando acessar Time B
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time B',
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Deve mostrar que o tempo esgotou (que é o indicativo de que não pode interagir)
+      expect(screen.getByText('Tempo Esgotado!')).toBeInTheDocument();
+    });
+
+    it('should allow interaction when user is in correct team', async () => {
+      mockUseParams.mockReturnValue({
+        sessionId: 'session123',
+        teamName: 'Time A',
+      });
+
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByText('Adicionar Nova Sugestão')).toBeInTheDocument();
+      expect(screen.getByTestId('variable-textarea')).toBeInTheDocument();
     });
   });
 });

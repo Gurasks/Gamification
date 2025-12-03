@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, act, within } from '@testing-library/react';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import AnonymousReviewScene from './AnonymousReviewScene';
@@ -135,7 +135,6 @@ const mockGetSession = require('../../services/firestore/firestoreServices').get
 const mockEndSession = require('../../services/firestore/firestoreServices').endSession;
 const mockUpdateRatingToCardInFirestore = require('../../services/firestore/firestoreServices').updateRatingToCardInFirestore;
 const mockAddCommentToCardInFirestore = require('../../services/firestore/firestoreServices').addCommentToCardInFirestore;
-const mockUpdateCommentToCardInFirestore = require('../../services/firestore/firestoreServices').updateCommentToCardInFirestore;
 const mockCreateUnsubscribeCards = require('../../hooks/firestoreUnsubscriber').createUnsubscribeCards;
 const mockUseParams = require('react-router-dom').useParams;
 const mockGetSortedCards = require('../../services/boardServices').getSortedCards;
@@ -288,6 +287,62 @@ describe('AnonymousReviewScene', () => {
     });
   });
 
+  describe('Statistics display', () => {
+    it('should calculate and display correct statistics', async () => {
+      const mockCardsWithStats = [
+        {
+          id: 'card1',
+          text: 'First card',
+          teamName: 'Time A',
+          createdBy: 'João Silva',
+          createdById: 'user123',
+          ratings: { user456: 4, user789: 5 },
+          comments: [
+            { id: 'comment1', text: 'Comment 1', createdById: 'user456' },
+            { id: 'comment2', text: 'Comment 2', createdById: 'user789' }
+          ],
+        },
+        {
+          id: 'card2',
+          text: 'Second card',
+          teamName: 'Time B',
+          createdBy: 'Maria Santos',
+          createdById: 'user456',
+          ratings: { user123: 3 },
+          comments: [
+            { id: 'comment3', text: 'Comment 3', createdById: 'user123' },
+            { id: 'comment4', text: 'Comment 4', createdById: 'user123' },
+            { id: 'comment5', text: 'Comment 5', createdById: 'user123' },
+          ],
+        },
+      ];
+
+      mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
+        setTimeout(() => {
+          callback(mockCardsWithStats);
+        }, 0);
+        return jest.fn();
+      });
+
+      render(
+        <TestWrapper>
+          <AnonymousReviewScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        // Verificar estatísticas
+        expect(screen.getByText('2')).toBeInTheDocument(); // Total cards
+        expect(screen.getByText('5')).toBeInTheDocument(); // Total comments
+        expect(screen.getByText('3')).toBeInTheDocument(); // Unique voters
+      });
+    });
+  });
+
   describe('Session closed state', () => {
     it('should show read-only mode when session is closed', async () => {
       const closedSession = { ...mockSession, isClosed: true };
@@ -311,6 +366,51 @@ describe('AnonymousReviewScene', () => {
           expect(card).toHaveAttribute('data-read-only', 'true');
         });
       });
+    });
+
+    it('should disable all interactive elements when in read-only mode', async () => {
+      const closedSession = { ...mockSession, isClosed: true };
+      mockGetSession.mockResolvedValue(closedSession);
+
+      render(
+        <TestWrapper>
+          <AnonymousReviewScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      // Verificar modo somente leitura
+      expect(screen.getByText('MODO SOMENTE LEITURA')).toBeInTheDocument();
+
+      // Verificar que botões de ação estão desabilitados
+      const anonymousCards = screen.getAllByTestId('anonymous-card');
+      anonymousCards.forEach(card => {
+        const rateButton = within(card).getByTestId('rate-card-button');
+        const commentButton = within(card).getByTestId('comment-card-button');
+        expect(rateButton).toBeDisabled();
+        expect(commentButton).toBeDisabled();
+      });
+    });
+
+    it('should show appropriate message for read-only mode', async () => {
+      const closedSession = { ...mockSession, isClosed: true };
+      mockGetSession.mockResolvedValue(closedSession);
+
+      render(
+        <TestWrapper>
+          <AnonymousReviewScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      const descriptionText = screen.getByText(/A fase de votação e comentários foi encerrada/i);
+      expect(descriptionText).toBeInTheDocument();
     });
   });
 

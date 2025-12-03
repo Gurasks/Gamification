@@ -623,3 +623,41 @@ export const resolveUUID = async (shortKey: string): Promise<string | null> => {
   const snap = await getDoc(doc(db, "uuidMappings", shortKey));
   return snap.exists() ? (snap.data().uuid as string) : null;
 };
+
+export const deleteCardInFirestore = async (cardId: string): Promise<void> => {
+  try {
+    const cardRef = doc(db, "cards", cardId);
+    await deleteDoc(cardRef);
+    console.log("Card deletado com sucesso");
+  } catch (error) {
+    console.error("Error deleting card:", error);
+    throw error;
+  }
+};
+
+export const deleteCommentFromCardInFirestore = async (
+  cardId: string,
+  commentId: string
+): Promise<void> => {
+  try {
+    const cardRef = doc(db, "cards", cardId);
+    const cardSnap = await getDoc(cardRef);
+    const card = cardSnap.data();
+
+    if (card && card.comments) {
+      const updatedComments = card.comments.filter(
+        (comment: { id: string }) => comment.id !== commentId
+      );
+
+      await updateDoc(cardRef, {
+        comments: updatedComments,
+        updatedAt: serverTimestamp(),
+      });
+
+      console.log("Comentário deletado com sucesso");
+    }
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+};

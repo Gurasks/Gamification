@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { endSession, getSession } from '../../services/firestore/firestoreServices';
+import { deleteCommentFromCardInFirestore, endSession, getSession } from '../../services/firestore/firestoreServices';
 import { createUnsubscribeCards } from '../../hooks/firestoreUnsubscriber';
 import type { Card, Session } from '../../types/global';
 import { updateRatingToCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore } from '../../services/firestore/firestoreServices';
@@ -123,6 +123,13 @@ const AnonymousReviewScene: React.FC = () => {
       toast.error('Erro ao atualizar comentário');
     }
   };
+
+  const handleDeleteComment = async (cardId: string, commentId: string) => {
+    if (!isReadOnly) {
+      await deleteCommentFromCardInFirestore(cardId, commentId);
+      toast.success('Comentário excluído com sucesso!');
+    }
+  }
 
   const handleGoBack = () => {
     if (session.teams && user?.uid) {
@@ -364,6 +371,7 @@ const AnonymousReviewScene: React.FC = () => {
                   onRate={handleRateCard}
                   onComment={handleAddComment}
                   onCommentEdit={handleEditComment}
+                  onCommentDelete={handleDeleteComment}
                   isReadOnly={isReadOnly}
                 />
               ))}

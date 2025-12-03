@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
+import { addCommentToCardInFirestore, createCardInFirestore, deleteCardInFirestore, deleteCommentFromCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
 import type { Card, Session } from '../../types/global';
 import { getSortedCards } from '../../services/boardServices';
 import VariableTextArea from "../../components/VariableTextArea";
@@ -26,9 +26,9 @@ import {
   ChevronRight,
   ArrowLeft,
   MessageSquare,
-  Star,
   Ban
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -152,6 +152,36 @@ const BoardScene: React.FC = () => {
       setIsCreatingCard(false);
     }
   };
+
+  const handleEdit = async (cardId: string, newText: string) => {
+    if (!timeEnded) {
+      await updateCardInFirestore(cardId, newText);
+    }
+  };
+
+  const handleComment = async (cardId: string, commentText: string) => {
+    if (!timeEnded && user) {
+      await addCommentToCardInFirestore(cardId, commentText, user);
+    }
+  };
+  const handleCommentEdit = async (cardId: string, commentId: string, newText: string) => {
+    if (!timeEnded) {
+      await updateCommentToCardInFirestore(cardId, commentId, newText);
+    }
+  };
+
+  const handleDelete = async (cardId: string) => {
+    if (!timeEnded) {
+      await deleteCardInFirestore(cardId);
+    }
+  };
+
+  const handleCommentDelete = async (cardId: string, commentId: string) => {
+    if (!timeEnded && user) {
+      await deleteCommentFromCardInFirestore(cardId, commentId);
+    }
+  };
+
 
   const handleGoBack = () => {
     navigate('/');
@@ -388,26 +418,11 @@ const BoardScene: React.FC = () => {
                   key={card.id}
                   card={card}
                   user={user}
-                  handleRate={(cardId, rating) => {
-                    if (!timeEnded) {
-                      updateRatingToCardInFirestore(cardId, rating, user);
-                    }
-                  }}
-                  onEdit={async (cardId, newText) => {
-                    if (!timeEnded) {
-                      await updateCardInFirestore(cardId, newText);
-                    }
-                  }}
-                  onComment={async (cardId, commentText) => {
-                    if (!timeEnded) {
-                      await addCommentToCardInFirestore(cardId, commentText, user);
-                    }
-                  }}
-                  onCommentEdit={async (cardId, commentId, commentText) => {
-                    if (!timeEnded) {
-                      await updateCommentToCardInFirestore(cardId, commentId, commentText);
-                    }
-                  }}
+                  onEdit={handleEdit}
+                  onComment={handleComment}
+                  onCommentEdit={handleCommentEdit}
+                  onDelete={handleDelete}
+                  onCommentDelete={handleCommentDelete}
                   timeEnded={timeEnded}
                 />
               ))}

@@ -1,4 +1,4 @@
-import { MessageSquareMore, Check, X, PencilLine } from 'lucide-react';
+import { MessageSquareMore, Trash2, Clock, PencilLine, X, Check } from 'lucide-react';
 import { useState } from 'react';
 import type { Card } from "../../../types/global";
 import VariableTextArea from "../../../components/VariableTextArea";
@@ -11,6 +11,7 @@ interface AnonymousCardProps {
   onRate: (cardId: string, rating: number) => void;
   onComment: (cardId: string, commentText: string) => Promise<void>;
   onCommentEdit: (cardId: string, commentId: string, newText: string) => Promise<void>;
+  onCommentDelete?: (cardId: string, commentId: string) => Promise<void>;
   isReadOnly?: boolean;
 }
 
@@ -20,12 +21,14 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
   onRate,
   onComment,
   onCommentEdit,
+  onCommentDelete,
   isReadOnly = false
 }) => {
   const [commentIdToEdit, setCommentIdToEdit] = useState("");
   const [editCommentText, setEditCommentText] = useState("");
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   const handleCommentSubmit = async () => {
     if (commentText.trim() && !isReadOnly) {
@@ -38,6 +41,19 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
     if (!isReadOnly) {
       await onCommentEdit(card.id, commentIdToEdit, editCommentText);
       setCommentIdToEdit("");
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!isReadOnly && onCommentDelete && window.confirm('Tem certeza que deseja excluir este comentário?')) {
+      setDeletingCommentId(commentId);
+      try {
+        await onCommentDelete(card.id, commentId);
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+      } finally {
+        setDeletingCommentId(null);
+      }
     }
   };
 
@@ -68,62 +84,81 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
         {showComments && (
           <div className="mt-3 space-y-3">
             {/* Lista de comentários existentes */}
-            {card.comments?.map((comment) => (
-              <div key={comment.id} className="flex justify-between items-start p-3 bg-white/60 rounded-lg backdrop-blur-sm border border-white/30">
-                <div className="flex-grow">
-                  {commentIdToEdit === comment.id ? (
-                    <div className="mb-3 w-full">
-                      <VariableTextArea
-                        text={editCommentText}
-                        setText={setEditCommentText}
-                        handleSubmit={handleCommentEditSubmit}
-                        disabled={isReadOnly}
-                        placeholder={isReadOnly ? "Edição desabilitada" : "Editar comentário..."}
-                      />
-                      {!isReadOnly && (
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={handleCommentEditSubmit}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                            title="Salvar"
-                          >
-                            <Check className="w-3 h-3" />
-                            <span className="text-xs">Salvar</span>
-                          </button>
-                          <button
-                            onClick={() => setCommentIdToEdit("")}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
-                            title="Cancelar"
-                          >
-                            <X className="w-3 h-3" />
-                            <span className="text-xs">Cancelar</span>
-                          </button>
+            {card.comments?.map((comment) => {
+              const isCommentOwner = user.uid === comment.createdById;
+              const isDeleting = deletingCommentId === comment.id;
+
+              return (
+                <div key={comment.id} className="flex justify-between items-start p-3 bg-white/60 rounded-lg backdrop-blur-sm border border-white/30">
+                  <div className="flex-grow">
+                    {commentIdToEdit === comment.id ? (
+                      <div className="mb-3 w-full">
+                        <VariableTextArea
+                          text={editCommentText}
+                          setText={setEditCommentText}
+                          handleSubmit={handleCommentEditSubmit}
+                          disabled={isReadOnly}
+                          placeholder={isReadOnly ? "Edição desabilitada" : "Editar comentário..."}
+                        />
+                        {!isReadOnly && (
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={handleCommentEditSubmit}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                              title="Salvar"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setCommentIdToEdit("")}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
+                              title="Cancelar"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-gray-800 text-sm leading-relaxed">{comment.text}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <p className="text-xs text-gray-600 font-medium">
+                            — {comment.createdBy}
+                          </p>
+                          {!isReadOnly && isCommentOwner && (
+                            <div className="flex gap-1 ml-2">
+                              <button
+                                onClick={() => {
+                                  setCommentIdToEdit(comment.id);
+                                  setEditCommentText(comment.text);
+                                }}
+                                className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
+                                title="Editar comentário"
+                              >
+                                <PencilLine size={14} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                disabled={isDeleting}
+                                className="text-xs text-red-500 hover:text-red-700 p-1 disabled:opacity-50"
+                                title="Excluir comentário"
+                              >
+                                {isDeleting ? (
+                                  <Clock size={12} className="animate-pulse" />
+                                ) : (
+                                  <Trash2 size={12} />
+                                )}
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-gray-800 text-sm leading-relaxed">{comment.text}</p>
-                      <p className="text-xs text-gray-600 mt-2 font-medium">
-                        — {comment.createdBy}
-                      </p>
-                    </>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
-                {!isReadOnly && user.uid === comment.createdById && commentIdToEdit !== comment.id && (
-                  <button
-                    onClick={() => {
-                      setCommentIdToEdit(comment.id);
-                      setEditCommentText(comment.text);
-                    }}
-                    className="ml-3 text-xs text-indigo-500 hover:text-indigo-700 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
-                    title="Editar comentário"
-                  >
-                    <PencilLine size={14} />
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
 
             {!isReadOnly && (
               <div className="mt-4 pt-4 border-t border-gray-300/50">
