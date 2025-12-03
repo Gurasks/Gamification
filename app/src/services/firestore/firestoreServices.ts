@@ -149,6 +149,27 @@ export const getSession = async (
   }
 };
 
+export const endSession = async (sessionId: string, user: User) => {
+  const docRef = doc(db, "sessions", sessionId);
+  const sessionDoc = await getDoc(docRef);
+
+  if (sessionDoc.exists()) {
+    const sessionData = sessionDoc.data();
+    const sessionOwner = sessionData.owner;
+    if (sessionOwner !== user.uid) {
+      return "notOwner";
+    } else {
+      await updateDoc(docRef, {
+        isClosed: true,
+        updatedAt: serverTimestamp(),
+      });
+      return "success";
+    }
+  } else {
+    return "notFound";
+  }
+};
+
 export const updateDocumentListMembers = async (
   sessionId: string,
   user: User
@@ -423,19 +444,22 @@ export const startSessionInFirebase = async (
         updatedAt: serverTimestamp(),
       });
 
-      await initializeTimers(teamTimers, 300);
+      await initializeTimers(sessionId, teamTimers, 300);
       console.log("Session started successfully");
       navigate(`/board/${sessionId}/team/${teamName}`);
     }
   }
 };
 
-export const initializeTimers = async (
+const initializeTimers = async (
+  sessionId: string,
   teamTimers: Record<string, string>,
   initialDuration: number
 ) => {
   Object.values(teamTimers).forEach(async (timerId) => {
     await setDoc(doc(db, "timers", timerId), {
+      sessionId: sessionId,
+      totalDuration: initialDuration,
       startTime: serverTimestamp(),
       duration: initialDuration,
       isRunning: true,
@@ -465,21 +489,28 @@ export const updateTimeToSyncTimerInFirebase = async (
     }
 
     const timerData = timerDoc.data();
-    const currentDuration = timerData.duration || 0;
 
-    const totalDuration = currentDuration + secondsToAdd;
+    const sessionRef = doc(db, "sessions", timerData.sessionId);
+
+    const sessionDoc = await getDoc(sessionRef);
+    if (!sessionDoc.exists()) {
+      throw new Error("Sessão não encontrado");
+    }
+    if (sessionDoc.data().isClosed) {
+      throw new Error("Sessão está encerrada");
+    }
+    const currentDuration = timerData.duration || 0;
+    const totalDuration = timerData.totalDuration || currentDuration;
+
+    const newTotalDuration = totalDuration + secondsToAdd;
 
     await updateDoc(timerRef, {
       duration: secondsToAdd,
       startTime: serverTimestamp(),
       isRunning: true,
       lastUpdated: serverTimestamp(),
-      totalDuration: totalDuration,
+      totalDuration: newTotalDuration,
     });
-
-    console.log(
-      `Tempo adicionado: +${secondsToAdd}s. Novo total: ${secondsToAdd}s`
-    );
   } catch (error) {
     console.error("Error adding time to sync timer:", error);
     throw error;

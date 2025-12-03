@@ -25,6 +25,7 @@
     "test:login": "jest src/scenes/LoginScene/LoginScene.test.tsx",
     "test:name-entry": "jest src/scenes/NameEntryScene/NameEntryScene.test.tsx",
     "test:register": "jest src/scenes/RegisterScene/RegisterScene.test.tsx",
+    "test:review": "jest src/scenes/AnonymousReviewScene/AnonymousReviewScene.test.tsx",
     "test:team-selection": "jest src/scenes/TeamSelectionScene/TeamSelectionScene.test.tsx",
     "test:validation": "npm run test:firestore-rules",
     "test:watch": "jest --watch",

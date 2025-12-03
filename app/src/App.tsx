@@ -15,6 +15,7 @@ import LoginScene from './scenes/LoginScene/LoginScene';
 import RegisterScene from './scenes/RegisterScene/RegisterScene';
 import { AppLayout } from './components/AppLayout';
 import RouteGuard from './components/RouteGuard';
+import AnonymousReviewScene from './scenes/AnonymousReviewScene/AnonymousReviewScene';
 
 const AppContent: React.FC = () => {
   const { globalLoading, loadingMessage } = useGlobalLoading();
@@ -57,7 +58,11 @@ const AppContent: React.FC = () => {
                 <LeaderboardScene />
               </AppLayout>
             } />
-
+            <Route path="/review/:sessionId" element={
+              <AppLayout>
+                <AnonymousReviewScene />
+              </AppLayout>
+            } />
             <Route path="/login" element={<LoginScene />} />
             <Route path="/register" element={<RegisterScene />} />
             <Route path="/name-entry" element={<NameEntryScene />} />

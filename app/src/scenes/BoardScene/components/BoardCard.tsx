@@ -3,7 +3,6 @@ import { useState } from 'react';
 import type { Card } from "../../../types/global";
 import VariableTextArea from "../../../components/VariableTextArea";
 import { User } from 'firebase/auth';
-import StarRating from './StarRating';
 import { stringToPastelBg } from '@/services/boardServices';
 
 interface BoardCardProps {
@@ -70,19 +69,19 @@ const BoardCard: React.FC<BoardCardProps> = ({
           <div className="ml-4 flex gap-2 mt-2">
             <button
               onClick={handleEditSubmit}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
               title="Salvar"
-              disabled={timeEnded}
             >
-              <Check />
+              <Check className="w-3 h-3" />
+              <span className="text-xs">Salvar</span>
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="px-3 py-1 text-white bg-red-400 rounded hover:bg-red-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
               title="Cancelar"
-              disabled={timeEnded}
             >
-              <X />
+              <X className="w-3 h-3" />
+              <span className="text-xs">Cancelar</span>
             </button>
           </div>
         </div>
@@ -133,17 +132,19 @@ const BoardCard: React.FC<BoardCardProps> = ({
                         <div className="flex gap-2 mt-2">
                           <button
                             onClick={handleCommentEditSubmit}
-                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                             title="Salvar"
                           >
-                            <Check />
+                            <Check className="w-3 h-3" />
+                            <span className="text-xs">Salvar</span>
                           </button>
                           <button
                             onClick={() => setCommentIdToEdit("")}
-                            className="px-3 py-1 text-white bg-red-400 rounded hover:bg-red-500"
+                            className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
                             title="Cancelar"
                           >
-                            <X />
+                            <X className="w-3 h-3" />
+                            <span className="text-xs">Cancelar</span>
                           </button>
                         </div>
                       )}
@@ -185,19 +186,9 @@ const BoardCard: React.FC<BoardCardProps> = ({
         )}
       </div>
 
-      {/* Rating and Author */}
+      {/* Author */}
       <div className="flex justify-between items-center mt-3">
         <p className="text-xs font-semibold text-gray-800">- {card.createdBy}</p>
-        <StarRating
-          ratings={card.ratings || {}}
-          onRate={(rating) => {
-            if (!timeEnded) {
-              handleRate(card.id, rating);
-            }
-          }}
-          userRating={card.ratings?.[user.uid]}
-          showReadonly={timeEnded}
-        />
       </div>
     </div>
   );

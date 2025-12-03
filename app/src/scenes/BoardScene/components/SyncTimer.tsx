@@ -15,6 +15,7 @@ interface SyncTimerProps {
   onTimeEnd?: () => void;
   onTimerStateChange?: (hasEnded: boolean) => void;
   onTimerLoaded?: () => void;
+  isSessionClosed?: boolean;
 }
 
 const SyncTimer = ({
@@ -24,7 +25,8 @@ const SyncTimer = ({
   sessionTeams,
   onTimeEnd,
   onTimerStateChange,
-  onTimerLoaded
+  onTimerLoaded,
+  isSessionClosed = false
 }: SyncTimerProps) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -159,7 +161,7 @@ const SyncTimer = ({
       </div>
 
       {/* Botões quando o tempo acabou */}
-      {hasEnded && (
+      {hasEnded && !isSessionClosed && (
         <div className="flex flex-col gap-2 w-full max-w-xs">
           {canAddTime ? <AddTimeInput
             additionalTime={additionalTime}

@@ -13,9 +13,10 @@ export type SortOption =
 interface CardSortingSelectorProps {
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
+  hasAuthorOption?: boolean;
 }
 
-const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSortChange }) => {
+const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSortChange, hasAuthorOption = true }) => {
   const sortOptions: Array<{
     value: SortOption;
     label: string;
@@ -57,19 +58,23 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSor
         label: 'Menos Comentários',
         icon: <MessageSquare className="w-4 h-4" />,
         description: 'Ordena pelos cards com menos comentários primeiro'
-      },
+      }
+    ];
+
+  if (hasAuthorOption) {
+    sortOptions.push(
       {
         value: 'author',
         label: 'Por Autor',
         icon: <Pencil className="w-4 h-4" />,
         description: 'Ordena pelos cards por autor alfabeticamente'
-      },
-    ];
+      });
+  }
 
   const currentSort = sortOptions.find(option => option.value === sortBy);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ArrowUpDown className="w-4 h-4 text-gray-500" />

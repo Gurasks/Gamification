@@ -6,8 +6,7 @@ import { CardSkeleton } from './components/CardSkeleton';
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
 import { addCommentToCardInFirestore, createCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
 import type { Card, Session } from '../../types/global';
-import { getNextTeam, getSortedCards } from '../../services/boardServices';
-import { getAvailableTeams } from '../../services/teamSelectionServices';
+import { getSortedCards } from '../../services/boardServices';
 import VariableTextArea from "../../components/VariableTextArea";
 import { returnTimerId } from '../../services/globalServices';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
@@ -16,14 +15,25 @@ import { Button } from '../../components/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import SyncTimer from './components/SyncTimer';
-import toast from 'react-hot-toast';
 import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
+import MasonryGrid from '@/components/MasonryGrid';
+import {
+  Clock,
+  FileText,
+  LogOut,
+  Users,
+  Eye,
+  ChevronRight,
+  ArrowLeft,
+  MessageSquare,
+  Star,
+  Ban
+} from 'lucide-react';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
   const { user } = useAuth();
   const [session, setSession] = useState<Session>({} as Session);
-  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
   const [_myTeam, setMyTeam] = useState<string>('');
   const [cards, setCards] = useState<Card[]>([]);
   const [newCardText, setNewCardText] = useState('');
@@ -31,9 +41,8 @@ const BoardScene: React.FC = () => {
   const [cardsLoading, setCardsLoading] = useState(true);
   const [showDescription, setShowDescription] = useState(false);
   const [isCreatingCard, setIsCreatingCard] = useState(false);
-  const [isChangingTeam, setIsChangingTeam] = useState(false);
   const [timeEnded, setTimeEnded] = useState<boolean>(false);
-  const [showLeaderboardButton, setShowLeaderboardButton] = useState<boolean>(false);
+  const [showAnonymousReview, setShowAnonymousReview] = useState<boolean>(false);
   const [timerLoaded, setTimerLoaded] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
 
@@ -44,15 +53,23 @@ const BoardScene: React.FC = () => {
   };
 
   const handleTimerStateChange = (hasEnded: boolean) => {
+    if (session.isClosed) {
+      setTimeEnded(true);
+      setShowAnonymousReview(true);
+      return;
+    }
+
     setTimeEnded(hasEnded);
     if (hasEnded) {
-      setShowLeaderboardButton(true);
+      setShowAnonymousReview(true);
+    } else {
+      setShowAnonymousReview(false);
     }
   };
 
   const handleTimeEnd = () => {
     setTimeEnded(true);
-    setShowLeaderboardButton(true);
+    setShowAnonymousReview(true);
   };
 
   useEffect(() => {
@@ -80,7 +97,7 @@ const BoardScene: React.FC = () => {
         const sessionData = await getSession(sessionId);
         if (sessionData) {
           setSession(sessionData);
-          setAvailableTeams(getAvailableTeams(sessionData.numOfTeams || 2));
+          setTimeEnded(sessionData.isClosed || false);
         }
 
         unsubscribeSession = createUnsubscribeSession(sessionId, setSession);
@@ -107,46 +124,8 @@ const BoardScene: React.FC = () => {
   useEffect(() => {
     if (sessionId && session.teams && user) {
       setMyTeam(session.teams[user.uid] || '');
-      setAvailableTeams(getAvailableTeams(session.numOfTeams || 2));
     }
   }, [sessionId, session.teams, user, session.numOfTeams]);
-
-  useEffect(() => {
-    setIsChangingTeam(false);
-  }, [sessionId, teamName]);
-
-  useEffect(() => {
-    return () => {
-      setIsChangingTeam(false);
-    };
-  }, []);
-
-  const handleChangeBoard = async () => {
-    if (!sessionId || !teamName || !availableTeams.length) {
-      setIsChangingTeam(false);
-      return;
-    }
-
-    setIsChangingTeam(true);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const nextTeam = getNextTeam(teamName, availableTeams);
-
-      if (nextTeam && nextTeam !== teamName) {
-        navigate(`/board/${sessionId}/team/${nextTeam}`);
-      } else {
-        console.error('Próximo time inválido:', nextTeam);
-        toast.error('Erro ao mudar de time');
-      }
-    } catch (error) {
-      console.error('Error changing team:', error);
-      toast.error('Erro ao mudar de time');
-    } finally {
-      setIsChangingTeam(false);
-    }
-  };
 
   const handleCreateCard = async () => {
     if (!newCardText.trim() || isCreatingCard) return;
@@ -194,7 +173,9 @@ const BoardScene: React.FC = () => {
           <Button
             onClick={handleGoBack}
             variant="primary"
+            className="flex items-center justify-center gap-2"
           >
+            <ArrowLeft className="w-4 h-4" />
             Voltar ao Início
           </Button>
         </div>
@@ -220,9 +201,11 @@ const BoardScene: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                {session.title}
-              </h1>
+              <div className="flex justify-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-800">
+                  {session.title}
+                </h1>
+              </div>
               {session.description && (
                 <CollapsibleDescriptionArea
                   sessionDescription={session.description}
@@ -230,9 +213,15 @@ const BoardScene: React.FC = () => {
                   setShowDescription={setShowDescription}
                 />
               )}
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span><strong>{teamName}</strong></span>
-                <span>Participante: <strong>{user.displayName}</strong></span>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mt-3">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <span className="font-semibold">{teamName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500">Participante:</span>
+                  <span className="font-semibold">{user.displayName}</span>
+                </div>
               </div>
             </div>
 
@@ -246,6 +235,7 @@ const BoardScene: React.FC = () => {
                   onTimeEnd={handleTimeEnd}
                   onTimerStateChange={handleTimerStateChange}
                   onTimerLoaded={handleTimerLoaded}
+                  isSessionClosed={session.isClosed}
                 />
               </div>
             )}
@@ -257,15 +247,18 @@ const BoardScene: React.FC = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                  Adicionar Nova Sugestão
-                </h2>
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    Adicionar Nova Sugestão
+                  </h2>
+                </div>
                 <VariableTextArea
                   text={newCardText}
                   setText={setNewCardText}
                   handleSubmit={handleCreateCard}
                   disabled={isCreatingCard}
                   placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
+                  rows={2}
                 />
                 {isCreatingCard && (
                   <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
@@ -278,58 +271,50 @@ const BoardScene: React.FC = () => {
               <div className="flex gap-3">
                 <Button
                   onClick={handleGoBack}
-                  variant="secondary"
+                  variant="outline-secondary"
+                  className="flex items-center justify-center gap-2 border-red-500 hover:border-red-600 text-red-500 hover:text-red-600"
                 >
+                  <LogOut className="w-4 h-4" />
                   Sair
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl shadow-lg p-6 mb-6">
+          <div className="bg-gradient-to-r from-red-50 to-red-50 border border-red-200 rounded-xl shadow-lg p-6 mb-6">
             <div className="text-center">
-              {isUserInTeam ? (
-                <>
-                  <h2 className="text-2xl font-bold text-yellow-800 mb-4">
-                    ⏰ Tempo Esgotado!
+              {session.isClosed ? (<>
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Ban className="w-8 h-8 text-red-600" />
+                  <h2 className="text-2xl font-bold text-red-800">
+                    Sessão Encerrada!
                   </h2>
+                </div>
+                <p className="text-red-700 mb-4">
+                  A sessão foi encerrada.
+                </p>
+              </>) : (
+                <>
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <Clock className="w-8 h-8 text-yellow-600" />
+                    <h2 className="text-2xl font-bold text-yellow-800">
+                      Tempo Esgotado!
+                    </h2>
+                  </div>
                   <p className="text-yellow-700 mb-4">
                     A fase de sugestões e votos foi encerrada.
                   </p>
                 </>
-              ) : (
-                <>
-                  <h2 className="text-2xl font-bold text-yellow-800 mb-4">
-                    ⚠️ Seu time é o <strong>{userTeam || 'Não definido'}</strong>:
-                  </h2>
-                  <p className="text-yellow-700 mb-4">
-                    Apenas membros do <strong>{teamName}</strong> podem adicionar sugestões e votar
-                  </p>
-                </>
               )}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button
-                  onClick={handleChangeBoard}
-                  loading={isChangingTeam}
-                  disabled={isChangingTeam || !sessionId || !teamName || availableTeams.length === 0}
-                  variant="primary"
-                  className="flex items-center gap-2"
-                  title={availableTeams.length === 0 ? "Nenhum time disponível" : "Mudar para outro time"}
-                  data-testid="change-team-button"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                  </svg>
-                  Mudar Time
-                </Button>
-
-                {showLeaderboardButton && (
+                {showAnonymousReview && (
                   <Button
-                    onClick={() => navigate(`/leaderboard/${sessionId}`)}
+                    onClick={() => navigate(`/review/${sessionId}`)}
                     variant="primary"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                   >
-                    📊 Ver tabela de classificação
+                    <Eye className="w-4 h-4" />
+                    Revisão Anônima
                   </Button>
                 )}
               </div>
@@ -341,12 +326,15 @@ const BoardScene: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="w-full">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Sugestões do {teamName}
-                <span className="text-sm font-normal text-gray-500 ml-2">
-                  ({teamCards.length} sugestões)
-                </span>
-              </h3>
+              <div className="flex items-center gap-2 mb-2">
+                <MessageSquare className="w-6 h-6 text-gray-700" />
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Sugestões do {teamName}
+                  <span className="text-sm font-normal text-gray-500 ml-2">
+                    ({teamCards.length} sugestões)
+                  </span>
+                </h3>
+              </div>
               {teamCards.length > 0 && !cardsLoading && (
                 <div>
                   <CardSortingSelector
@@ -376,17 +364,25 @@ const BoardScene: React.FC = () => {
           ) : teamCards.length === 0 ? (
             // Estado vazio
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+              <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-10 h-10 text-gray-400" />
               </div>
-              <p className="text-gray-500 mb-2">Nenhuma sugestão ainda</p>
-              <p className="text-gray-400 text-sm">Seja o primeiro a adicionar uma sugestão!</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhuma sugestão ainda</h3>
+              <p className="text-gray-500 mb-6">Seja o primeiro a adicionar uma sugestão!</p>
+              {!timeEnded && isUserInTeam && (
+                <div className="flex items-center justify-center gap-2 text-blue-600">
+                  <ChevronRight className="w-4 h-4" />
+                  <span className="text-sm">Use o formulário acima para começar</span>
+                </div>
+              )}
             </div>
           ) : (
             // Cards carregados e ordenados
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <MasonryGrid
+              columns={{ sm: 1, md: 2, lg: 3 }}
+              gap={24}
+              className="p-2"
+            >
               {sortedTeamCards.map(card => (
                 <BoardCard
                   key={card.id}
@@ -415,8 +411,32 @@ const BoardScene: React.FC = () => {
                   timeEnded={timeEnded}
                 />
               ))}
-            </div>
+            </MasonryGrid>
           )}
+        </div>
+
+        {/* Footer com ações */}
+        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-end items-center">
+          <div className="flex gap-3">
+            <Button
+              onClick={handleGoBack}
+              variant="outline-primary"
+              className="flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar ao Início
+            </Button>
+            {showAnonymousReview && (
+              <Button
+                onClick={() => navigate(`/review/${sessionId}`)}
+                variant="primary"
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+              >
+                <Eye className="w-4 h-4" />
+                Revisão Anônima
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

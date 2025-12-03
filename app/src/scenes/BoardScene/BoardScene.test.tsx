@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import toast from 'react-hot-toast';
+import React, { act } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import BoardScene from './BoardScene';
+import { Card } from '@/types/global';
 
 // Mock dos serviços e hooks
 jest.mock('../../services/firestore/firestoreServices', () => ({
@@ -20,11 +20,7 @@ jest.mock('../../hooks/firestoreUnsubscriber', () => ({
 }));
 
 jest.mock('../../services/boardServices', () => ({
-  getNextTeam: jest.fn(),
-}));
-
-jest.mock('../../services/teamSelectionServices', () => ({
-  getAvailableTeams: jest.fn(),
+  getSortedCards: jest.fn((cards) => cards),
 }));
 
 jest.mock('../../services/globalServices', () => ({
@@ -87,27 +83,58 @@ jest.mock('./components/SyncTimer', () => ({
     sessionTeams,
     onTimeEnd,
     onTimerStateChange,
-    onTimerLoaded
-  }: any) => (
-    <div data-testid="sync-timer">
-      Sync Timer - {currentTeam}
-      <button
-        data-testid="trigger-time-end"
-        onClick={() => {
+    onTimerLoaded,
+    isSessionClosed
+  }: any) => {
+    // Esta função será chamada quando o componente for montado
+    React.useEffect(() => {
+      // Simular que o timer foi carregado
+      setTimeout(() => {
+        onTimerLoaded?.();
+      }, 0);
+
+      // Se a sessão está fechada, chamar onTimeEnd imediatamente
+      if (isSessionClosed) {
+        setTimeout(() => {
           onTimeEnd?.();
           onTimerStateChange?.(true);
-        }}
-      >
-        Simular tempo esgotado
-      </button>
-      <button
-        data-testid="trigger-timer-loaded"
-        onClick={() => onTimerLoaded?.()}
-      >
-        Simular timer carregado
-      </button>
-    </div>
-  ),
+        }, 0);
+      }
+    }, []);
+
+    return (
+      <div data-testid="sync-timer">
+        Sync Timer - {currentTeam}
+        <button
+          data-testid="trigger-time-end"
+          onClick={() => {
+            onTimeEnd?.();
+            onTimerStateChange?.(true);
+          }}
+        >
+          Simular tempo esgotado
+        </button>
+        <button
+          data-testid="trigger-session-closed"
+          onClick={() => {
+            onTimeEnd?.();
+            onTimerStateChange?.(true);
+          }}
+        >
+          Simular sessão encerrada
+        </button>
+        <button
+          data-testid="trigger-timer-loaded"
+          onClick={() => onTimerLoaded?.()}
+        >
+          Simular timer carregado
+        </button>
+        <div data-testid="session-closed-status">
+          {isSessionClosed ? 'Sessão Encerrada' : 'Sessão Ativa'}
+        </div>
+      </div>
+    );
+  },
 }));
 
 jest.mock('../../components/CollapsibleDescriptionArea', () => ({
@@ -130,7 +157,7 @@ jest.mock('../../components/LoadingSpinner', () => ({
 jest.mock('../../components/Button', () => ({
   Button: ({ onClick, loading, variant, children, className, disabled, title }: any) => (
     <button
-      data-testid={`button-${variant}`}
+      data-testid={`button-${variant || 'default'}`}
       onClick={onClick}
       disabled={loading || disabled}
       className={className}
@@ -177,18 +204,19 @@ jest.mock('./components/CardSorteningSelector', () => ({
   SortOption: {}
 }));
 
-jest.mock('../../services/boardServices', () => ({
-  getNextTeam: jest.fn(),
-  getSortedCards: jest.fn((cards) => cards),
+jest.mock('../../components/MasonryGrid', () => ({
+  __esModule: true,
+  default: ({ children, className }: any) => (
+    <div data-testid="masonry-grid" className={className}>
+      {children}
+    </div>
+  ),
 }));
-
 
 const mockGetSession = require('../../services/firestore/firestoreServices').getSession;
 const mockCreateCardInFirestore = require('../../services/firestore/firestoreServices').createCardInFirestore;
 const mockCreateUnsubscribeSession = require('../../hooks/firestoreUnsubscriber').createUnsubscribeSession;
 const mockCreateUnsubscribeCards = require('../../hooks/firestoreUnsubscriber').createUnsubscribeCards;
-const mockGetNextTeam = require('../../services/boardServices').getNextTeam;
-const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
 const mockReturnTimerId = require('../../services/globalServices').returnTimerId;
 const mockUseParams = require('react-router-dom').useParams;
 const mockGetSortedCards = require('../../services/boardServices').getSortedCards;
@@ -201,6 +229,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     </BrowserRouter>
   );
 };
+
 
 describe('BoardScene', () => {
   const mockUser = {
@@ -218,6 +247,7 @@ describe('BoardScene', () => {
     },
     numOfTeams: 2,
     hasStarted: true,
+    isClosed: false,
   };
 
   const mockCards = [
@@ -254,13 +284,16 @@ describe('BoardScene', () => {
     });
 
     mockGetSession.mockResolvedValue(mockSession);
-    mockGetAvailableTeams.mockReturnValue(['Time A', 'Time B']);
     mockReturnTimerId.mockReturnValue('timer123');
     mockCreateUnsubscribeSession.mockReturnValue(jest.fn());
     mockCreateUnsubscribeCards.mockImplementation((_sessionId: string, callback: (cards: any[]) => void) => {
-      callback(mockCards);
+      // Usar setTimeout para simular carregamento assíncrono
+      setTimeout(() => {
+        callback(mockCards);
+      }, 0);
       return jest.fn();
     });
+    mockGetSortedCards.mockImplementation((cards: Card[]) => cards);
   });
 
   describe('Loading state', () => {
@@ -348,14 +381,18 @@ describe('BoardScene', () => {
       fireEvent.click(triggerTimeEnd);
 
       await waitFor(() => {
-        expect(screen.getByText('⏰ Tempo Esgotado!')).toBeInTheDocument();
+        expect(screen.getByText('Tempo Esgotado!')).toBeInTheDocument();
       });
 
       expect(screen.queryByText('Adicionar Nova Sugestão')).not.toBeInTheDocument();
       expect(screen.queryByTestId('variable-textarea')).not.toBeInTheDocument();
     });
 
-    it('should show leaderboard button when time ends', async () => {
+    it('should show session closed message when session is closed', async () => {
+      // Mock de sessão encerrada
+      const closedSession = { ...mockSession, isClosed: true };
+      mockGetSession.mockResolvedValue(closedSession);
+
       render(
         <TestWrapper>
           <BoardScene />
@@ -366,13 +403,46 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      // Simular tempo esgotado
-      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
-      fireEvent.click(triggerTimeEnd);
+      expect(screen.getByText('Sessão Encerrada!')).toBeInTheDocument();
+      expect(screen.queryByText('Adicionar Nova Sugestão')).not.toBeInTheDocument();
+    });
+
+    it('should navigate to review when review button is clicked', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
 
       await waitFor(() => {
-        expect(screen.getByText('📊 Ver tabela de classificação')).toBeInTheDocument();
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
+
+      // Aguardar cards carregarem
+      await waitFor(() => {
+        expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
+      });
+
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+
+      await act(async () => {
+        fireEvent.click(triggerTimeEnd);
+      });
+
+      // Aguardar botão aparecer
+      await waitFor(() => {
+        const reviewButtons = screen.getAllByText('Revisão Anônima');
+        expect(reviewButtons.length).toBeGreaterThan(0);
+      }, { timeout: 2000 });
+
+      // Clicar no primeiro botão de revisão encontrado
+      const reviewButtons = screen.getAllByText('Revisão Anônima');
+      await act(async () => {
+        fireEvent.click(reviewButtons[0]);
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith('/review/session123');
     });
 
     it('should pass timeEnded prop to BoardCard components when time ends', async () => {
@@ -419,15 +489,7 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Seu time é o/)).toBeInTheDocument();
-
-      const timeAElements = screen.getAllByText('Time A');
-      expect(timeAElements.length).toBeGreaterThan(0);
-
-      expect(screen.getByText(/Apenas membros do/)).toBeInTheDocument();
-
-      const timeBElements = screen.getAllByText('Time B');
-      expect(timeBElements.length).toBeGreaterThan(0);
+      expect(screen.getByText('Tempo Esgotado!')).toBeInTheDocument();
     });
 
     it('should hide card creation when user is not in current team', async () => {
@@ -502,179 +564,6 @@ describe('BoardScene', () => {
 
       // Garantir que a função não foi chamada
       expect(mockCreateCardInFirestore).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Team navigation', () => {
-    it('should render team change button when conditions are met', async () => {
-      // Para ver o botão "Mudar Time", precisamos que o tempo tenha acabado
-      // ou o usuário não esteja no time atual
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time B', // Usuário está no Time A, visualizando Time B
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      // Agora o botão deve estar visível
-      expect(screen.getByText('Mudar Time')).toBeInTheDocument();
-    });
-
-    it('should navigate to next team when change team button is clicked', async () => {
-      mockGetNextTeam.mockReturnValue('Time B');
-
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time C',
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      const changeTeamButton = screen.getByTestId('button-primary');
-      fireEvent.click(changeTeamButton);
-
-      await waitFor(() => {
-        expect(mockGetNextTeam).toHaveBeenCalledWith('Time C', ['Time A', 'Time B']);
-      });
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/board/session123/team/Time B');
-      });
-    });
-
-    it('should show error toast when team change fails', async () => {
-      mockGetNextTeam.mockReturnValue('Time C');
-
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time C',
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      const changeTeamButton = screen.getByTestId('button-primary');
-      fireEvent.click(changeTeamButton);
-
-      await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Erro ao mudar de time');
-      });
-    });
-
-
-    it('should not render team change button when user is in current team and time has not ended', async () => {
-      // Usuário está no time atual e tempo não acabou
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time A', // Usuário está no Time A, visualizando Time A
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      // Botão não deve estar visível nesta condição
-      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Change team button visibility', () => {
-    it('should show change team button when time has ended and user is in team', async () => {
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time A', // Usuário está no Time A
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      // Inicialmente não deve mostrar o botão
-      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
-
-      // Simular tempo esgotado
-      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
-      fireEvent.click(triggerTimeEnd);
-
-      await waitFor(() => {
-        // Agora o botão deve estar visível
-        expect(screen.getByText('Mudar Time')).toBeInTheDocument();
-      });
-    });
-
-    it('should show change team button when user is not in current team', async () => {
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time B', // Usuário está no Time A, visualizando Time B
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      // Botão deve estar visível imediatamente
-      expect(screen.getByText('Mudar Time')).toBeInTheDocument();
-    });
-
-    it('should not show change team button when user is in current team and time has not ended', async () => {
-      mockUseParams.mockReturnValue({
-        sessionId: 'session123',
-        teamName: 'Time A', // Usuário está no Time A, visualizando Time A
-      });
-
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
-
-      // Botão não deve estar visível
-      expect(screen.queryByText('Mudar Time')).not.toBeInTheDocument();
     });
   });
 
@@ -790,6 +679,7 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
+      expect(screen.getByTestId('button-outline-secondary')).toBeInTheDocument();
       expect(screen.getByText('Sair')).toBeInTheDocument();
     });
 
@@ -810,7 +700,7 @@ describe('BoardScene', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
-    it('should navigate to leaderboard when leaderboard button is clicked', async () => {
+    it('should navigate to review when review button is clicked', async () => {
       render(
         <TestWrapper>
           <BoardScene />
@@ -821,16 +711,31 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      // Simular tempo esgotado para mostrar o botão
-      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
-      fireEvent.click(triggerTimeEnd);
-
+      // Aguardar cards carregarem
       await waitFor(() => {
-        const leaderboardButton = screen.getByText('📊 Ver tabela de classificação');
-        fireEvent.click(leaderboardButton);
+        expect(screen.getByTestId('sync-timer')).toBeInTheDocument();
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith('/leaderboard/session123');
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+
+      await act(async () => {
+        fireEvent.click(triggerTimeEnd);
+      });
+
+      // Aguardar botão aparecer
+      await waitFor(() => {
+        const reviewButtons = screen.getAllByText('Revisão Anônima');
+        expect(reviewButtons.length).toBeGreaterThan(0);
+      }, { timeout: 2000 });
+
+      // Clicar no primeiro botão de revisão encontrado
+      const reviewButtons = screen.getAllByText('Revisão Anônima');
+      await act(async () => {
+        fireEvent.click(reviewButtons[0]);
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith('/review/session123');
     });
   });
 
@@ -978,45 +883,38 @@ describe('BoardScene', () => {
     });
   });
 
-  // Adicione também testes para as mudanças no header
-  describe('Header display', () => {
-    it('should display team name without "Time:" label', async () => {
+  describe('Session closed state', () => {
+    it('should show review button when session is closed', async () => {
+      const closedSession = { ...mockSession, isClosed: true };
+      mockGetSession.mockResolvedValue(closedSession);
+
       render(
         <TestWrapper>
           <BoardScene />
         </TestWrapper>
       );
 
+      // Aguardar loading
       await waitFor(() => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      // Verificar que "Time:" não está mais no header
-      expect(screen.queryByText('Time:')).not.toBeInTheDocument();
-
-      // Verificar que o nome do time ainda está presente
-      expect(screen.getByText('Time A')).toBeInTheDocument();
-    });
-
-    it('should display "Sugestões do Time X" without "Time" before do', async () => {
-      render(
-        <TestWrapper>
-          <BoardScene />
-        </TestWrapper>
-      );
-
+      // Aguardar que o componente processe a sessão fechada
       await waitFor(() => {
-        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
-      });
+        // Verificar se a mensagem de sessão encerrada aparece
+        expect(screen.getByText('Sessão Encerrada!')).toBeInTheDocument();
+      }, { timeout: 2000 });
 
-      // Verificar o novo formato do título
-      expect(screen.getByText('Sugestões do Time A')).toBeInTheDocument();
+      // Verificar se o botão de revisão aparece
+      await waitFor(() => {
+        const reviewButtons = screen.getAllByText('Revisão Anônima');
+        expect(reviewButtons.length).toBeGreaterThan(0);
+      }, { timeout: 2000 });
     });
   });
 
-  // Atualize o teste que verifica a renderização do header
-  describe('Main content rendering', () => {
-    it('should display cards when loaded', async () => {
+  describe('Footer buttons', () => {
+    it('should show review button in footer when time ends', async () => {
       render(
         <TestWrapper>
           <BoardScene />
@@ -1027,13 +925,48 @@ describe('BoardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      await waitFor(() => {
-        // CORRIGIDO: Novo formato sem "Time" duplicado
-        expect(screen.getByText('Sugestões do Time A')).toBeInTheDocument();
-      }, { timeout: 2000 }); // Adicionar timeout maior se necessário
+      // Inicialmente não deve mostrar o botão
+      expect(screen.queryByText('Revisão Anônima')).not.toBeInTheDocument();
 
-      expect(screen.getByText('(2 sugestões)')).toBeInTheDocument();
-      expect(screen.getAllByTestId('board-card')).toHaveLength(2);
+      // Simular tempo esgotado
+      const triggerTimeEnd = screen.getByTestId('trigger-time-end');
+      fireEvent.click(triggerTimeEnd);
+
+      await waitFor(() => {
+        // Agora o botão deve estar visível no footer
+        const buttons = screen.getAllByText('Revisão Anônima');
+        expect(buttons.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('should not show review button when time is not ended', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Revisão Anônima')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('MasonryGrid usage', () => {
+    it('should use MasonryGrid for cards layout', async () => {
+      render(
+        <TestWrapper>
+          <BoardScene />
+        </TestWrapper>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByTestId('masonry-grid')).toBeInTheDocument();
     });
   });
 });

@@ -24,6 +24,7 @@ export interface Session {
   startTime?: Timestamp;
   updatedAt?: Timestamp;
   teamTimers?: Record<string, string>;
+  isClosed?: boolean;
 }
 
 export interface SessionCreationData {
