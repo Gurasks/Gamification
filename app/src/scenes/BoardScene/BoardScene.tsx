@@ -4,8 +4,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
-import { addCommentToCardInFirestore, createCardInFirestore, deleteCardInFirestore, deleteCommentFromCardInFirestore, getSession, updateCardInFirestore, updateCommentToCardInFirestore, updateRatingToCardInFirestore } from '../../services/firestore/firestoreServices';
-import type { Card, Session } from '../../types/global';
+import {
+  addCommentToCardInFirestore,
+  createCardInFirestore,
+  deleteCardInFirestore,
+  deleteCommentFromCardInFirestore,
+  getSession,
+  updateCardInFirestore,
+  updateCommentToCardInFirestore
+} from '../../services/firestore/firestoreServices';
+import type { Card, CardMetadata, CategoryType, PriorityLevel, RequirementType, Session } from '../../types/global';
 import { getSortedCards } from '../../services/boardServices';
 import VariableTextArea from "../../components/VariableTextArea";
 import { returnTimerId } from '../../services/globalServices';
@@ -29,6 +37,8 @@ import {
   Ban
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MetadataSelectors } from '@/components/MetadataSelectors';
+import { CardFilters } from '@/components/CardFilters';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -45,6 +55,15 @@ const BoardScene: React.FC = () => {
   const [showAnonymousReview, setShowAnonymousReview] = useState<boolean>(false);
   const [timerLoaded, setTimerLoaded] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [priority, setPriority] = useState<PriorityLevel | ''>('');
+  const [requirementType, setRequirementType] = useState<RequirementType | ''>('');
+  const [category, setCategory] = useState<CategoryType | ''>('');
+  const [estimatedEffort, setEstimatedEffort] = useState<number | ''>('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [filterPriority, setFilterPriority] = useState<PriorityLevel[]>([]);
+  const [filterCategory, setFilterCategory] = useState<CategoryType[]>([]);
+  const [filterTags, setFilterTags] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   const navigate = useNavigate();
 
@@ -139,15 +158,29 @@ const BoardScene: React.FC = () => {
         return;
       }
 
+      const metadata: CardMetadata = {};
+      if (priority) metadata.priority = priority;
+      if (requirementType) metadata.requirementType = requirementType;
+      if (category) metadata.category = category;
+      if (estimatedEffort) metadata.estimatedEffort = estimatedEffort;
+      if (tags.length > 0) metadata.tags = tags;
+
       await createCardInFirestore(
         newCardText,
         sessionId,
         user,
         teamName,
-        setNewCardText
+        setNewCardText,
+        metadata
       );
+
+      setPriority('');
+      setRequirementType('');
+      setCategory('');
+      setEstimatedEffort('');
+      setTags([]);
     } catch (error) {
-      console.error('Error creating card:', error);
+      toast.error('Erro ao criar sugestão');
     } finally {
       setIsCreatingCard(false);
     }
@@ -188,11 +221,7 @@ const BoardScene: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <LoadingOverlay
-        message="Carregando sessão..."
-      />
-    );
+    return <LoadingOverlay message="Carregando sessão..." />;
   }
 
   if (!session || !session.id) {
@@ -223,6 +252,29 @@ const BoardScene: React.FC = () => {
   const userTeam = session.teams[user.uid];
   const isUserInTeam = userTeam === teamName;
   const sortedTeamCards = getSortedCards(teamCards, sortBy);
+
+  const filteredTeamCards = sortedTeamCards.filter(card => {
+    if (filterPriority.length > 0) {
+      if (!card.priority) return false;
+      if (!filterPriority.includes(card.priority)) return false;
+    }
+
+    if (filterCategory.length > 0) {
+      if (!card.category) return false;
+      if (!filterCategory.includes(card.category)) return false;
+    }
+
+    if (filterTags.length > 0) {
+      const cardTags = card.tags || [];
+      const hasMatchingTag = filterTags.some(tag => cardTags.includes(tag));
+      if (!hasMatchingTag) return false;
+    }
+
+    return true;
+  });
+
+  const allTags = teamCards.flatMap(card => card.tags || []);
+  const availableTags = [...new Set(allTags)];
 
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -290,6 +342,21 @@ const BoardScene: React.FC = () => {
                   placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
                   rows={2}
                 />
+                <div className="mt-4">
+                  <MetadataSelectors
+                    priority={priority}
+                    setPriority={setPriority}
+                    requirementType={requirementType}
+                    setRequirementType={setRequirementType}
+                    category={category}
+                    setCategory={setCategory}
+                    estimatedEffort={estimatedEffort}
+                    setEstimatedEffort={setEstimatedEffort}
+                    tags={tags}
+                    setTags={setTags}
+                    disabled={isCreatingCard}
+                  />
+                </div>
                 {isCreatingCard && (
                   <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
                     <LoadingSpinner size="sm" />
@@ -361,10 +428,25 @@ const BoardScene: React.FC = () => {
                 <h3 className="text-xl font-semibold text-gray-800">
                   Sugestões do {teamName}
                   <span className="text-sm font-normal text-gray-500 ml-2">
-                    ({teamCards.length} sugestões)
+                    ({filteredTeamCards.length} sugestões {teamCards.length === filteredTeamCards.length ? '' : ` filtradas`})
                   </span>
                 </h3>
               </div>
+              {teamCards.length > 0 && !cardsLoading && (
+                <div className="mb-6">
+                  <CardFilters
+                    availableTags={availableTags}
+                    selectedTags={filterTags}
+                    setSelectedTags={setFilterTags}
+                    priority={filterPriority}
+                    setPriority={setFilterPriority}
+                    category={filterCategory}
+                    setCategory={setFilterCategory}
+                    isExpanded={showFilters}
+                    onToggleExpand={() => setShowFilters(!showFilters)}
+                  />
+                </div>
+              )}
               {teamCards.length > 0 && !cardsLoading && (
                 <div>
                   <CardSortingSelector
@@ -413,7 +495,7 @@ const BoardScene: React.FC = () => {
               gap={24}
               className="p-2"
             >
-              {sortedTeamCards.map(card => (
+              {filteredTeamCards.map(card => (
                 <BoardCard
                   key={card.id}
                   card={card}

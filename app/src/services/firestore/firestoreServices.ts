@@ -10,6 +10,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   where,
   type DocumentData,
@@ -21,6 +22,10 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "../../config/firebase";
 import type {
   Card,
+  CardData,
+  CategoryType,
+  PriorityLevel,
+  RequirementType,
   Session,
   SessionCreationData,
   UserData,
@@ -256,23 +261,63 @@ export const createCardInFirestore = async (
   sessionId: string | undefined,
   user: User,
   teamName: string | undefined,
-  setNewCardText: (text: string) => void
+  setNewCardText: (text: string) => void,
+  metadata?: {
+    priority?: PriorityLevel;
+    requirementType?: RequirementType;
+    category?: CategoryType;
+    estimatedEffort?: number;
+    tags?: string[];
+  }
 ) => {
   if (!sessionId || !teamName || !newCardText.trim() || _.isEmpty(user)) return;
   try {
-    await addDoc(collection(db, "cards"), {
+    const cardData: CardData = {
       text: newCardText,
       sessionId,
-      createdBy: user.displayName,
+      createdBy: String(user.displayName || "Usuário"),
       createdById: user.uid,
       teamName,
-      votes: [],
-      createdAt: serverTimestamp(),
-    });
+      createdAt: serverTimestamp() as Timestamp,
+    };
+
+    if (metadata) {
+      if (metadata.priority) cardData.priority = metadata.priority;
+      if (metadata.requirementType)
+        cardData.requirementType = metadata.requirementType;
+      if (metadata.category) cardData.category = metadata.category;
+      if (metadata.estimatedEffort)
+        cardData.estimatedEffort = metadata.estimatedEffort;
+      if (metadata.tags) cardData.tags = metadata.tags;
+    }
+
+    await addDoc(collection(db, "cards"), cardData);
 
     setNewCardText("");
   } catch (error) {
     console.error("Error creating card:", error);
+    throw error;
+  }
+};
+
+export const updateCardMetadataInFirestore = async (
+  cardId: string,
+  metadata: {
+    priority?: PriorityLevel;
+    requirementType?: RequirementType;
+    category?: CategoryType;
+    estimatedEffort?: number;
+    tags?: string[];
+  }
+): Promise<void> => {
+  try {
+    const cardRef = doc(db, "cards", cardId);
+    await updateDoc(cardRef, {
+      ...metadata,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error updating card metadata:", error);
     throw error;
   }
 };

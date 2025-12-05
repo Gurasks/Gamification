@@ -1,9 +1,18 @@
-import { MessageSquareMore, Trash2, Clock, PencilLine, X, Check } from 'lucide-react';
+import {
+  MessageSquareMore,
+  Trash2,
+  Clock,
+  PencilLine,
+  X,
+  Check,
+  Hash
+} from 'lucide-react';
 import { useState } from 'react';
 import type { Card } from "../../../types/global";
 import VariableTextArea from "../../../components/VariableTextArea";
 import { User } from 'firebase/auth';
 import StarRating from '../../BoardScene/components/StarRating';
+import metadataService from '@/services/metadataOptionsService';
 
 interface AnonymousCardProps {
   card: Card;
@@ -57,6 +66,10 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
     }
   };
 
+  const priorityOption = card.priority ? metadataService.getPriorityOption(card.priority) : undefined;
+  const requirementTypeOption = card.requirementType ? metadataService.getRequirementTypeOption(card.requirementType) : undefined;
+  const categoryOption = card.category ? metadataService.getCategoryOption(card.category) : undefined;
+
   return (
     <div className={`text-sm [text-align:justify] p-4 bg-white rounded-xl shadow-lg border border-gray-200 hover:border-purple-300 transition-all duration-300 hover:shadow-xl ${isReadOnly ? 'opacity-95' : ''
       }`}>
@@ -64,6 +77,56 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-base font-semibold text-gray-800 leading-relaxed">{card.text}</h3>
       </div>
+
+      {/* Metadados do Card */}
+      {(card.priority || card.requirementType || card.category || card.estimatedEffort || card.tags?.length) && (
+        <div className="mt-3 mb-3 space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {priorityOption && (
+              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${priorityOption.bgColor} ${priorityOption.color} ${priorityOption.borderColor}`}>
+                {priorityOption.icon}
+                <span>{priorityOption.label}</span>
+              </span>
+            )}
+
+            {requirementTypeOption && (
+              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${requirementTypeOption.bgColor} ${requirementTypeOption.color} ${requirementTypeOption.borderColor}`}>
+                {requirementTypeOption.icon}
+                <span>{requirementTypeOption.label}</span>
+              </span>
+            )}
+
+            {categoryOption && (
+              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${categoryOption.bgColor} ${categoryOption.color} ${categoryOption.borderColor}`}>
+                {categoryOption.icon}
+                <span>{categoryOption.label}</span>
+              </span>
+            )}
+
+            {card.estimatedEffort && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full border border-amber-200">
+                <Clock className="w-3 h-3" />
+                <span>{card.estimatedEffort}h</span>
+              </span>
+            )}
+          </div>
+
+          {/* Tags */}
+          {card.tags && card.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {card.tags.map(tag => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md border border-blue-100"
+                >
+                  <Hash size={10} />
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Comments Section */}
       <div className="mt-3">

@@ -42,16 +42,44 @@ export interface Comment {
   createdAt: Timestamp;
 }
 
-export interface Card {
-  id: string;
+export interface CardMetadata {
+  priority?: PriorityLevel;
+  requirementType?: RequirementType;
+  category?: CategoryType;
+  estimatedEffort?: number;
+  tags?: string[];
+}
+
+export interface BaseCardData {
   text: string;
-  columnId: string;
   sessionId: string;
-  teamName: string;
   createdBy: string;
   createdById: string;
-  ratings: Record<string, number>;
+  teamName: string;
   createdAt: Timestamp;
+}
+
+export type CardData = BaseCardData & CardMetadata;
+
+export interface Card extends BaseCardData, CardMetadata {
+  id: string;
+  columnId: string;
+  ratings: Record<string, number>;
   comments?: Comment[];
   updatedAt?: Timestamp;
 }
+
+export type PriorityLevel = "baixa" | "media" | "alta" | "critica";
+export type RequirementType =
+  | "funcional"
+  | "nao-funcional"
+  | "tecnico"
+  | "design"
+  | "outro";
+export type CategoryType =
+  | "melhoria"
+  | "bug"
+  | "feature"
+  | "documentacao"
+  | "pergunta"
+  | "feedback";
