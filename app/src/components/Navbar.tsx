@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
                 />
               </div>
               <span className="text-xl font-bold text-gray-800">
-                Gamification
+                Singular
               </span>
             </button>
           </div>

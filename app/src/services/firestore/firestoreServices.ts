@@ -489,7 +489,7 @@ export const startSessionInFirebase = async (
         updatedAt: serverTimestamp(),
       });
 
-      await initializeTimers(sessionId, teamTimers, 300);
+      await initializeTimers(sessionId, teamTimers, 600);
       console.log("Session started successfully");
       navigate(`/board/${sessionId}/team/${teamName}`);
     }

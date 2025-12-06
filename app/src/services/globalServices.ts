@@ -127,3 +127,63 @@ export const validateEmailStepByStep = (email: string): string | null => {
 
   return null;
 };
+
+export const validatePassword = (password: string) => {
+  if (password.length < 6) {
+    return "A senha deve ter pelo menos 6 caracteres";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "A senha deve conter pelo menos uma letra maiúscula";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "A senha deve conter pelo menos um número";
+  }
+  return "";
+};
+
+export const getPasswordStrength = (pwd: string) => {
+  if (pwd.length === 0)
+    return {
+      score: 0,
+      label: "Vazia",
+      color: "bg-gray-300",
+      textColor: "text-gray-500",
+    };
+
+  let score = 0;
+  const requirements = {
+    length: pwd.length >= 6,
+    lengthStrong: pwd.length >= 8,
+    uppercase: /[A-Z]/.test(pwd),
+    number: /[0-9]/.test(pwd),
+    special: /[^A-Za-z0-9]/.test(pwd),
+  };
+
+  if (requirements.length) score++;
+  if (requirements.lengthStrong) score++;
+  if (requirements.uppercase) score++;
+  if (requirements.number) score++;
+  if (requirements.special) score++;
+
+  const strengthLevels = [
+    { label: "Muito fraca", color: "bg-red-500", textColor: "text-red-600" },
+    { label: "Fraca", color: "bg-red-400", textColor: "text-red-500" },
+    { label: "Média", color: "bg-yellow-500", textColor: "text-yellow-600" },
+    { label: "Forte", color: "bg-green-400", textColor: "text-green-600" },
+    {
+      label: "Muito forte",
+      color: "bg-green-500",
+      textColor: "text-green-700",
+    },
+  ];
+
+  const level = strengthLevels[score - 1] || strengthLevels[0];
+
+  return {
+    score,
+    label: level.label,
+    color: level.color,
+    textColor: level.textColor,
+    requirements,
+  };
+};

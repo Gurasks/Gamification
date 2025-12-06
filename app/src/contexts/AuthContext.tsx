@@ -137,6 +137,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await signOut(auth);
     setUser(null);
     setAnonymousUser(false);
+
+    sessionStorage.removeItem('redirect_after_login');
+    sessionStorage.removeItem('pending_session_code');
+    sessionStorage.removeItem('redirect_after_name_entry');
   };
 
   const signInWithGoogle = async (): Promise<{ success: boolean; isNewUser?: boolean }> => {
