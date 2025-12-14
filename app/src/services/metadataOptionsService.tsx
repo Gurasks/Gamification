@@ -20,7 +20,6 @@ import {
   HelpCircle,
   MessageSquare,
   Layers,
-  Tag as TagIcon,
   AlertCircle,
   Clock
 } from 'lucide-react';
@@ -181,7 +180,6 @@ export const metadataIcons = {
   category: <Layers className="w-4 h-4" />,
   requirementType: <BarChart3 className="w-4 h-4" />,
   effort: <Clock className="w-4 h-4" />,
-  tags: <TagIcon className="w-4 h-4" />,
   filter: <AlertCircle className="w-4 h-4" />,
   metadata: <Layers className="w-4 h-4" />
 };
@@ -226,23 +224,6 @@ export const renderMetadataBadge = (
   );
 };
 
-export const renderTagBadge = (tag: string, onRemove?: () => void): ReactNode => {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-      #{tag}
-      {onRemove && (
-        <button
-          type="button"
-          onClick={onRemove}
-          className="text-blue-600 hover:text-blue-800"
-        >
-          ×
-        </button>
-      )}
-    </span>
-  );
-};
-
 export const getCustomDropdownOptions = {
   priority: priorityOptions.map(option => ({
     value: option.value,
@@ -283,7 +264,6 @@ export const metadataService = {
   getAllCategoryValues,
   getAllRequirementTypeValues,
   renderMetadataBadge,
-  renderTagBadge,
   getCustomDropdownOptions,
   getCorrectOptionText
 };

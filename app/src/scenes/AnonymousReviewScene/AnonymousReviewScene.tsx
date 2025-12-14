@@ -4,9 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { deleteCommentFromCardInFirestore, endSession, getSession } from '../../services/firestore/firestoreServices';
+import { deleteCommentFromCardInFirestore, endSession, getSession, voteOnCardMetadata } from '../../services/firestore/firestoreServices';
 import { createUnsubscribeCards } from '../../hooks/firestoreUnsubscriber';
-import type { Card, Session } from '../../types/global';
+import type { Card, MetadataType, Session, VoteValue } from '../../types/global';
 import { updateRatingToCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore } from '../../services/firestore/firestoreServices';
 import toast from 'react-hot-toast';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
@@ -130,6 +130,25 @@ const AnonymousReviewScene: React.FC = () => {
       toast.success('Comentário excluído com sucesso!');
     }
   }
+
+  const handleMetadataVote = async (
+    cardId: string,
+    metadataType: MetadataType,
+    vote: VoteValue
+  ) => {
+    if (!user || isReadOnly) {
+      toast.error('Você não pode votar agora');
+      return;
+    }
+
+    try {
+      await voteOnCardMetadata(cardId, metadataType, vote, user);
+      toast.success('Voto registrado!');
+    } catch (error) {
+      console.error('Error voting on metadata:', error);
+      toast.error('Erro ao registrar voto');
+    }
+  };
 
   const handleGoBack = () => {
     if (session.teams && user?.uid) {
@@ -372,6 +391,7 @@ const AnonymousReviewScene: React.FC = () => {
                   onComment={handleAddComment}
                   onCommentEdit={handleEditComment}
                   onCommentDelete={handleDeleteComment}
+                  onMetadataVote={handleMetadataVote}
                   isReadOnly={isReadOnly}
                 />
               ))}

@@ -4,6 +4,7 @@ import {
   arrayUnion,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -23,12 +24,16 @@ import { db } from "../../config/firebase";
 import type {
   Card,
   CardData,
+  CardMetadata,
+  CardMetadataVotes,
   CategoryType,
+  MetadataType,
   PriorityLevel,
   RequirementType,
   Session,
   SessionCreationData,
   UserData,
+  VoteValue,
 } from "../../types/global";
 import type { UserStats } from "../../types/leaderboard";
 import type { SelectionMethod } from "../../types/teamSelection";
@@ -255,20 +260,13 @@ export const deleteSession = async (sessionId: string) => {
   }
 };
 
-// Create a new card
 export const createCardInFirestore = async (
   newCardText: string,
   sessionId: string | undefined,
   user: User,
   teamName: string | undefined,
   setNewCardText: (text: string) => void,
-  metadata?: {
-    priority?: PriorityLevel;
-    requirementType?: RequirementType;
-    category?: CategoryType;
-    estimatedEffort?: number;
-    tags?: string[];
-  }
+  metadata?: CardMetadata
 ) => {
   if (!sessionId || !teamName || !newCardText.trim() || _.isEmpty(user)) return;
   try {
@@ -288,7 +286,6 @@ export const createCardInFirestore = async (
       if (metadata.category) cardData.category = metadata.category;
       if (metadata.estimatedEffort)
         cardData.estimatedEffort = metadata.estimatedEffort;
-      if (metadata.tags) cardData.tags = metadata.tags;
     }
 
     await addDoc(collection(db, "cards"), cardData);
@@ -307,7 +304,6 @@ export const updateCardMetadataInFirestore = async (
     requirementType?: RequirementType;
     category?: CategoryType;
     estimatedEffort?: number;
-    tags?: string[];
   }
 ): Promise<void> => {
   try {
@@ -705,4 +701,65 @@ export const deleteCommentFromCardInFirestore = async (
     console.error("Error deleting comment:", error);
     throw error;
   }
+};
+
+export const voteOnCardMetadata = async (
+  cardId: string,
+  metadataType: MetadataType,
+  vote: VoteValue,
+  user: User
+): Promise<void> => {
+  try {
+    const cardRef = doc(db, "cards", cardId);
+
+    // Para votos em metadados, usamos apenas o valor do voto (como no rating)
+    // Não precisamos do objeto completo, apenas do valor
+    const votePath = `metadataVotes.${metadataType}.${user.uid}`;
+
+    // Se o voto for null ou undefined, remove o campo
+    if (!vote) {
+      await updateDoc(cardRef, {
+        [votePath]: deleteField(),
+      });
+    } else {
+      await updateDoc(cardRef, {
+        [votePath]: vote,
+      });
+    }
+  } catch (error) {
+    console.error("Error voting on metadata:", error);
+    throw error;
+  }
+};
+
+export const getMetadataVoteSummary = (
+  metadataVotes: CardMetadataVotes | undefined
+) => {
+  const summary = {
+    priority: { agree: 0, disagree: 0, neutral: 0 },
+    requirementType: { agree: 0, disagree: 0, neutral: 0 },
+    category: { agree: 0, disagree: 0, neutral: 0 },
+    estimatedEffort: { agree: 0, disagree: 0, neutral: 0 },
+  };
+
+  if (!metadataVotes) return summary;
+
+  // Função para contar votos no novo formato (apenas valores)
+  const countVotes = (votes: Record<string, VoteValue> | undefined) => {
+    if (!votes) return { agree: 0, disagree: 0, neutral: 0 };
+
+    return {
+      agree: Object.values(votes).filter((v) => v === "agree").length,
+      disagree: Object.values(votes).filter((v) => v === "disagree").length,
+      neutral: Object.values(votes).filter((v) => v === "neutral").length,
+    };
+  };
+
+  // Atualize as chamadas para usar o novo formato
+  summary.priority = countVotes(metadataVotes.priority);
+  summary.requirementType = countVotes(metadataVotes.requirementType);
+  summary.category = countVotes(metadataVotes.category);
+  summary.estimatedEffort = countVotes(metadataVotes.estimatedEffort);
+
+  return summary;
 };

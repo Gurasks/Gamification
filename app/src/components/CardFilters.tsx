@@ -5,15 +5,11 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  Tag as TagIcon
 } from 'lucide-react';
 import metadataService, { MetadataOption } from '@/services/metadataOptionsService';
 
 
 interface CardFiltersProps {
-  availableTags: string[];
-  selectedTags: string[];
-  setSelectedTags: (tags: string[]) => void;
   priority: PriorityLevel[];
   setPriority: (priority: PriorityLevel[]) => void;
   category: CategoryType[];
@@ -23,9 +19,6 @@ interface CardFiltersProps {
 }
 
 export const CardFilters: React.FC<CardFiltersProps> = ({
-  availableTags,
-  selectedTags,
-  setSelectedTags,
   priority,
   setPriority,
   category,
@@ -33,13 +26,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
   isExpanded = false,
   onToggleExpand,
 }) => {
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
+
 
   const togglePriority = (p: PriorityLevel) => {
     if (priority.includes(p)) {
@@ -58,12 +45,11 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
   };
 
   const clearFilters = () => {
-    setSelectedTags([]);
     setPriority([]);
     setCategory([]);
   };
 
-  const hasFilters = selectedTags.length > 0 || priority.length > 0 || category.length > 0;
+  const hasFilters = priority.length > 0 || category.length > 0;
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -77,7 +63,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           Filtros
           {hasFilters && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
-              {selectedTags.length + priority.length + category.length}
+              {priority.length + category.length}
             </span>
           )}
           {isExpanded ? (
@@ -162,41 +148,6 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
               ))}
             </div>
           </div>
-
-          {/* Filtro por Tags */}
-          {availableTags.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <TagIcon className="w-4 h-4 text-gray-600" />
-                <label className="text-sm font-medium text-gray-700">
-                  Tags
-                </label>
-                {selectedTags.length > 0 && (
-                  <span className="text-xs text-gray-500">
-                    ({selectedTags.length} selecionada{selectedTags.length > 1 ? 's' : ''})
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {availableTags.map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-all ${selectedTags.includes(tag)
-                      ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300 font-medium shadow-sm'
-                      : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
-                      }`}
-                  >
-                    <span>#{tag}</span>
-                    {selectedTags.includes(tag) && (
-                      <X className="w-3 h-3" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -246,23 +197,6 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
               </span>
             );
           })}
-
-          {selectedTags.map(tag => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gradient-to-r from-green-50 to-green-100 text-green-800 rounded-full border border-green-200"
-            >
-              <TagIcon className="w-3 h-3" />
-              <span>#{tag}</span>
-              <button
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className="p-0.5 hover:bg-green-200 rounded-full transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
         </div>
       )}
     </div>

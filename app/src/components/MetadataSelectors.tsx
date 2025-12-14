@@ -3,7 +3,6 @@ import { CategoryType, PriorityLevel, RequirementType } from '@/types/global';
 import { AlertCircle, Layers } from 'lucide-react';
 import React from 'react';
 import { CustomDropdown } from './CustomDropdown';
-import { CustomTagInput } from './CustomTagInput';
 
 interface MetadataSelectorsProps {
   priority: PriorityLevel | '';
@@ -14,8 +13,6 @@ interface MetadataSelectorsProps {
   setCategory: (category: CategoryType) => void;
   estimatedEffort: number | '';
   setEstimatedEffort: (effort: number) => void;
-  tags: string[];
-  setTags: (tags: string[]) => void;
   disabled?: boolean;
 }
 
@@ -28,8 +25,6 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
   setCategory,
   estimatedEffort,
   setEstimatedEffort,
-  tags,
-  setTags,
   disabled = false
 }) => {
   return (
@@ -86,20 +81,6 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
             placeholder="Ex: 2"
           />
         </div>
-      </div>
-
-      {/* Tags */}
-      <div className="flex flex-col gap-1 space-y-2">
-        <label className="block text-start text-s font-medium text-gray-600 mb-1">
-          Tags
-        </label>
-        <CustomTagInput
-          tags={tags}
-          onTagsChange={setTags}
-          disabled={disabled}
-          placeholder="Digite uma tag e pressione Enter..."
-          maxTags={10}
-        />
       </div>
 
       {/* Dicas de uso */}

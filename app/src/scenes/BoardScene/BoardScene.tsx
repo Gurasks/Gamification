@@ -59,10 +59,8 @@ const BoardScene: React.FC = () => {
   const [requirementType, setRequirementType] = useState<RequirementType | ''>('');
   const [category, setCategory] = useState<CategoryType | ''>('');
   const [estimatedEffort, setEstimatedEffort] = useState<number | ''>('');
-  const [tags, setTags] = useState<string[]>([]);
   const [filterPriority, setFilterPriority] = useState<PriorityLevel[]>([]);
   const [filterCategory, setFilterCategory] = useState<CategoryType[]>([]);
-  const [filterTags, setFilterTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   const navigate = useNavigate();
@@ -163,7 +161,6 @@ const BoardScene: React.FC = () => {
       if (requirementType) metadata.requirementType = requirementType;
       if (category) metadata.category = category;
       if (estimatedEffort) metadata.estimatedEffort = estimatedEffort;
-      if (tags.length > 0) metadata.tags = tags;
 
       await createCardInFirestore(
         newCardText,
@@ -178,7 +175,6 @@ const BoardScene: React.FC = () => {
       setRequirementType('');
       setCategory('');
       setEstimatedEffort('');
-      setTags([]);
     } catch (error) {
       toast.error('Erro ao criar sugestão');
     } finally {
@@ -264,17 +260,8 @@ const BoardScene: React.FC = () => {
       if (!filterCategory.includes(card.category)) return false;
     }
 
-    if (filterTags.length > 0) {
-      const cardTags = card.tags || [];
-      const hasMatchingTag = filterTags.some(tag => cardTags.includes(tag));
-      if (!hasMatchingTag) return false;
-    }
-
     return true;
   });
-
-  const allTags = teamCards.flatMap(card => card.tags || []);
-  const availableTags = [...new Set(allTags)];
 
   return (
     <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -352,8 +339,6 @@ const BoardScene: React.FC = () => {
                     setCategory={setCategory}
                     estimatedEffort={estimatedEffort}
                     setEstimatedEffort={setEstimatedEffort}
-                    tags={tags}
-                    setTags={setTags}
                     disabled={isCreatingCard}
                   />
                 </div>
@@ -435,9 +420,6 @@ const BoardScene: React.FC = () => {
               {teamCards.length > 0 && !cardsLoading && (
                 <div className="mb-6">
                   <CardFilters
-                    availableTags={availableTags}
-                    selectedTags={filterTags}
-                    setSelectedTags={setFilterTags}
                     priority={filterPriority}
                     setPriority={setFilterPriority}
                     category={filterCategory}

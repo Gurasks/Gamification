@@ -1,18 +1,20 @@
+import metadataService from '@/services/metadataOptionsService';
+import { User } from 'firebase/auth';
 import {
-  MessageSquareMore,
-  Trash2,
-  Clock,
-  PencilLine,
-  X,
   Check,
-  Hash
+  Clock,
+  MessageSquareMore,
+  PencilLine,
+  Trash2,
+  Vote,
+  X
 } from 'lucide-react';
 import { useState } from 'react';
-import type { Card } from "../../../types/global";
 import VariableTextArea from "../../../components/VariableTextArea";
-import { User } from 'firebase/auth';
+import type { Card, MetadataType, VoteValue } from "../../../types/global";
 import StarRating from '../../BoardScene/components/StarRating';
-import metadataService from '@/services/metadataOptionsService';
+import MetadataVote from './MetadataVote';
+import { calculateVotes } from '@/services/metadataVoteServices';
 
 interface AnonymousCardProps {
   card: Card;
@@ -20,8 +22,9 @@ interface AnonymousCardProps {
   onRate: (cardId: string, rating: number) => void;
   onComment: (cardId: string, commentText: string) => Promise<void>;
   onCommentEdit: (cardId: string, commentId: string, newText: string) => Promise<void>;
-  onCommentDelete?: (cardId: string, commentId: string) => Promise<void>;
-  isReadOnly?: boolean;
+  onCommentDelete: (cardId: string, commentId: string) => Promise<void>;
+  onMetadataVote: (cardId: string, metadataType: MetadataType, vote: VoteValue) => Promise<void>;
+  isReadOnly: boolean;
 }
 
 const AnonymousCard: React.FC<AnonymousCardProps> = ({
@@ -31,12 +34,14 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
   onComment,
   onCommentEdit,
   onCommentDelete,
+  onMetadataVote,
   isReadOnly = false
 }) => {
   const [commentIdToEdit, setCommentIdToEdit] = useState("");
   const [editCommentText, setEditCommentText] = useState("");
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [showMetadataVotes, setShowMetadataVotes] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   const handleCommentSubmit = async () => {
@@ -70,6 +75,25 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
   const requirementTypeOption = card.requirementType ? metadataService.getRequirementTypeOption(card.requirementType) : undefined;
   const categoryOption = card.category ? metadataService.getCategoryOption(card.category) : undefined;
 
+
+  const getUserVote = (metadataType: MetadataType): VoteValue | undefined => {
+    const votes = card.metadataVotes?.[metadataType];
+    return votes?.[user.uid];
+  };
+
+  const handleMetadataVote = async (metadataType: MetadataType, vote: VoteValue) => {
+    if (!isReadOnly && onMetadataVote) {
+      await onMetadataVote(card.id, metadataType, vote);
+    }
+  };
+
+  const hasMetadataToVote = card.priority || card.requirementType || card.category || card.estimatedEffort;
+
+  const priorityVotes = calculateVotes(card.metadataVotes?.priority)
+  const requirementTypeVotes = calculateVotes(card.metadataVotes?.requirementType)
+  const categoryVotes = calculateVotes(card.metadataVotes?.category)
+  const estimatedEffortVotes = calculateVotes(card.metadataVotes?.estimatedEffort)
+
   return (
     <div className={`text-sm [text-align:justify] p-4 bg-white rounded-xl shadow-lg border border-gray-200 hover:border-purple-300 transition-all duration-300 hover:shadow-xl ${isReadOnly ? 'opacity-95' : ''
       }`}>
@@ -79,7 +103,7 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
       </div>
 
       {/* Metadados do Card */}
-      {(card.priority || card.requirementType || card.category || card.estimatedEffort || card.tags?.length) && (
+      {(card.priority || card.requirementType || card.category || card.estimatedEffort) && (
         <div className="mt-3 mb-3 space-y-2">
           <div className="flex flex-wrap gap-2">
             {priorityOption && (
@@ -110,21 +134,87 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
               </span>
             )}
           </div>
+        </div>
+      )}
 
-          {/* Tags */}
-          {card.tags && card.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {card.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md border border-blue-100"
-                >
-                  <Hash size={10} />
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+      {hasMetadataToVote && (
+        <div className="mb-3">
+          <button
+            onClick={() => setShowMetadataVotes(!showMetadataVotes)}
+            className={`flex items-center gap-2 text-xs font-medium transition-colors ${isReadOnly
+              ? 'text-gray-600 cursor-pointer hover:text-gray-800'
+              : 'text-blue-600 hover:text-blue-800'
+              }`}
+            title={isReadOnly ? "Visualizar votos nos metadados" : "Votar nos metadados"}
+          >
+            <Vote size={16} />
+            <span>
+              Votar nos metadados
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Seção de votação em metadados */}
+      {showMetadataVotes && hasMetadataToVote && (
+        <div className="mb-4 p-4 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+          <div className="space-y-3">
+            {card.priority && priorityOption && (
+              <MetadataVote
+                metadataType="priority"
+                metadataValue={card.priority}
+                metadataLabel={priorityOption.label}
+                currentVote={getUserVote('priority')}
+                onVote={(vote) => handleMetadataVote('priority', vote)}
+                isReadOnly={isReadOnly}
+                agreeCount={priorityVotes.agree}
+                disagreeCount={priorityVotes.disagree}
+                neutralCount={priorityVotes.neutral}
+              />
+            )}
+
+            {card.requirementType && requirementTypeOption && (
+              <MetadataVote
+                metadataType="requirementType"
+                metadataValue={card.requirementType}
+                metadataLabel={requirementTypeOption.label}
+                currentVote={getUserVote('requirementType')}
+                onVote={(vote) => handleMetadataVote('requirementType', vote)}
+                isReadOnly={isReadOnly}
+                agreeCount={requirementTypeVotes.agree}
+                disagreeCount={requirementTypeVotes.disagree}
+                neutralCount={requirementTypeVotes.neutral}
+              />
+            )}
+
+            {card.category && categoryOption && (
+              <MetadataVote
+                metadataType="category"
+                metadataValue={card.category}
+                metadataLabel={categoryOption.label}
+                currentVote={getUserVote('category')}
+                onVote={(vote) => handleMetadataVote('category', vote)}
+                isReadOnly={isReadOnly}
+                agreeCount={categoryVotes.agree}
+                disagreeCount={categoryVotes.disagree}
+                neutralCount={categoryVotes.neutral}
+              />
+            )}
+
+            {card.estimatedEffort !== undefined && (
+              <MetadataVote
+                metadataType="estimatedEffort"
+                metadataValue={card.estimatedEffort}
+                metadataLabel={`${card.estimatedEffort} horas`}
+                currentVote={getUserVote('estimatedEffort')}
+                onVote={(vote) => handleMetadataVote('estimatedEffort', vote)}
+                isReadOnly={isReadOnly}
+                agreeCount={estimatedEffortVotes.agree}
+                disagreeCount={estimatedEffortVotes.disagree}
+                neutralCount={estimatedEffortVotes.neutral}
+              />
+            )}
+          </div>
         </div>
       )}
 

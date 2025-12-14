@@ -167,7 +167,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
       )}
 
       {/* Metadados do Card */}
-      {(card.priority || card.requirementType || card.category || card.estimatedEffort || card.tags?.length) && (
+      {(card.priority || card.requirementType || card.category || card.estimatedEffort) && (
         <div className="mt-3 mb-3 space-y-2">
           <div className="flex flex-wrap gap-2">
             {priorityOption && (
@@ -198,21 +198,6 @@ const BoardCard: React.FC<BoardCardProps> = ({
               </span>
             )}
           </div>
-
-          {/* Tags */}
-          {card.tags && card.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {card.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md border border-blue-100"
-                >
-                  <Hash size={10} />
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       )}
 

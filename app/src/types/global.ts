@@ -47,7 +47,7 @@ export interface CardMetadata {
   requirementType?: RequirementType;
   category?: CategoryType;
   estimatedEffort?: number;
-  tags?: string[];
+  metadataVotes?: CardMetadataVotes;
 }
 
 export interface BaseCardData {
@@ -83,3 +83,29 @@ export type CategoryType =
   | "documentacao"
   | "pergunta"
   | "feedback";
+
+export type MetadataType =
+  | "priority"
+  | "requirementType"
+  | "category"
+  | "estimatedEffort";
+export type VoteValue = "agree" | "disagree" | "neutral";
+
+export interface MetadataVote {
+  userId: string;
+  vote: VoteValue;
+  timestamp: Timestamp;
+  displayName?: string;
+}
+
+export interface CardMetadataVotes {
+  priority?: Record<string, VoteValue>;
+  requirementType?: Record<string, VoteValue>;
+  category?: Record<string, VoteValue>;
+  estimatedEffort?: Record<string, VoteValue>;
+}
+export interface VoteCounts {
+  agree: number;
+  disagree: number;
+  neutral: number;
+}

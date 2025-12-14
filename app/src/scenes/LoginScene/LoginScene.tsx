@@ -27,7 +27,6 @@ const LoginScene: React.FC = () => {
       await signIn(data.email, data.password);
       toast.success('Login realizado com sucesso!');
 
-      // Verificar se tem sessão pendente
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
       if (pendingSessionCode) {
         navigate(`/join-a-session/${pendingSessionCode}`);
@@ -68,7 +67,6 @@ const LoginScene: React.FC = () => {
         toast.success('Login realizado com Google!');
       }
 
-      // Verificar sessão pendente
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
       if (pendingSessionCode) {
         navigate(`/join-a-session/${pendingSessionCode}`);
