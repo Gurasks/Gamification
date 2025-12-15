@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import type { LeaderboardSortTypes, TabType, TeamMetrics, UserContributions, UserStats } from '../../types/leaderboard';
-import { fetchLeaderboardData, getSession, getCardsBySessionId } from '../../services/firestore/firestoreServices';
 import { useParams } from 'react-router-dom';
 import type { Session, Card } from '../../types/global';
 import { getAvailableTeams } from '../../services/teamSelectionServices';
@@ -9,6 +8,9 @@ import TeamLeaderboard from './components/TeamLeaderboard';
 import MembersLeaderboard from './components/MembersLeaderboard';
 import ContributionsModal from './components/ContributionsModal';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { getCardsBySessionId } from '@/services/firestore/cardServices';
+import { fetchLeaderboardData } from '@/services/firestore/firestoreServices';
+import { getSession } from '@/services/firestore/sessionServices';
 
 const LeaderboardScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

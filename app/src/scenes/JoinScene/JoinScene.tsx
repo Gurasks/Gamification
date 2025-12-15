@@ -158,39 +158,6 @@ const JoinScene: React.FC = () => {
     <>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
-          {/* Header com botão voltar */}
-          <div className="relative text-center">
-            <Button
-              onClick={handleGoBack}
-              variant="primary"
-              className="flex items-center justify-center gap-2"
-              size='sm'
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
-
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              {requiresPassword ? 'Senha da Sessão' : 'Entrar em uma Sessão'}
-            </h1>
-            <p className="text-gray-600">
-              {requiresPassword
-                ? `A sessão "${sessionData?.title}" é protegida por senha`
-                : 'Junte-se a uma sessão existente'
-              }
-            </p>
-
-            {/* Feedback de retorno do login */}
-            {isReturningFromLogin && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg animate-fade-in">
-                <p className="text-green-700 text-sm flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Login realizado com sucesso! Continue para entrar na sessão.
-                </p>
-              </div>
-            )}
-          </div>
-
           {/* Join Session Card */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="text-center mb-6">
@@ -328,7 +295,7 @@ const JoinScene: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Join Options */}
+          {/* Quick Join Options
           {!requiresPassword && !isJoining && user && (
             <div className="text-center animate-fade-in">
               <p className="text-gray-500 text-sm mb-3">Sessões recentes:</p>
@@ -345,7 +312,7 @@ const JoinScene: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Additional Info */}
           <div className="text-center">

@@ -4,10 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { deleteCommentFromCardInFirestore, endSession, getSession, voteOnCardMetadata } from '../../services/firestore/firestoreServices';
 import { createUnsubscribeCards } from '../../hooks/firestoreUnsubscriber';
 import type { Card, MetadataType, Session, VoteValue } from '../../types/global';
-import { updateRatingToCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore } from '../../services/firestore/firestoreServices';
 import toast from 'react-hot-toast';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
 import CardSortingSelector, { SortOption } from '../BoardScene/components/CardSorteningSelector';
@@ -15,6 +13,8 @@ import { getSortedCards } from '../../services/boardServices';
 import AnonymousCard from './components/AnonymousCard';
 import MasonryGrid from '../../components/MasonryGrid';
 import { Lock, Unlock, Eye, BarChart3, ArrowLeft, Home, Shield, Users, MessageSquare, Star } from 'lucide-react';
+import { updateRatingToCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore, deleteCommentFromCardInFirestore, voteOnCardMetadata } from '@/services/firestore/cardServices';
+import { getSession, endSession } from '@/services/firestore/sessionServices';
 
 const AnonymousReviewScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

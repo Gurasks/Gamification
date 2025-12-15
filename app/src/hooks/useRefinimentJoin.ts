@@ -1,13 +1,13 @@
 import { useState } from "react";
-import {
-  resolveUUID,
-  updateDocumentListMembers,
-  getSession,
-} from "@/services/firestore/firestoreServices";
+import { resolveUUID } from "@/services/firestore/firestoreServices";
 import { handleReponse } from "@/services/homeServices";
 import toast from "react-hot-toast";
 import { useGlobalLoading } from "@/contexts/LoadingContext";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  getSession,
+  updateDocumentListMembers,
+} from "@/services/firestore/sessionServices";
 
 export const useSessionJoin = () => {
   const { user } = useAuth();

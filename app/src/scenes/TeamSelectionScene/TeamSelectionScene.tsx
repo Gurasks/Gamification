@@ -9,14 +9,8 @@ import ExitConfirmationModal from './components/ExitConfirmationModal';
 import SelectionMethodChooser from './components/SelectionMethodChooser';
 import OwnerTeamAssignment from './components/OwnerTeamAssignment';
 import TeamSelection from './components/TeamSelection';
-import {
-  deleteSession,
-  removeUserFromSession,
-  startSessionInFirebase,
-  updateNumOfTeamsToSessionInFirebase,
-  updateSelectionMethodToSessionInFirebase
-} from '@/services/firestore/firestoreServices';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { deleteSession, removeUserFromSession, startSessionInFirebase, updateNumOfTeamsToSessionInFirebase, updateSelectionMethodToSessionInFirebase } from '@/services/firestore/sessionServices';
 
 const TeamSelectionScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

@@ -4,15 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
-import {
-  addCommentToCardInFirestore,
-  createCardInFirestore,
-  deleteCardInFirestore,
-  deleteCommentFromCardInFirestore,
-  getSession,
-  updateCardInFirestore,
-  updateCommentToCardInFirestore
-} from '../../services/firestore/firestoreServices';
 import type { Card, CardMetadata, CategoryType, PriorityLevel, RequirementType, Session } from '../../types/global';
 import { getSortedCards } from '../../services/boardServices';
 import VariableTextArea from "../../components/VariableTextArea";
@@ -39,6 +30,8 @@ import {
 import toast from 'react-hot-toast';
 import { MetadataSelectors } from '@/components/MetadataSelectors';
 import { CardFilters } from '@/components/CardFilters';
+import { getSession } from '@/services/firestore/sessionServices';
+import { createCardInFirestore, updateCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore, deleteCardInFirestore, deleteCommentFromCardInFirestore } from '@/services/firestore/cardServices';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();

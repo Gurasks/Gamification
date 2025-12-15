@@ -6,7 +6,6 @@ export const useSessionCode = () => {
   const [code, setCode] = useState(sessionCode || "");
   const [isRestored, setIsRestored] = useState(false);
 
-  // Restaurar código da sessão do sessionStorage
   useEffect(() => {
     if (!sessionCode) {
       const savedCode = sessionStorage.getItem("pending_session_code");

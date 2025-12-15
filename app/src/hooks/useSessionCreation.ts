@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalLoading } from "@/contexts/LoadingContext";
-import {
-  createSessionInFirestore,
-  shortenUUID,
-} from "@/services/firestore/firestoreServices";
+import { shortenUUID } from "@/services/firestore/firestoreServices";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { createSessionInFirestore } from "@/services/firestore/sessionServices";
 
 export const useSessionCreation = () => {
   const { user } = useAuth();
