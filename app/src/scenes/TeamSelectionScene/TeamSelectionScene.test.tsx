@@ -1,22 +1,20 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import TeamSelectionScene from './TeamSelectionScene';
+import { useAuth } from '../../contexts/AuthContext';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
 import {
-  startSessionInFirebase,
-  removeUserFromSession,
   deleteSession,
-  updateNumOfTeamsToSessionInFirebase,
-  updateSelectionMethodToSessionInFirebase
-} from '../../services/firestore/firestoreServices';
-import { useAuth } from '../../contexts/AuthContext';
+  removeUserFromSession,
+  startSessionInFirebase
+} from '../../services/firestore/sessionServices';
+import TeamSelectionScene from './TeamSelectionScene';
 
 // Mocks
 jest.mock('../../hooks/firestoreUnsubscriber', () => ({
   createUnsubscribeMembers: jest.fn(),
 }));
 
-jest.mock('../../services/firestore/firestoreServices', () => ({
+jest.mock('../../services/firestore/sessionServices', () => ({
   startSessionInFirebase: jest.fn(),
   updateNumOfTeamsToSessionInFirebase: jest.fn(),
   updateSelectionMethodToSessionInFirebase: jest.fn(),

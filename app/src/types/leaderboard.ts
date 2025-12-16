@@ -1,3 +1,4 @@
+import { GamificationPoints } from "@/services/gamificationServices";
 import type { Card } from "./global";
 
 export interface UserStats {
@@ -7,6 +8,8 @@ export interface UserStats {
   averageRating: number;
   totalReplies: number;
   totalCardsCreated: number;
+  totalScore?: number;
+  gamificationPoints?: GamificationPoints;
 }
 export interface TeamMetrics {
   teamName: string;
@@ -16,6 +19,7 @@ export interface TeamMetrics {
   totalReplies: number;
   averageRating: number;
   totalMembers: number;
+  totalScore?: number;
 }
 
 export interface UserContributions {
@@ -27,6 +31,11 @@ export interface UserContributions {
   }>;
 }
 
-export type LeaderboardSortTypes = "comments" | "rating" | "replies" | "cards";
+export type LeaderboardSortTypes =
+  | "score"
+  | "comments"
+  | "rating"
+  | "replies"
+  | "cards";
 
 export type TabType = "participants" | "teams";

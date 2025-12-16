@@ -1,16 +1,16 @@
+import { deleteSession, removeUserFromSession, startSessionInFirebase, updateNumOfTeamsToSessionInFirebase, updateSelectionMethodToSessionInFirebase } from '@/services/firestore/sessionServices';
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import ShareButton from '../../components/ShareButton';
 import { useAuth } from '../../contexts/AuthContext';
 import { createUnsubscribeMembers } from '../../hooks/firestoreUnsubscriber';
 import type { Session, UserData } from '../../types/global';
-import ShareButton from '../../components/ShareButton';
-import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
 import ExitConfirmationModal from './components/ExitConfirmationModal';
-import SelectionMethodChooser from './components/SelectionMethodChooser';
 import OwnerTeamAssignment from './components/OwnerTeamAssignment';
+import SelectionMethodChooser from './components/SelectionMethodChooser';
 import TeamSelection from './components/TeamSelection';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
-import { deleteSession, removeUserFromSession, startSessionInFirebase, updateNumOfTeamsToSessionInFirebase, updateSelectionMethodToSessionInFirebase } from '@/services/firestore/sessionServices';
 
 const TeamSelectionScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();

@@ -194,7 +194,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
             {card.estimatedEffort && (
               <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full border border-amber-200">
                 <Clock className="w-3 h-3" />
-                <span>{card.estimatedEffort}h</span>
+                <span>{card.estimatedEffort}</span>
               </span>
             )}
           </div>

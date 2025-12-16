@@ -89,6 +89,7 @@ export type MetadataType =
   | "requirementType"
   | "category"
   | "estimatedEffort";
+
 export type VoteValue = "agree" | "disagree" | "neutral";
 
 export interface MetadataVote {

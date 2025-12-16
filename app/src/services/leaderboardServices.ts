@@ -1,133 +1,11 @@
+import { generateExportContent } from "@/utils/exportSessionContent";
+import { getEnhancedStyles } from "@/utils/exportSessionStyles";
 import type { Card, Session } from "../types/global";
 import type {
   TeamMetrics,
   UserContributions,
   UserStats,
 } from "../types/leaderboard";
-import { calculateAverageRating } from "./globalServices";
-
-export const generateExportContent = (
-  session: Session,
-  teamMetrics: TeamMetrics[],
-  sortedData: UserStats[],
-  allCards: Card[]
-) => {
-  return `
-      <h1>Relatório da Sessão: ${session?.title || "N/A"}</h1>
-      <p><strong>Descrição:</strong> ${session?.description || "N/A"}</p>
-      <p><strong>Data de Geração:</strong> ${new Date().toLocaleString()}</p>
-
-      <div class="section">
-        <h2>Métricas por Time</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Membros</th>
-              <th>Comentários</th>
-              <th>Sugestões</th>
-              <th>Respostas</th>
-              <th>Nota Média</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${teamMetrics
-              .map(
-                (team) => `
-              <tr>
-                <td>${team.teamName}</td>
-                <td>${team.totalMembers}</td>
-                <td>${team.totalComments}</td>
-                <td>${team.totalCards}</td>
-                <td>${team.totalReplies}</td>
-                <td>${team.averageRating}</td>
-              </tr>
-            `
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Classificação Individual</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Posição</th>
-              <th>Usuário</th>
-              <th>Comentários</th>
-              <th>Nota Média</th>
-              <th>Respostas</th>
-              <th>Sugestões</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sortedData
-              .map(
-                (user, index) => `
-              <tr>
-                <td>#${index + 1}</td>
-                <td>${user.userName}</td>
-                <td>${user.totalComments}</td>
-                <td>${user.averageRating}</td>
-                <td>${user.totalReplies}</td>
-                <td>${user.totalCardsCreated}</td>
-                <td>${session?.teams?.[user.userId] || "N/A"}</td>
-              </tr>
-            `
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <h2>Sugestões e Comentários</h2>
-        ${allCards
-          .map(
-            (card) => `
-          <div class="card">
-            <h3>Sugestão: ${card.text}</h3>
-            <p><strong>Autor:</strong> ${
-              card.createdBy
-            } | <strong>Time:</strong> ${
-              card.teamName
-            } | <strong>Data:</strong> ${new Date(
-              card.createdAt?.toDate() || Date.now()
-            ).toLocaleString()}</p>
-            ${
-              card.ratings
-                ? `<p><strong>Avaliação Média:</strong> ${calculateAverageRating(
-                    card.ratings
-                  ).toFixed(1)}</p>`
-                : ""
-            }
-            ${
-              card.comments && card.comments.length > 0
-                ? `
-              <h4>Comentários (${card.comments.length}):</h4>
-              ${card.comments
-                .map(
-                  (comment: any) => `
-                <div class="comment">
-                  <p><strong>${comment.createdBy}:</strong> ${comment.text}</p>
-                  <small>${new Date(comment.createdAt).toLocaleString()}</small>
-                </div>
-              `
-                )
-                .join("")}
-            `
-                : "<p>Nenhum comentário</p>"
-            }
-          </div>
-        `
-          )
-          .join("")}
-      </div>
-    `;
-};
 
 export const exportToPDF = (
   session: Session,
@@ -144,28 +22,30 @@ export const exportToPDF = (
   const printWindow = window.open("", "_blank");
   if (printWindow) {
     printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Relatório - ${session?.title || "Sessão"}</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-              .section { margin-bottom: 30px; }
-              table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-              th { background-color: #f5f5f5; }
-              .card { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
-              .comment { margin-left: 20px; padding: 5px; border-left: 2px solid #007bff; }
-            </style>
-          </head>
-          <body>
-            ${printContent}
-          </body>
-        </html>
-      `);
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Relatório Completo - ${session?.title || "Sessão"}</title>
+          <meta charset="UTF-8">
+          ${getEnhancedStyles()}
+        </head>
+        <body>
+          ${printContent}
+          <script>
+            // Auto-print após carregamento
+            window.onload = function() {
+              setTimeout(() => {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                };
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
     printWindow.document.close();
-    printWindow.print();
   }
 };
 
@@ -188,17 +68,8 @@ export const exportToDOC = (
       <html>
         <head>
           <meta charset="UTF-8">
-          <title>Relatório - ${session?.title || "Sessão"}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-            .section { margin-bottom: 30px; }
-            table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f5f5f5; }
-            .card { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
-            .comment { margin-left: 20px; padding: 5px; border-left: 2px solid #007bff; }
-          </style>
+          <title>Relatório Completo - ${session?.title || "Sessão"}</title>
+          ${getEnhancedStyles()}
         </head>
         <body>
           ${content}
@@ -212,7 +83,9 @@ export const exportToDOC = (
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `relatorio-${session?.title || "sessao"}.doc`;
+  link.download = `relatorio-completo-${
+    session?.title?.toLowerCase().replace(/\s+/g, "-") || "sessao"
+  }-${new Date().toISOString().split("T")[0]}.doc`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
