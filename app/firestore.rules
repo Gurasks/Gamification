@@ -43,20 +43,31 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // ===== REGRAS PRINCIPAIS =====
+    function isValidMetadata() {
+      return (
+      // Prioridade deve ser um dos valores permitidos
+      (!request.resource.data.keys().hasAny(['priority']) ||
+      request.resource.data.priority in ['baixa', 'media', 'alta', 'critica']) &&
 
-    // Sessions (salas/sessões)
-    match /sessions/{sessionId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && hasValidSessionStructure();
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn() && isSessionOwner();
+      // Tipo de requisito deve ser um dos valores permitidos
+      (!request.resource.data.keys().hasAny(['requirementType']) ||
+      request.resource.data.requirementType in ['funcional', 'nao-funcional', 'tecnico', 'design', 'outro']) &&
+
+      // Categoria deve ser um dos valores permitidos
+      (!request.resource.data.keys().hasAny(['category']) ||
+      request.resource.data.category in ['melhoria', 'bug', 'feature', 'documentacao', 'pergunta', 'feedback']) &&
+
+      // Esforço estimado deve ser número positivo
+      (!request.resource.data.keys().hasAny(['estimatedEffort']) ||
+      request.resource.data.estimatedEffort is number &&
+      request.resource.data.estimatedEffort >= 0)
+      );
     }
 
     function isValidMetadataVote() {
       return (
-      (!request.resource.data.keys().hasAny(['metadataVotes']) ||
-      request.resource.data.metadataVotes is map) &&
+      !request.resource.data.keys().hasAny(['metadataVotes']) ||
+      (request.resource.data.metadataVotes is map &&
 
       // Valida estrutura de votos em metadados
       (!request.resource.data.metadataVotes.keys().hasAny(['priority']) ||
@@ -70,13 +81,25 @@ service cloud.firestore {
 
       (!request.resource.data.metadataVotes.keys().hasAny(['estimatedEffort']) ||
       request.resource.data.metadataVotes.estimatedEffort is map)
+      )
       );
+
+    }
+
+    // ===== REGRAS PRINCIPAIS =====
+
+    // Sessions (salas/sessões)
+    match /sessions/{sessionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && hasValidSessionStructure();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn() && isSessionOwner();
     }
 
     // Cards (cartões de refinamento)
     match /cards/{cardId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && isValidMetadata() && isValidMetadataVote();
+      allow create: if isSignedIn() && isValidMetadata();
       allow update: if isSignedIn() && isValidMetadata() && isValidMetadataVote();
       allow delete: if isSignedIn() && isCardOwner();
     }

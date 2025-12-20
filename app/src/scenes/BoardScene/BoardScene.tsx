@@ -1,37 +1,45 @@
-import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import BoardCard from './components/BoardCard';
-import { CardSkeleton } from './components/CardSkeleton';
-import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
-import type { Card, CardMetadata, CategoryType, PriorityLevel, RequirementType, Session } from '../../types/global';
-import { getSortedCards } from '../../services/boardServices';
-import VariableTextArea from "../../components/VariableTextArea";
-import { returnTimerId } from '../../services/globalServices';
-import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { Button } from '../../components/Button';
-import { useAuth } from '@/contexts/AuthContext';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
-import SyncTimer from './components/SyncTimer';
-import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
+import { CardFilters } from '@/components/CardFilters';
 import MasonryGrid from '@/components/MasonryGrid';
+import { MetadataSelectors } from '@/components/MetadataSelectors';
+import { useAuth } from '@/contexts/AuthContext';
 import {
+  addCommentToCardInFirestore,
+  createCardInFirestore,
+  deleteCardInFirestore,
+  deleteCommentFromCardInFirestore,
+  updateCardInFirestore,
+  updateCardMetadataInFirestore,
+  updateCommentToCardInFirestore
+} from '@/services/firestore/cardServices';
+import { getSession } from '@/services/firestore/sessionServices';
+import _ from 'lodash';
+import {
+  ArrowLeft,
+  Ban,
+  ChevronRight,
   Clock,
+  Eye,
   FileText,
   LogOut,
-  Users,
-  Eye,
-  ChevronRight,
-  ArrowLeft,
   MessageSquare,
-  Ban
+  Users
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { MetadataSelectors } from '@/components/MetadataSelectors';
-import { CardFilters } from '@/components/CardFilters';
-import { getSession } from '@/services/firestore/sessionServices';
-import { createCardInFirestore, updateCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore, deleteCardInFirestore, deleteCommentFromCardInFirestore } from '@/services/firestore/cardServices';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '../../components/Button';
+import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
+import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import VariableTextArea from "../../components/VariableTextArea";
+import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
+import { getSortedCards } from '../../services/boardServices';
+import { returnTimerId } from '../../services/globalServices';
+import type { Card, CardMetadata, CategoryType, Metadata, PriorityLevel, RequirementType, Session } from '../../types/global';
+import BoardCard from './components/BoardCard';
+import { CardSkeleton } from './components/CardSkeleton';
+import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
+import SyncTimer from './components/SyncTimer';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -80,6 +88,70 @@ const BoardScene: React.FC = () => {
   const handleTimeEnd = () => {
     setTimeEnded(true);
     setShowAnonymousReview(true);
+  };
+
+  const handleMetadataUpdate = async (cardId: string, metadata: Metadata) => {
+    if (!timeEnded) {
+      try {
+        const cleanMetadata: Metadata = {};
+
+        if (metadata.priority) {
+          cleanMetadata.priority = metadata.priority;
+        }
+        if (metadata.requirementType) {
+          cleanMetadata.requirementType = metadata.requirementType;
+        }
+        if (metadata.category) {
+          cleanMetadata.category = metadata.category;
+        }
+        if (metadata.estimatedEffort) {
+          cleanMetadata.estimatedEffort = metadata.estimatedEffort;
+        }
+
+        await updateCardMetadataInFirestore(cardId, cleanMetadata);
+
+        setCards(prevCards =>
+          prevCards.map(card => {
+            if (card.id === cardId) {
+              const updatedCard = { ...card };
+
+              if (cleanMetadata.priority) {
+                updatedCard.priority = cleanMetadata.priority;
+              } else {
+                delete updatedCard.priority;
+              }
+
+
+              if (cleanMetadata.requirementType) {
+                updatedCard.requirementType = cleanMetadata.requirementType;
+              } else {
+                delete updatedCard.requirementType;
+              }
+
+              if (cleanMetadata.category) {
+                updatedCard.category = cleanMetadata.category;
+              } else {
+                delete updatedCard.category;
+              }
+
+              if (cleanMetadata.estimatedEffort && cleanMetadata.estimatedEffort >= 0) {
+                updatedCard.estimatedEffort = cleanMetadata.estimatedEffort;
+              } else {
+                delete updatedCard.estimatedEffort;
+              }
+
+              return updatedCard;
+            }
+            return card;
+          })
+        );
+
+        toast.success('Metadados atualizados!');
+      } catch (error) {
+        console.error('Erro ao atualizar metadados:', error);
+        toast.error('Erro ao atualizar metadados');
+      }
+    }
   };
 
   useEffect(() => {
@@ -480,6 +552,7 @@ const BoardScene: React.FC = () => {
                   onCommentEdit={handleCommentEdit}
                   onDelete={handleDelete}
                   onCommentDelete={handleCommentDelete}
+                  onMetadataUpdate={handleMetadataUpdate}
                   timeEnded={timeEnded}
                 />
               ))}

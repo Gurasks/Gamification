@@ -12,7 +12,7 @@ interface MetadataSelectorsProps {
   category: CategoryType | '';
   setCategory: (category: CategoryType) => void;
   estimatedEffort: number | '';
-  setEstimatedEffort: (effort: number) => void;
+  setEstimatedEffort: (effort: number | '') => void;
   disabled?: boolean;
 }
 
@@ -53,7 +53,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           options={metadataService.getCustomDropdownOptions.requirementType}
         />
 
-        {/* Categoria - usando CustomDropdown */}
+        {/* Categoria */}
         <CustomDropdown
           value={category}
           onChange={setCategory as (category: string) => void}
@@ -72,13 +72,14 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
             type="number"
             min="0"
             step="0.5"
-            value={estimatedEffort}
-            onChange={(e) => setEstimatedEffort(parseFloat(e.target.value) || 0)}
-            disabled={disabled}
-            className="w-full text-sm p-2 border border-gray-300 rounded-md
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-               disabled:opacity-50 disabled:cursor-not-allowed"
+            value={estimatedEffort ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              setEstimatedEffort(value === '' ? '' : parseFloat(value));
+            }}
+            className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
             placeholder="Ex: 2"
+            disabled={disabled}
           />
         </div>
       </div>

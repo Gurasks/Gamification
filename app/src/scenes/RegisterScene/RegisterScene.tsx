@@ -107,7 +107,6 @@ const RegisterScene: React.FC = () => {
               }
             }}
             message="Preencha os dados para se cadastrar"
-            showBackButton={true}
             onBack={handleGoBack}
             backButtonLabel="Voltar"
           />

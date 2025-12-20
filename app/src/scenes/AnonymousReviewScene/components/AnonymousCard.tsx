@@ -289,7 +289,7 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
                                 className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
                                 title="Editar comentário"
                               >
-                                <PencilLine size={14} />
+                                <PencilLine className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDeleteComment(comment.id)}
@@ -298,9 +298,9 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
                                 title="Excluir comentário"
                               >
                                 {isDeleting ? (
-                                  <Clock size={12} className="animate-pulse" />
+                                  <Clock className="w-4 h-4 animate-pulse" />
                                 ) : (
-                                  <Trash2 size={12} />
+                                  <Trash2 className="w-4 h-4" />
                                 )}
                               </button>
                             </div>

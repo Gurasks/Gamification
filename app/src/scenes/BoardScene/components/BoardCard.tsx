@@ -4,16 +4,18 @@ import { User } from 'firebase/auth';
 import {
   Check,
   Clock,
-  Hash,
   MessageSquareMore,
   PencilLine,
+  Settings,
+  Tag,
   Trash2,
   X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import VariableTextArea from "../../../components/VariableTextArea";
-import type { Card } from "../../../types/global";
+import type { Card, Metadata } from "../../../types/global";
+import CardMetadataEditorForm from './CardMetadataEditorForm';
 
 interface BoardCardProps {
   card: Card;
@@ -21,9 +23,13 @@ interface BoardCardProps {
   onEdit: (cardId: string, newText: string) => Promise<void>;
   onComment: (cardId: string, commentText: string) => Promise<void>;
   onCommentEdit: (cardId: string, commentId: string, newText: string) => Promise<void>;
-  onDelete?: (cardId: string) => Promise<void>;
-  onCommentDelete?: (cardId: string, commentId: string) => Promise<void>;
-  timeEnded?: boolean;
+  onDelete: (cardId: string) => Promise<void>;
+  onCommentDelete: (cardId: string, commentId: string) => Promise<void>;
+  timeEnded: boolean;
+  onMetadataUpdate: (
+    cardId: string,
+    metadata: Metadata
+  ) => Promise<void>;
 }
 
 const BoardCard: React.FC<BoardCardProps> = ({
@@ -34,7 +40,8 @@ const BoardCard: React.FC<BoardCardProps> = ({
   onComment,
   onDelete,
   onCommentDelete,
-  timeEnded = false
+  onMetadataUpdate,
+  timeEnded
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [commentIdToEdit, setCommentIdToEdit] = useState("");
@@ -44,6 +51,13 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [isDeletingCard, setIsDeletingCard] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [isEditingMetadata, setIsEditingMetadata] = useState(false);
+  const [editedMetadata, setEditedMetadata] = useState({
+    priority: card.priority,
+    requirementType: card.requirementType,
+    category: card.category,
+    estimatedEffort: card.estimatedEffort
+  });
   const pastelBgClass = stringToPastelBg(card.createdBy);
 
   const handleCommentSubmit = async () => {
@@ -93,6 +107,48 @@ const BoardCard: React.FC<BoardCardProps> = ({
     }
   };
 
+  useEffect(() => {
+    setEditedMetadata({
+      priority: card.priority,
+      requirementType: card.requirementType,
+      category: card.category,
+      estimatedEffort: card.estimatedEffort
+    });
+  }, [card]);
+
+  const handleSaveMetadata = async () => {
+    if (timeEnded) return;
+    try {
+      const updatedMetadata: Metadata = {};
+      if (editedMetadata.priority !== card.priority)
+        updatedMetadata.priority = editedMetadata.priority;
+      if (editedMetadata.requirementType !== card.requirementType)
+        updatedMetadata.requirementType = editedMetadata.requirementType;
+      if (editedMetadata.category !== card.category)
+        updatedMetadata.category = editedMetadata.category;
+      if (editedMetadata.estimatedEffort !== card.estimatedEffort)
+        updatedMetadata.estimatedEffort = editedMetadata.estimatedEffort;
+
+      Object.keys(updatedMetadata).forEach(key => {
+        const metadataKey = key as keyof Metadata;
+        if (!updatedMetadata[metadataKey]) {
+          delete updatedMetadata[metadataKey];
+        }
+      });
+
+      if (Object.keys(updatedMetadata).length > 0) {
+        await onMetadataUpdate(card.id, updatedMetadata);
+
+        toast.success('Metadados atualizados!');
+      }
+
+      setIsEditingMetadata(false);
+    } catch (error) {
+      console.error('Erro ao atualizar metadados:', error);
+      toast.error('Erro ao atualizar metadados');
+    }
+  };
+
   const priorityOption = card.priority ? metadataService.getPriorityOption(card.priority) : undefined;
   const requirementTypeOption = card.requirementType ? metadataService.getRequirementTypeOption(card.requirementType) : undefined;
   const categoryOption = card.category ? metadataService.getCategoryOption(card.category) : undefined;
@@ -136,68 +192,63 @@ const BoardCard: React.FC<BoardCardProps> = ({
           <div className="flex-1">
             <h3 className="text-base font-semibold text-gray-800 mb-2">{card.text}</h3>
           </div>
-
-          <div className="flex gap-1 ml-2">
-            {canEditCard && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
-                title="Editar sugestão"
-              >
-                <PencilLine size={14} />
-              </button>
-            )}
-
-            {canDeleteCard && (
-              <button
-                onClick={handleDeleteCard}
-                disabled={isDeletingCard}
-                className="text-xs text-red-500 hover:text-red-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Excluir sugestão"
-              >
-                {isDeletingCard ? (
-                  <Clock size={14} className="animate-pulse" />
-                ) : (
-                  <Trash2 size={14} />
-                )}
-              </button>
-            )}
-          </div>
         </div>
       )}
 
       {/* Metadados do Card */}
-      {(card.priority || card.requirementType || card.category || card.estimatedEffort) && (
+      {(card.priority || card.requirementType || card.category || card.estimatedEffort || isEditingMetadata) && (
         <div className="mt-3 mb-3 space-y-2">
-          <div className="flex flex-wrap gap-2">
-            {priorityOption && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${priorityOption.bgColor} ${priorityOption.color} ${priorityOption.borderColor}`}>
-                {priorityOption.icon}
-                <span>{priorityOption.label}</span>
-              </span>
-            )}
+          {isEditingMetadata && !timeEnded ? (
+            <CardMetadataEditorForm
+              editedMetadata={editedMetadata}
+              setEditedMetadata={setEditedMetadata as React.Dispatch<React.SetStateAction<Metadata>>}
+              handleSaveMetadata={handleSaveMetadata}
+              setIsEditingMetadata={setIsEditingMetadata}
+              timeEnded={timeEnded}
+            />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {priorityOption && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${priorityOption.bgColor} ${priorityOption.color} ${priorityOption.borderColor}`}>
+                  {priorityOption.icon}
+                  <span>{priorityOption.label}</span>
+                </span>
+              )}
 
-            {requirementTypeOption && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${requirementTypeOption.bgColor} ${requirementTypeOption.color} ${requirementTypeOption.borderColor}`}>
-                {requirementTypeOption.icon}
-                <span>{requirementTypeOption.label}</span>
-              </span>
-            )}
+              {requirementTypeOption && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${requirementTypeOption.bgColor} ${requirementTypeOption.color} ${requirementTypeOption.borderColor}`}>
+                  {requirementTypeOption.icon}
+                  <span>{requirementTypeOption.label}</span>
+                </span>
+              )}
 
-            {categoryOption && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${categoryOption.bgColor} ${categoryOption.color} ${categoryOption.borderColor}`}>
-                {categoryOption.icon}
-                <span>{categoryOption.label}</span>
-              </span>
-            )}
+              {categoryOption && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border ${categoryOption.bgColor} ${categoryOption.color} ${categoryOption.borderColor}`}>
+                  {categoryOption.icon}
+                  <span>{categoryOption.label}</span>
+                </span>
+              )}
 
-            {card.estimatedEffort && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full border border-amber-200">
-                <Clock className="w-3 h-3" />
-                <span>{card.estimatedEffort}</span>
-              </span>
-            )}
-          </div>
+              {card.estimatedEffort && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full border border-amber-200">
+                  <Clock className="w-3 h-3" />
+                  <span>{card.estimatedEffort}</span>
+                </span>
+              )}
+
+              {/* Botão de edição se não houver metadados visíveis */}
+              {canEditCard && !card.priority && !card.requirementType && !card.category && !card.estimatedEffort && (
+                <button
+                  onClick={() => setIsEditingMetadata(true)}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded-full border border-gray-300 hover:bg-gray-200"
+                  title="Adicionar metadados"
+                >
+                  <Tag className="w-3 h-3" />
+                  Adicionar metadados
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -267,7 +318,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                                 className="text-xs text-indigo-500 hover:text-indigo-700"
                                 title="Editar"
                               >
-                                <PencilLine size={12} />
+                                <PencilLine className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDeleteComment(comment.id)}
@@ -276,9 +327,9 @@ const BoardCard: React.FC<BoardCardProps> = ({
                                 title="Excluir"
                               >
                                 {isDeleting ? (
-                                  <Clock size={12} className="animate-pulse" />
+                                  <Clock className="w-4 h-4 animate-pulse" />
                                 ) : (
-                                  <Trash2 size={12} />
+                                  <Trash2 className="w-4 h-4" />
                                 )}
                               </button>
                             </div>
@@ -309,6 +360,42 @@ const BoardCard: React.FC<BoardCardProps> = ({
       {/* Author */}
       <div className="flex justify-between items-center mt-3">
         <p className="text-xs font-semibold text-gray-800">- {card.createdBy}</p>
+        <div className="flex gap-1 ml-2">
+          {canEditCard && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
+              title="Editar sugestão"
+            >
+              <PencilLine className="w-4 h-4" />
+            </button>
+          )}
+
+          {canDeleteCard && (
+            <button
+              onClick={handleDeleteCard}
+              disabled={isDeletingCard}
+              className="text-xs text-red-500 hover:text-red-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Excluir sugestão"
+            >
+              {isDeletingCard ? (
+                <Clock className="w-4 h-4 animate-pulse" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
+
+          {canEditCard && (
+            <button
+              onClick={() => setIsEditingMetadata(true)}
+              className="ml-1 text-zinc-500 hover:text-zinc-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Editar metadados"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

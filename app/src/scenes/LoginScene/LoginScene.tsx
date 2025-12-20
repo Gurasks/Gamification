@@ -90,27 +90,6 @@ const LoginScene: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        {/* Header com botão voltar */}
-        <div className="relative text-center">
-          <Button
-            onClick={handleGoBack}
-            variant="primary"
-            className="flex items-center justify-center gap-2"
-            disabled={isLoading || isGoogleLoading}
-            size='sm'
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Fazer Login
-          </h1>
-          <p className="text-gray-600">
-            Acesse sua conta para continuar
-          </p>
-        </div>
-
         {/* Login Card */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <AuthForm
@@ -126,20 +105,9 @@ const LoginScene: React.FC = () => {
               }
             }}
             message="Entre com sua conta para acessar as sessões"
-            showBackButton={true}
             onBack={handleGoBack}
             backButtonLabel="Voltar"
           />
-
-          {/* Register Link (alternativa) */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Não tem uma conta?{' '}
-              <Link to="/register" className="text-blue-500 hover:text-blue-600 font-medium">
-                Cadastre-se
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>

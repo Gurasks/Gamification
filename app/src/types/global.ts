@@ -42,13 +42,16 @@ export interface Comment {
   createdAt: Timestamp;
 }
 
-export interface CardMetadata {
+export interface Metadata {
   priority?: PriorityLevel;
   requirementType?: RequirementType;
   category?: CategoryType;
   estimatedEffort?: number;
-  metadataVotes?: CardMetadataVotes;
 }
+
+export type CardMetadata = Metadata & {
+  metadataVotes?: CardMetadataVotes;
+};
 
 export interface BaseCardData {
   text: string;
