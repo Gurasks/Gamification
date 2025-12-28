@@ -340,11 +340,29 @@ const BoardScene: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
-              <div className="flex justify-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-800">
-                  {session.title}
-                </h1>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div className='w-full justify-center'>
+                  <h1 className="text-3xl font-bold text-gray-800">
+                    {session.title}
+                  </h1>
+
+                </div>
+                {session.hasStarted && teamTimerId && teamName && (
+                  <div className="flex-shrink-0">
+                    <SyncTimer
+                      timerId={teamTimerId}
+                      user={user}
+                      currentTeam={teamName}
+                      sessionTeams={session.teams || {}}
+                      onTimeEnd={handleTimeEnd}
+                      onTimerStateChange={handleTimerStateChange}
+                      onTimerLoaded={handleTimerLoaded}
+                      isSessionClosed={session.isClosed}
+                    />
+                  </div>
+                )}
               </div>
+
               {session.description && (
                 <CollapsibleDescriptionArea
                   sessionDescription={session.description}
@@ -363,21 +381,6 @@ const BoardScene: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {session.hasStarted && teamTimerId && teamName && (
-              <div className="flex-shrink-0">
-                <SyncTimer
-                  timerId={teamTimerId}
-                  user={user}
-                  currentTeam={teamName}
-                  sessionTeams={session.teams || {}}
-                  onTimeEnd={handleTimeEnd}
-                  onTimerStateChange={handleTimerStateChange}
-                  onTimerLoaded={handleTimerLoaded}
-                  isSessionClosed={session.isClosed}
-                />
-              </div>
-            )}
           </div>
         </div>
 
