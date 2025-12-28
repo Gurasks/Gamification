@@ -1,5 +1,5 @@
 import { SortOption } from "@/scenes/BoardScene/components/CardSorteningSelector";
-import { Card } from "@/types/global";
+import { Card, Session } from "@/types/global";
 import { PASTEL_BG_CLASSES } from "@/utils/stringToPastelBg";
 import { calculateAverageRating } from "./globalServices";
 
@@ -101,3 +101,19 @@ export function stringToPastelBg(value: string | undefined | null): string {
   const index = Math.abs(hash) % PASTEL_BG_CLASSES.length;
   return PASTEL_BG_CLASSES[index];
 }
+
+export const calculateTeamStats = (session: Session, cards: Card[]) => {
+  if (!session.teams || cards.length === 0) return [];
+
+  const allTeams = Object.values(session.teams);
+  const uniqueTeams = [...new Set(allTeams)];
+
+  return uniqueTeams.map((teamName) => {
+    const teamCards = cards.filter((card) => card.teamName === teamName);
+
+    return {
+      name: teamName,
+      cardCount: teamCards.length,
+    };
+  });
+};

@@ -33,13 +33,14 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import VariableTextArea from "../../components/VariableTextArea";
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
-import { getSortedCards } from '../../services/boardServices';
+import { calculateTeamStats, getSortedCards } from '../../services/boardServices';
 import { returnTimerId } from '../../services/globalServices';
 import type { Card, CardMetadata, CategoryType, Metadata, PriorityLevel, RequirementType, Session } from '../../types/global';
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
 import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
 import SyncTimer from './components/SyncTimer';
+import { TeamScoreboard } from './components/TeamScoreboard';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -63,6 +64,7 @@ const BoardScene: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState<PriorityLevel[]>([]);
   const [filterCategory, setFilterCategory] = useState<CategoryType[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showScoreboard, setShowScoreboard] = useState(true);
 
   const navigate = useNavigate();
 
@@ -313,6 +315,8 @@ const BoardScene: React.FC = () => {
   const userTeam = session.teams[user.uid];
   const isUserInTeam = userTeam === teamName;
   const sortedTeamCards = getSortedCards(teamCards, sortBy);
+  const teamStats = calculateTeamStats(session, cards);
+  const totalCards = cards.length;
 
   const filteredTeamCards = sortedTeamCards.filter(card => {
     if (filterPriority.length > 0) {
@@ -466,6 +470,18 @@ const BoardScene: React.FC = () => {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {teamStats.length > 0 && (
+          <div className="mb-6">
+            <TeamScoreboard
+              teams={teamStats}
+              currentTeam={teamName || ''}
+              totalCards={totalCards}
+              showScoreboard={showScoreboard}
+              setShowScoreboard={setShowScoreboard}
+            />
           </div>
         )}
 
