@@ -41,6 +41,7 @@ import { CardSkeleton } from './components/CardSkeleton';
 import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
 import SyncTimer from './components/SyncTimer';
 import { TeamScoreboard } from './components/TeamScoreboard';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -599,6 +600,7 @@ const BoardScene: React.FC = () => {
             )}
           </div>
         </div>
+        <ScrollToTopButton />
       </div>
     </div>
   );

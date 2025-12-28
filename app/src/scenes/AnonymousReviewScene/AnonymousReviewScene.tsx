@@ -15,6 +15,7 @@ import MasonryGrid from '../../components/MasonryGrid';
 import { Lock, Unlock, Eye, BarChart3, ArrowLeft, Home, Shield, Users, MessageSquare, Star } from 'lucide-react';
 import { updateRatingToCardInFirestore, addCommentToCardInFirestore, updateCommentToCardInFirestore, deleteCommentFromCardInFirestore, voteOnCardMetadata } from '@/services/firestore/cardServices';
 import { getSession, endSession } from '@/services/firestore/sessionServices';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 
 const AnonymousReviewScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -421,6 +422,7 @@ const AnonymousReviewScene: React.FC = () => {
             </div>
           </div>
         </div>
+        <ScrollToTopButton />
       </div>
     </div>
   );
