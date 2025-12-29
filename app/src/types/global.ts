@@ -113,3 +113,12 @@ export interface VoteCounts {
   disagree: number;
   neutral: number;
 }
+
+export interface TeamTimer {
+  id: string;
+  duration: number;
+  totalDuration?: number;
+  isRunning: boolean;
+  startTime: Timestamp;
+  lastUpdated?: Timestamp;
+}

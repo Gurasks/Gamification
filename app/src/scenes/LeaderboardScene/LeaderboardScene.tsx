@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { LeaderboardSortTypes, TabType, TeamMetrics, UserContributions, UserStats } from '../../types/leaderboard';
+import type { LeaderboardSortTypes, TabType, TeamMetrics, TeamTimeData, UserContributions, UserStats } from '../../types/leaderboard';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Session, Card } from '../../types/global';
 import { getAvailableTeams } from '../../services/teamSelectionServices';
@@ -10,12 +10,14 @@ import ContributionsModal from './components/ContributionsModal';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { getCardsBySessionId } from '@/services/firestore/cardServices';
 import { fetchLeaderboardData } from '@/services/firestore/firestoreServices';
-import { getSession } from '@/services/firestore/sessionServices';
-import { Trophy, Download, Users, TrendingUp, RefreshCw, ChevronLeft, Home, FileText, BarChart3, Shield, MessageSquare } from 'lucide-react';
+import { getSession, getSessionTeamTimers } from '@/services/firestore/sessionServices';
+import { Trophy, Download, Users, TrendingUp, RefreshCw, ChevronLeft, Home, FileText, BarChart3, Shield, MessageSquare, Clock } from 'lucide-react';
 import CollapsibleDescriptionArea from '@/components/CollapsibleDescriptionArea';
 import { Button } from '@/components/Button';
-import { calculateUserGamificationPoints, calculateTotalScore } from '@/services/gamificationServices';
+import { calculateUserGamificationPoints, calculateTotalScore, calculateTeamTimes } from '@/services/gamificationServices';
 import ScoreExplanationFooter from './components/ScoreExplanationFooter';
+import TimeEfficiencySection from './components/TimeEfficiencySection';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 
 const LeaderboardScene: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -30,6 +32,7 @@ const LeaderboardScene: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<UserContributions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
+  const [teamTimers, setTeamTimers] = useState<TeamTimeData[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,20 +43,30 @@ const LeaderboardScene: React.FC = () => {
   const loadLeaderboardData = async (sessionId: string) => {
     setLoading(true);
     try {
-      const [fetchedLeaderboardData, sessionData, cardsData] = await Promise.all([
+      const [fetchedLeaderboardData, sessionData, cardsData, timersData] = await Promise.all([
         fetchLeaderboardData(sessionId),
         getSession(sessionId),
-        getCardsBySessionId(sessionId)
+        getCardsBySessionId(sessionId),
+        getSessionTeamTimers(sessionId)
       ]);
 
+      const calculatedTeamTimes = calculateTeamTimes(cardsData, timersData);
+      setTeamTimers(calculatedTeamTimes);
+
       const enrichedData = fetchedLeaderboardData.map(user => {
-        const gamificationPoints = calculateUserGamificationPoints(cardsData, user.userId);
+        const gamificationPoints = calculateUserGamificationPoints(
+          cardsData,
+          user.userId,
+          sessionData?.teams?.[user.userId],
+          calculatedTeamTimes
+        );
         const totalScore = calculateTotalScore(gamificationPoints);
 
         return {
           ...user,
           gamificationPoints,
-          totalScore
+          totalScore,
+          timeBonus: gamificationPoints.timeEfficiency.bonusPoints // Adicionar bônus de tempo
         };
       });
 
@@ -372,12 +385,16 @@ const LeaderboardScene: React.FC = () => {
           )}
         </div>
 
+        <TimeEfficiencySection teamTimers={teamTimers} allCards={allCards} />
+
         {/* Footer com informações */}
         <ScoreExplanationFooter
           loadLeaderboardData={loadLeaderboardData}
           sessionId={sessionId || ''}
           handleGoBack={handleGoBack}
         />
+
+        <ScrollToTopButton />
       </div>
 
       {/* Modal de Contribuições do Usuário */}

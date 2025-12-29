@@ -1,22 +1,27 @@
 import { db } from "@/config/firebase";
-import { Session, SessionCreationData, UserData } from "@/types/global";
+import {
+  Session,
+  SessionCreationData,
+  TeamTimer,
+  UserData,
+} from "@/types/global";
+import { SelectionMethod } from "@/types/teamSelection";
 import { User } from "firebase/auth";
 import {
-  serverTimestamp,
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
   deleteDoc,
+  doc,
   DocumentData,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
-import { extractUserData } from "../globalServices";
-import { SelectionMethod } from "@/types/teamSelection";
 import _ from "lodash";
 import { SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAvailableTeams } from "../teamSelectionServices";
 import { v4 as uuidv4 } from "uuid";
+import { extractUserData } from "../globalServices";
+import { getAvailableTeams } from "../teamSelectionServices";
 
 const sessionCache = new Map<string, Session>();
 
@@ -304,5 +309,44 @@ export const startSessionInFirebase = async (
       console.log("Session started successfully");
       navigate(`/board/${sessionId}/team/${teamName}`);
     }
+  }
+};
+
+export const getSessionTeamTimers = async (
+  sessionId: string
+): Promise<Record<string, TeamTimer>> => {
+  try {
+    const session = await getSession(sessionId);
+    const teamTimers = session?.teamTimers;
+
+    if (!teamTimers) {
+      throw new Error("Não há timers inicializados");
+    }
+
+    const entries = await Promise.all(
+      Object.entries(teamTimers).map(async ([teamName, timerId]) => {
+        const timerDoc = await getDoc(doc(db, "timers", timerId));
+
+        if (!timerDoc.exists()) {
+          return null;
+        }
+
+        const timer: TeamTimer = {
+          id: timerDoc.id,
+          ...(timerDoc.data() as Omit<TeamTimer, "id">),
+        };
+
+        return [teamName, timer] as const;
+      })
+    );
+
+    const validEntries = entries.filter(
+      (entry): entry is readonly [string, TeamTimer] => entry !== null
+    );
+
+    return Object.fromEntries(validEntries);
+  } catch (error) {
+    console.error("Error getting session timers:", error);
+    return {};
   }
 };

@@ -39,3 +39,10 @@ export type LeaderboardSortTypes =
   | "cards";
 
 export type TabType = "participants" | "teams";
+
+export interface TeamTimeData {
+  teamName: string;
+  totalTime: number;
+  averageTimePerCard?: number;
+  efficiency: number;
+}
