@@ -11,7 +11,7 @@ import {
   updateCardMetadataInFirestore,
   updateCommentToCardInFirestore
 } from '@/services/firestore/cardServices';
-import { getSession } from '@/services/firestore/sessionServices';
+import { getSession, getTimerSnap } from '@/services/firestore/sessionServices';
 import _ from 'lodash';
 import {
   ArrowLeft,
@@ -42,6 +42,7 @@ import CardSortingSelector, { SortOption } from './components/CardSorteningSelec
 import SyncTimer from './components/SyncTimer';
 import { TeamScoreboard } from './components/TeamScoreboard';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
+import { SyncTimerSkeleton } from './components/SyncTimerSkeleton';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -66,6 +67,8 @@ const BoardScene: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<CategoryType[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showScoreboard, setShowScoreboard] = useState(true);
+  const [teamTimerReady, setTeamTimerReady] = useState(false);
+  const [teamTimerId, setTeamTimerId] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -156,6 +159,24 @@ const BoardScene: React.FC = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (!sessionId || !session.hasStarted || !teamName) return;
+
+    const resolveTimer = async () => {
+      const timerId = returnTimerId(teamName, session);
+      if (!timerId) return;
+
+      const timerSnap = await getTimerSnap(timerId);
+
+      if (timerSnap.exists()) {
+        setTeamTimerId(timerId);
+        setTeamTimerReady(true);
+      }
+    };
+
+    resolveTimer();
+  }, [sessionId, session.hasStarted, session.teamTimers, teamName]);
 
   useEffect(() => {
     const safetyTimeout = setTimeout(() => {
@@ -288,6 +309,10 @@ const BoardScene: React.FC = () => {
     return <LoadingOverlay message="Carregando sessão..." />;
   }
 
+  if (!session.hasStarted || !session.timersReady) {
+    return <LoadingOverlay message="Inicializando sessão..." />;
+  }
+
   if (!session || !session.id) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -311,7 +336,6 @@ const BoardScene: React.FC = () => {
     return null;
   }
 
-  const teamTimerId = returnTimerId(teamName, session);
   const teamCards = cards.filter(card => card.teamName === teamName);
   const userTeam = session.teams[user.uid];
   const isUserInTeam = userTeam === teamName;
@@ -347,7 +371,7 @@ const BoardScene: React.FC = () => {
                   </h1>
 
                 </div>
-                {session.hasStarted && teamTimerId && teamName && (
+                {session.hasStarted && teamTimerReady && teamTimerId && teamName && (
                   <div className="flex-shrink-0">
                     <SyncTimer
                       timerId={teamTimerId}
@@ -360,6 +384,9 @@ const BoardScene: React.FC = () => {
                       isSessionClosed={session.isClosed}
                     />
                   </div>
+                )}
+                {session.hasStarted && !teamTimerReady && (
+                  <SyncTimerSkeleton />
                 )}
               </div>
 

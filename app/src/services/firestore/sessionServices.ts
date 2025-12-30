@@ -57,16 +57,18 @@ const initializeTimers = async (
   teamTimers: Record<string, string>,
   initialDuration: number
 ) => {
-  Object.values(teamTimers).forEach(async (timerId) => {
-    await setDoc(doc(db, "timers", timerId), {
-      sessionId: sessionId,
-      totalDuration: initialDuration,
-      startTime: serverTimestamp(),
-      duration: initialDuration,
-      isRunning: true,
-      lastUpdated: serverTimestamp(),
-    });
-  });
+  await Promise.all(
+    Object.values(teamTimers).map((timerId) =>
+      setDoc(doc(db, "timers", timerId), {
+        sessionId: sessionId,
+        totalDuration: initialDuration,
+        startTime: serverTimestamp(),
+        duration: initialDuration,
+        isRunning: true,
+        lastUpdated: serverTimestamp(),
+      })
+    )
+  );
 };
 
 export const createSessionInFirestore = async (
@@ -301,11 +303,16 @@ export const startSessionInFirebase = async (
       await updateDoc(doc(db, "sessions", sessionId), {
         hasStarted: true,
         startTime: serverTimestamp(),
-        teamTimers: teamTimers,
+        teamTimers,
+        timersReady: false,
         updatedAt: serverTimestamp(),
       });
 
       await initializeTimers(sessionId, teamTimers, 600);
+
+      await updateDoc(doc(db, "sessions", sessionId), {
+        timersReady: true,
+      });
       console.log("Session started successfully");
       navigate(`/board/${sessionId}/team/${teamName}`);
     }
@@ -349,4 +356,8 @@ export const getSessionTeamTimers = async (
     console.error("Error getting session timers:", error);
     return {};
   }
+};
+
+export const getTimerSnap = async (timerId: string) => {
+  return await getDoc(doc(db, "timers", timerId));
 };

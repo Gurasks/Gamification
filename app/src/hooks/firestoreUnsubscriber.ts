@@ -9,23 +9,16 @@ export const createUnsubscribeSession = (
   sessionId: string,
   setSession: (session: Session) => void
 ) => {
-  const sessionQuery = query(
-    collection(db, "sessions"),
-    where("sessionId", "==", sessionId)
-  );
+  const sessionRef = doc(db, "sessions", sessionId);
 
-  const unsubscribeSession = onSnapshot(sessionQuery, (snapshot) => {
-    const sessionDataArray = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Session[];
-    if (sessionDataArray.length === 1) {
-      const sessionData = sessionDataArray[0];
-      setSession(sessionData);
+  return onSnapshot(sessionRef, (snapshot) => {
+    if (snapshot.exists()) {
+      setSession({
+        id: snapshot.id,
+        ...snapshot.data(),
+      } as Session);
     }
   });
-
-  return unsubscribeSession;
 };
 
 export const createUnsubscribeCards = (
@@ -70,7 +63,7 @@ export const createUnsubscribeMembers = (
     if (sessionDataArray.length === 1) {
       const sessionData = sessionDataArray[0];
       const teamName = sessionData.teams?.[user.uid];
-      if (sessionData.hasStarted) {
+      if (sessionData.hasStarted && sessionData.timersReady) {
         if (teamName) {
           navigate(`/board/${sessionId}/team/${teamName}`);
         } else {
