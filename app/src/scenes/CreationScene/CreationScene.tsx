@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { useSessionCreation } from '@/hooks/useSessionCreation';
 
+export const MAX_DESCRIPTION_LENGTH = 1500;
+
 const CreationScene: React.FC = () => {
   const {
     formData,
@@ -137,12 +139,12 @@ const CreationScene: React.FC = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 value={formData.description}
                 onChange={(e) => updateFormData('description', (e.target as HTMLTextAreaElement).value)}
-                maxLength={1000}
+                maxLength={MAX_DESCRIPTION_LENGTH}
                 disabled={isCreating}
               />
               <p className="text-xs text-gray-500 mt-1 flex justify-between">
                 <span>Opcional: Esta descrição ajudará os participantes</span>
-                <span>{formData.description.length}/1000</span>
+                <span>{formData.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
               </p>
             </div>
 

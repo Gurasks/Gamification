@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { createSessionInFirestore } from "@/services/firestore/sessionServices";
+import { MAX_DESCRIPTION_LENGTH } from "@/scenes/CreationScene/CreationScene";
 
 export const useSessionCreation = () => {
   const { user } = useAuth();
@@ -31,8 +32,10 @@ export const useSessionCreation = () => {
       errors.push("Nome da sessão deve ter no máximo 100 caracteres");
     }
 
-    if (formData.description.length > 500) {
-      errors.push("Descrição deve ter no máximo 500 caracteres");
+    if (formData.description.length > MAX_DESCRIPTION_LENGTH) {
+      errors.push(
+        `Descrição deve ter no máximo ${MAX_DESCRIPTION_LENGTH} caracteres`
+      );
     }
 
     return errors;
