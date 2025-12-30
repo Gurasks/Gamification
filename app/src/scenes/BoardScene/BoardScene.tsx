@@ -43,6 +43,7 @@ import SyncTimer from './components/SyncTimer';
 import { TeamScoreboard } from './components/TeamScoreboard';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { SyncTimerSkeleton } from './components/SyncTimerSkeleton';
+import CreateSuggestionForm from './components/CreateSuggestionForm';
 
 const BoardScene: React.FC = () => {
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
@@ -233,24 +234,11 @@ const BoardScene: React.FC = () => {
     }
   }, [sessionId, session.teams, user, session.numOfTeams]);
 
-  const handleCreateCard = async () => {
-    if (!newCardText.trim() || isCreatingCard) return;
+  const handleSubmitCard = async (metadata: CardMetadata | undefined) => {
+    if (!user) return;
 
     setIsCreatingCard(true);
-
     try {
-      if (!user) {
-        console.error('Usuário não autenticado');
-        navigate('/name-entry');
-        return;
-      }
-
-      const metadata: CardMetadata = {};
-      if (priority) metadata.priority = priority;
-      if (requirementType) metadata.requirementType = requirementType;
-      if (category) metadata.category = category;
-      if (estimatedEffort) metadata.estimatedEffort = estimatedEffort;
-
       await createCardInFirestore(
         newCardText,
         sessionId,
@@ -264,8 +252,6 @@ const BoardScene: React.FC = () => {
       setRequirementType('');
       setCategory('');
       setEstimatedEffort('');
-    } catch (error) {
-      toast.error('Erro ao criar sugestão');
     } finally {
       setIsCreatingCard(false);
     }
@@ -299,7 +285,6 @@ const BoardScene: React.FC = () => {
       await deleteCommentFromCardInFirestore(cardId, commentId);
     }
   };
-
 
   const handleGoBack = () => {
     navigate('/');
@@ -414,53 +399,23 @@ const BoardScene: React.FC = () => {
         {/* Controls */}
         {!timeEnded && isUserInTeam ? (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Adicionar Nova Sugestão
-                  </h2>
-                </div>
-                <VariableTextArea
-                  text={newCardText}
-                  setText={setNewCardText}
-                  handleSubmit={handleCreateCard}
-                  disabled={isCreatingCard}
-                  placeholder={isCreatingCard ? "Criando sugestão..." : "Digite sua sugestão..."}
-                  rows={2}
-                />
-                <div className="mt-4">
-                  <MetadataSelectors
-                    priority={priority}
-                    setPriority={setPriority}
-                    requirementType={requirementType}
-                    setRequirementType={setRequirementType}
-                    category={category}
-                    setCategory={setCategory}
-                    estimatedEffort={estimatedEffort}
-                    setEstimatedEffort={setEstimatedEffort}
-                    disabled={isCreatingCard}
-                  />
-                </div>
-                {isCreatingCard && (
-                  <div className="flex items-center gap-2 mt-2 text-blue-600 text-sm">
-                    <LoadingSpinner size="sm" />
-                    <span>Criando sugestão...</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleGoBack}
-                  variant="outline-secondary"
-                  className="flex items-center justify-center gap-2 border-red-500 hover:border-red-600 text-red-500 hover:text-red-600"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </Button>
-              </div>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Adicionar Nova Sugestão
+            </h2>
+            <CreateSuggestionForm
+              text={newCardText}
+              setText={setNewCardText}
+              priority={priority}
+              setPriority={setPriority}
+              requirementType={requirementType}
+              setRequirementType={setRequirementType}
+              category={category}
+              setCategory={setCategory}
+              estimatedEffort={estimatedEffort}
+              setEstimatedEffort={setEstimatedEffort}
+              isSubmitting={isCreatingCard}
+              onSubmit={handleSubmitCard}
+            />
           </div>
         ) : (
           <div className="bg-gradient-to-r from-red-50 to-red-50 border border-red-200 rounded-xl shadow-lg p-6 mb-6">
