@@ -95,7 +95,7 @@ export function stringToPastelBg(value: string | undefined | null): string {
 
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+    hash = Math.trunc(hash * 31 + str.charCodeAt(i));
   }
 
   const index = Math.abs(hash) % PASTEL_BG_CLASSES.length;
