@@ -1,4 +1,4 @@
-export const SyncTimerSkelleton: React.FC = () => {
+export const SyncTimerSkeleton: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <div className="relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden bg-gray-200 shadow-lg">

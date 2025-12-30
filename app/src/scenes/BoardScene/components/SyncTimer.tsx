@@ -3,7 +3,7 @@ import { createUnsubscribeSyncTimer } from '@/hooks/firestoreUnsubscriber';
 import { updateTimeToSyncTimerInFirebase } from '@/services/firestore/firestoreServices';
 import { returnToastMessage } from '@/services/globalServices';
 import { User } from 'firebase/auth';
-import { SyncTimerSkelleton } from './SyncTimerSkelleton';
+import { SyncTimerSkeleton } from './SyncTimerSkeleton';
 import { AddTimeInput } from './AddTimeInput';
 import { getAdditionalTimeDisplay } from '@/services/boardServices';
 
@@ -134,7 +134,7 @@ const SyncTimer = ({
 
   // Mostrar loading enquanto o timer não carregou
   if (!timerLoaded) {
-    return <SyncTimerSkelleton />;
+    return <SyncTimerSkeleton />;
   }
 
   const isLowTimeStyle = isLowTime ? 'bg-red-400' : 'bg-indigo-500';
