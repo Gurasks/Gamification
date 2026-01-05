@@ -91,9 +91,9 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-3">
               {metadataService.metadataIcons.priority}
-              <label className="text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700">
                 Prioridade
-              </label>
+              </div>
               {priority.length > 0 && (
                 <span className="text-xs text-gray-500">
                   ({priority.length} selecionada{priority.length > 1 ? 's' : ''})
@@ -122,9 +122,9 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-3">
               {metadataService.metadataIcons.category}
-              <label className="text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700">
                 Categoria
-              </label>
+              </div>
               {category.length > 0 && (
                 <span className="text-xs text-gray-500">
                   ({category.length} selecionada{category.length > 1 ? 's' : ''})

@@ -19,15 +19,33 @@ export const exportToPDF = (
     sortedData,
     allCards
   );
+
+  const sessionTitle = session?.title || "sessao";
+  const safeTitle = sessionTitle.toLowerCase().replaceAll(" ", "-");
+  const dateStr = new Date().toISOString().split("T")[0];
+  const fileName = `relatorio-completo-${safeTitle}-${dateStr}`;
+
   const printWindow = window.open("", "_blank");
   if (printWindow) {
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Relatório Completo - ${session?.title || "Sessão"}</title>
+          <title>${fileName}</title>
           <meta charset="UTF-8">
           ${getEnhancedStyles()}
+          <style>
+            @media print {
+              @page {
+                size: A4;
+                margin: 20mm;
+              }
+              body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+            }
+          </style>
         </head>
         <body>
           ${printContent}
@@ -41,6 +59,13 @@ export const exportToPDF = (
                 };
               }, 500);
             };
+
+            // Fallback para fechar a janela se a impressão não ocorrer
+            setTimeout(() => {
+              if (!window.closed) {
+                window.close();
+              }
+            }, 10000);
           </script>
         </body>
       </html>
@@ -83,9 +108,13 @@ export const exportToDOC = (
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `relatorio-completo-${
-    session?.title?.toLowerCase().replace(/\s+/g, "-") || "sessao"
-  }-${new Date().toISOString().split("T")[0]}.doc`;
+
+  const sessionTitle = session?.title || "sessao";
+  const safeTitle = sessionTitle.toLowerCase().replaceAll(" ", "-");
+  const dateStr = new Date().toISOString().split("T")[0];
+  const fileName = `relatorio-completo-${safeTitle}-${dateStr}`;
+
+  link.download = `${fileName}.doc`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

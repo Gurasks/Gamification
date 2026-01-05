@@ -272,7 +272,7 @@ export const updateNumOfTeamsToSessionInFirebase = async (
     target: { value: SetStateAction<string> };
   }
 ) => {
-  const newNumOfTeams = parseInt(e.target.value as string);
+  const newNumOfTeams = Number.parseInt(e.target.value as string);
   if (!sessionId) return;
   await updateDoc(doc(db, "sessions", sessionId), {
     numOfTeams: newNumOfTeams,

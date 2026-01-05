@@ -7,11 +7,11 @@ import { User } from "firebase/auth";
 export const returnTimerId = (
   teamName: string | undefined,
   session: Session
-) => {
+): string => {
   return (teamName && session.teamTimers?.[teamName]) || "";
 };
 
-export const returnToastMessage = (message: string, type: string) => {
+export const returnToastMessage = (message: string, type: string): void => {
   if (type === "error") {
     toast(message, {
       icon: React.createElement(XCircle, {
@@ -25,7 +25,7 @@ export const returnToastMessage = (message: string, type: string) => {
         margin: "0 auto",
       },
     });
-  } else if (type === "sucess") {
+  } else if (type === "success") {
     toast(message, {
       icon: React.createElement(CheckCircle, {
         className: "text-white-500 w-15 h-15",
@@ -48,23 +48,29 @@ export const returnToastMessage = (message: string, type: string) => {
 };
 
 export const uuidToBytes = (uuid: string): Uint8Array => {
-  const hex = uuid.replace(/-/g, "");
+  const hex = uuid.replaceAll("-", "");
   if (hex.length !== 32) throw new Error("Invalid UUID format");
-  return Uint8Array.from(hex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
+
+  return Uint8Array.from(
+    hex.match(/.{1,2}/g)!.map((b) => Number.parseInt(b, 16))
+  );
 };
 
-// Base64-url encode for browser (no Buffer)
 export const toBase64Url = (bytes: Uint8Array): string => {
   let binary = "";
-  bytes.forEach((b) => (binary += String.fromCharCode(b)));
-  let base64 = btoa(binary); // standard base64
-  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); // url-safe
+  bytes.forEach((b) => {
+    binary += String.fromCodePoint(b);
+  });
+
+  const base64 = btoa(binary);
+
+  return base64.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 };
 
 export const getShortenedUUID = (uuid: string): string => {
   const bytes = uuidToBytes(uuid);
   const base64 = toBase64Url(bytes);
-  return base64.slice(0, 8); // take first 8 chars
+  return base64.slice(0, 8);
 };
 
 export const calculateAverageRating = (
@@ -72,9 +78,7 @@ export const calculateAverageRating = (
 ): number => {
   if (!ratings || Object.keys(ratings).length === 0) return 0;
   const values = Object.values(ratings);
-  return values.length > 0
-    ? values.reduce((a, b) => a + b, 0) / values.length
-    : 0;
+  return values.reduce((a, b) => a + b, 0) / values.length;
 };
 
 export const extractUserData = (user: User) => {
@@ -82,7 +86,7 @@ export const extractUserData = (user: User) => {
     uid: user.uid,
     displayName: user.displayName || "Usuário",
     email: user.email || "",
-    isAnonymous: user.isAnonymous || false,
+    isAnonymous: user.isAnonymous,
   };
 };
 

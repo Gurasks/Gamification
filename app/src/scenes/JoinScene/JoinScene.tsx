@@ -1,27 +1,28 @@
-import { useState, useEffect } from "react";
+import { LoginPrompt } from "@/components/LoginPrompt";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSessionCode } from "@/hooks/useSessionCode";
+import {
+  AlertTriangle,
+  Clock,
+  Lock,
+  LogIn,
+  Users,
+  XCircle
+} from 'lucide-react';
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useSessionJoin } from "../../hooks/useRefinimentJoin";
-import { useAuth } from "@/contexts/AuthContext";
-import { LoginPrompt } from "@/components/LoginPrompt";
-import {
-  Lock,
-  Users,
-  AlertTriangle,
-  XCircle,
-  Clock,
-  LogIn,
-  ArrowLeft,
-  CheckCircle
-} from 'lucide-react';
-import { useSessionCode } from "@/hooks/useSessionCode";
 
 const JoinScene: React.FC = () => {
   const { sessionCode } = useParams<{ sessionCode: string }>();
   const [sessionPassword, setSessionPassword] = useState('');
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [isReturningFromLogin, setIsReturningFromLogin] = useState(false);
+  const [_isReturningFromLogin, setIsReturningFromLogin] = useState(false);
+  const [_hasAttemptedAutoJoin, setHasAttemptedAutoJoin] = useState(false);
+  const [_isAutoJoinComplete, setIsAutoJoinComplete] = useState(false);
+  const autoJoinAttemptedRef = useRef(false);
 
   const { user, loading: authLoading } = useAuth();
   const { sessionCode: joinCode, setSessionCode: setJoinCode, isRestored } = useSessionCode();
@@ -60,7 +61,13 @@ const JoinScene: React.FC = () => {
         }, 3000);
       }
 
-      if (user && joinCode && !requiresPassword && !isJoining) {
+      if (user &&
+        joinCode &&
+        !requiresPassword &&
+        !isJoining &&
+        !autoJoinAttemptedRef.current &&
+        !error) {
+
         const timer = setTimeout(() => {
           handleAutoJoin();
         }, 500);
@@ -68,10 +75,12 @@ const JoinScene: React.FC = () => {
         return () => clearTimeout(timer);
       }
     }
-  }, [authLoading, sessionCode, user, joinCode, requiresPassword, isJoining]);
+  }, [authLoading, sessionCode, user, joinCode, requiresPassword, isJoining, error]);
 
   const handleAutoJoin = async () => {
-    if (!user || !joinCode || requiresPassword || isJoining) return;
+    if (!user || !joinCode || requiresPassword || isJoining || autoJoinAttemptedRef.current) return;
+
+    autoJoinAttemptedRef.current = true;
 
     try {
       const result = await joinSession(joinCode, undefined);
@@ -79,9 +88,14 @@ const JoinScene: React.FC = () => {
       if (result?.success) {
         sessionStorage.removeItem('pending_session_code');
         navigate(`/team-selection/${result.sessionId}`);
+      } else {
+        console.log('Auto-join falhou ou sessão não encontrada');
       }
     } catch (err) {
       console.error('Erro no auto-join:', err);
+    } finally {
+      setHasAttemptedAutoJoin(true);
+      setIsAutoJoinComplete(true);
     }
   };
 
@@ -94,6 +108,10 @@ const JoinScene: React.FC = () => {
       return;
     }
 
+    autoJoinAttemptedRef.current = false;
+    setHasAttemptedAutoJoin(false);
+    setIsAutoJoinComplete(false);
+
     const password = requiresPassword ? sessionPassword : undefined;
     const result = await joinSession(joinCode, password);
 
@@ -105,8 +123,11 @@ const JoinScene: React.FC = () => {
 
   const handleLoginSuccess = () => {
     setShowLoginPrompt(false);
-
     sessionStorage.setItem('is_returning_from_login', 'true');
+
+    autoJoinAttemptedRef.current = false;
+    setHasAttemptedAutoJoin(false);
+    setIsAutoJoinComplete(false);
   };
 
   const handleGoBack = () => {
@@ -116,16 +137,20 @@ const JoinScene: React.FC = () => {
     } else {
       navigate('/');
     }
-  };
 
-  const handleQuickJoin = (code: string) => {
-    setJoinCode(code);
-    resetError();
+    autoJoinAttemptedRef.current = false;
+    setHasAttemptedAutoJoin(false);
+    setIsAutoJoinComplete(false);
   };
 
   const handleInputChange = (value: string) => {
     setJoinCode(value);
     resetError();
+
+    // Resetar flags quando o código muda
+    autoJoinAttemptedRef.current = false;
+    setHasAttemptedAutoJoin(false);
+    setIsAutoJoinComplete(false);
 
     if (value.trim()) {
       sessionStorage.setItem('pending_session_code', value.trim());
@@ -277,7 +302,7 @@ const JoinScene: React.FC = () => {
                     (!user && !requiresPassword)
                   }
                   loading={isJoining}
-                  variant={requiresPassword ? "primary" : "primary"}
+                  variant={"primary"}
                   className={`flex-1 ${requiresPassword ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'}`}
                 >
                   {!user && !requiresPassword ? (
@@ -294,25 +319,6 @@ const JoinScene: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Quick Join Options
-          {!requiresPassword && !isJoining && user && (
-            <div className="text-center animate-fade-in">
-              <p className="text-gray-500 text-sm mb-3">Sessões recentes:</p>
-              <div className="flex justify-center space-x-2">
-                {['TEAM123', 'PROJ456', 'RETRO789'].map((code) => (
-                  <button
-                    key={code}
-                    onClick={() => handleQuickJoin(code)}
-                    disabled={isJoining}
-                    className="px-3 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {code}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )} */}
 
           {/* Additional Info */}
           <div className="text-center">

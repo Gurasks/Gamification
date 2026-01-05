@@ -179,21 +179,27 @@ const TeamSelectionScene: React.FC = () => {
             <div className="border-b pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="teamNumbers" className="block text-sm font-medium text-gray-700 mb-2">
                     Quantidade de Times
                   </label>
                   {isOwner ? (
-                    <input
-                      name="teamNumbers"
-                      type="number"
-                      min="2"
-                      max="10"
-                      defaultValue={numOfTeams}
-                      onChange={e => updateNumOfTeamsToSessionInFirebase(sessionId, setAvailableTeams, e)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-2xl font-bold"
-                    />
+                    <div>
+                      <input
+                        id="teamNumbers"
+                        name="teamNumbers"
+                        type="number"
+                        min="2"
+                        max="10"
+                        defaultValue={numOfTeams}
+                        onChange={e => updateNumOfTeamsToSessionInFirebase(sessionId, setAvailableTeams, e)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-2xl font-bold"
+                      />
+                      <small className="text-gray-500 text-xs mt-1 block text-center">
+                        Digite um número entre 2 e 10
+                      </small>
+                    </div>
                   ) : (
-                    <div className="text-center">
+                    <div className="text-center" aria-labelledby="teamNumbersLabel">
                       <p className="text-3xl font-bold text-gray-800">{numOfTeams}</p>
                       <p className="text-sm text-gray-500 mt-1">times</p>
                     </div>

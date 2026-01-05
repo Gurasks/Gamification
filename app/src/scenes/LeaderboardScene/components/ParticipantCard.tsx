@@ -27,17 +27,29 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
 
   const getRankIcon = () => {
     switch (rank) {
-      case 1: return <Award className="w-6 h-6 text-yellow-500" />;
-      case 2: return <Award className="w-6 h-6 text-gray-500" />;
-      case 3: return <Award className="w-6 h-6 text-orange-500" />;
+      case 1: return <Award className="w-6 h-6 text-yellow-500" aria-hidden="true" />;
+      case 2: return <Award className="w-6 h-6 text-gray-500" aria-hidden="true" />;
+      case 3: return <Award className="w-6 h-6 text-orange-500" aria-hidden="true" />;
       default: return <span className="text-lg font-bold text-gray-700">#{rank}</span>;
+    }
+  };
+
+  // Handler para navegação por teclado
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onViewDetails();
     }
   };
 
   return (
     <div
-      className={`rounded-xl shadow-lg border p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer ${getRankColor()}`}
+      role="button"
+      tabIndex={0}
       onClick={onViewDetails}
+      onKeyDown={handleKeyDown}
+      className={`rounded-xl shadow-lg border p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${getRankColor()}`}
+      aria-label={`Ver detalhes das contribuições de ${user.userName}, rank ${rank} com ${user.totalScore || 0} pontos`}
     >
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
@@ -64,7 +76,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
       {/* Métricas */}
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-          <MessageSquare className="w-4 h-4 text-blue-600" />
+          <MessageSquare className="w-4 h-4 text-blue-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-blue-800">{user.totalComments}</div>
             <div className="text-xs text-blue-600">Comentários</div>
@@ -72,7 +84,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-          <Star className="w-4 h-4 text-green-600" />
+          <Star className="w-4 h-4 text-green-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-green-800">{user.averageRating.toFixed(1)}</div>
             <div className="text-xs text-green-600">Avaliação Média</div>
@@ -80,7 +92,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-lg">
-          <FileText className="w-4 h-4 text-purple-600" />
+          <FileText className="w-4 h-4 text-purple-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-purple-800">{user.totalCardsCreated}</div>
             <div className="text-xs text-purple-600">Sugestões</div>
@@ -88,7 +100,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg">
-          <ThumbsUp className="w-4 h-4 text-amber-600" />
+          <ThumbsUp className="w-4 h-4 text-amber-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-amber-800">{user.totalReplies}</div>
             <div className="text-xs text-amber-600">Respostas</div>
@@ -96,7 +108,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
         </div>
       </div>
 
-      {/* Gamificação - se disponível */}
+      {/* Gamificação */}
       {user.gamificationPoints && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="text-xs text-gray-500 mb-2">Contribuições de gamificação:</div>
@@ -113,12 +125,26 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
 
       {/* Ver Detalhes */}
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <button className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-1">
+        <div
+          className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-1"
+          role="presentation"
+        >
           Ver contribuições detalhadas
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
           </svg>
-        </button>
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { CustomDropdown } from "@/components/CustomDropdown";
 import { categoryOptions, priorityOptions, requirementTypeOptions } from "@/services/metadataOptionsService";
 import { CategoryType, Metadata, PriorityLevel, RequirementType } from "@/types/global";
 import { Check, Settings, X } from "lucide-react";
+import React, { useId } from "react";
 
 type CardMetadataEditorFormProps = {
   editedMetadata: Metadata;
@@ -18,6 +19,11 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
   setIsEditingMetadata,
   timeEnded
 }) => {
+  const priorityId = useId();
+  const requirementTypeId = useId();
+  const categoryId = useId();
+  const effortId = useId();
+
   const handlePriorityChange = (value: string) => {
     setEditedMetadata((prev) => ({
       ...prev,
@@ -42,7 +48,7 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
   const handleEstimatedEffortChange = (value: string) => {
     setEditedMetadata((prev) => ({
       ...prev,
-      estimatedEffort: value === "" ? undefined : parseFloat(value),
+      estimatedEffort: value === "" ? undefined : Number.parseFloat(value),
     }));
   };
 
@@ -60,8 +66,14 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
       <div className="grid grid-cols-2 gap-2">
         {/* Prioridade */}
         <div className="col-span-2">
-          <label className="text-xs text-gray-600 mb-1 block">Prioridade</label>
+          <label
+            htmlFor={priorityId}
+            className="text-xs text-gray-600 mb-1 block"
+          >
+            Prioridade
+          </label>
           <CustomDropdown
+            id={priorityId}
             value={editedMetadata.priority || "ND"}
             onChange={handlePriorityChange}
             options={priorityOptions}
@@ -72,8 +84,14 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
 
         {/* Tipo de Requisito */}
         <div>
-          <label className="text-xs text-gray-600 mb-1 block">Tipo</label>
+          <label
+            htmlFor={requirementTypeId}
+            className="text-xs text-gray-600 mb-1 block"
+          >
+            Tipo
+          </label>
           <CustomDropdown
+            id={requirementTypeId}
             value={editedMetadata.requirementType || "ND"}
             onChange={handleRequirementTypeChange}
             options={requirementTypeOptions}
@@ -84,8 +102,14 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
 
         {/* Categoria */}
         <div>
-          <label className="text-xs text-gray-600 mb-1 block">Categoria</label>
+          <label
+            htmlFor={categoryId}
+            className="text-xs text-gray-600 mb-1 block"
+          >
+            Categoria
+          </label>
           <CustomDropdown
+            id={categoryId}
             value={editedMetadata.category || "ND"}
             onChange={handleCategoryChange}
             options={categoryOptions}
@@ -96,8 +120,14 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
 
         {/* Esforço Estimado */}
         <div className="col-span-2">
-          <label className="text-xs text-gray-600 mb-1 block">Esforço Estimado</label>
+          <label
+            htmlFor={effortId}
+            className="text-xs text-gray-600 mb-1 block"
+          >
+            Esforço Estimado
+          </label>
           <input
+            id={effortId}
             type="number"
             min="0"
             step="0.5"
@@ -106,29 +136,34 @@ const CardMetadataEditorForm: React.FC<CardMetadataEditorFormProps> = ({
               const value = e.target.value;
               handleEstimatedEffortChange(value);
             }}
-            className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+            className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
             placeholder="Ex: 2"
             disabled={timeEnded}
+            aria-describedby={`${effortId}-description`}
           />
         </div>
-        <div className="flex gap-1">
+
+        <div className="col-span-2 flex gap-1">
           <button
             onClick={handleSaveMetadata}
-            className="text-xs flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+            className="text-xs flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
             title="Salvar"
           >
             <Check className="w-3 h-3" />
+            <span className="sr-only">Salvar</span>
           </button>
           <button
             onClick={() => setIsEditingMetadata(false)}
-            className="text-xs flex items-center gap-1 px-2 py-1 bg-red-400 text-white rounded hover:bg-red-500"
+            className="text-xs flex items-center gap-1 px-2 py-1 bg-red-400 text-white rounded hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1"
             title="Cancelar"
           >
             <X className="w-3 h-3" />
+            <span className="sr-only">Cancelar</span>
           </button>
         </div>
       </div>
-    </div>);
+    </div>
+  );
 }
 
 export default CardMetadataEditorForm;

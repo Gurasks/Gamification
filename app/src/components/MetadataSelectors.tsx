@@ -1,7 +1,7 @@
 import metadataService from '@/services/metadataOptionsService';
 import { CategoryType, PriorityLevel, RequirementType } from '@/types/global';
 import { AlertCircle, Layers } from 'lucide-react';
-import React from 'react';
+import React, { useId } from 'react';
 import { CustomDropdown } from './CustomDropdown';
 
 interface MetadataSelectorsProps {
@@ -27,6 +27,8 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
   setEstimatedEffort,
   disabled = false
 }) => {
+  const effortInputId = useId();
+
   return (
     <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
       <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -42,6 +44,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           disabled={disabled}
           placeholder="Prioridade..."
           options={metadataService.getCustomDropdownOptions.priority}
+          label="Prioridade"
         />
 
         {/* Tipo de Requisito */}
@@ -51,6 +54,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           disabled={disabled}
           placeholder="Tipo de requisito..."
           options={metadataService.getCustomDropdownOptions.requirementType}
+          label="Tipo de requisito"
         />
 
         {/* Categoria */}
@@ -60,26 +64,32 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           disabled={disabled}
           placeholder="Categoria..."
           options={metadataService.getCustomDropdownOptions.category}
+          label="Categoria"
         />
 
         {/* Esforço Estimado */}
         <div className="flex flex-col gap-1">
-          <label className="text-start text-xs font-medium text-gray-600 mb-1">
+          <label
+            htmlFor={effortInputId}
+            className="text-start text-xs font-medium text-gray-600 mb-1"
+          >
             Esforço estimado
           </label>
 
           <input
+            id={effortInputId}
             type="number"
             min="0"
             step="0.5"
             value={estimatedEffort ?? ''}
             onChange={(e) => {
               const value = e.target.value;
-              setEstimatedEffort(value === '' ? '' : parseFloat(value));
+              setEstimatedEffort(value === '' ? '' : Number.parseFloat(value));
             }}
-            className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+            className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
             placeholder="Ex: 2"
             disabled={disabled}
+            aria-describedby={`${effortInputId}-description`}
           />
         </div>
       </div>
