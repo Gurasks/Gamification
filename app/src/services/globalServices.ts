@@ -64,7 +64,7 @@ export const toBase64Url = (bytes: Uint8Array): string => {
 
   const base64 = btoa(binary);
 
-  return base64.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+  return base64.replaceAll("+", "-").replaceAll("/", "_").split("=")[0];
 };
 
 export const getShortenedUUID = (uuid: string): string => {
