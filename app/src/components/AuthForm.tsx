@@ -15,6 +15,7 @@ import {
 import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 import { Button } from './Button';
 import { validateEmailStepByStep, validatePassword } from '@/services/globalServices';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export type AuthMode = 'login' | 'register';
 
@@ -39,36 +40,42 @@ const FormHeader: React.FC<{
   backButtonLabel: string;
   isLoading: boolean;
   isGoogleLoading: boolean;
-}> = ({ mode, message, showBackButton, onBack, backButtonLabel, isLoading, isGoogleLoading }) => (
-  <div className="text-center relative">
-    {showBackButton && onBack && (
-      <Button
-        onClick={onBack}
-        variant="primary"
-        className="flex items-center justify-center gap-2"
-        disabled={isLoading || isGoogleLoading}
-        size='sm'
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {backButtonLabel}
-      </Button>
-    )}
+}> = ({ mode, message, showBackButton, onBack, backButtonLabel, isLoading, isGoogleLoading }) => {
+  const { t } = useLanguage();
 
-    <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
-      {mode === 'login' ? (
-        <LogIn className="w-8 h-8 text-blue-600" />
-      ) : (
-        <UserPlus className="w-8 h-8 text-green-600" />
+  return (
+    <div className="text-center relative">
+      {showBackButton && onBack && (
+        <div className="absolute left-0 top-0">
+          <Button
+            onClick={onBack}
+            variant="outline-secondary"
+            size="sm"
+            className="flex items-center justify-center gap-2"
+            disabled={isLoading || isGoogleLoading}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {backButtonLabel}
+          </Button>
+        </div>
+      )}
+
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
+        {mode === 'login' ? (
+          <LogIn className="w-8 h-8 text-blue-600" />
+        ) : (
+          <UserPlus className="w-8 h-8 text-green-600" />
+        )}
+      </div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        {mode === 'login' ? t('auth.login') : t('auth.register')}
+      </h2>
+      {message && (
+        <p className="text-gray-600 text-sm">{message}</p>
       )}
     </div>
-    <h2 className="text-2xl font-bold text-gray-800 mb-2">
-      {mode === 'login' ? 'Faça Login' : 'Crie sua Conta'}
-    </h2>
-    {message && (
-      <p className="text-gray-600 text-sm">{message}</p>
-    )}
-  </div>
-);
+  );
+};
 
 const PasswordInput: React.FC<{
   label: string;
@@ -142,50 +149,66 @@ const SubmitButton: React.FC<{
   mode: AuthMode;
   isLoading: boolean;
   disabled: boolean;
-}> = ({ mode, isLoading, disabled }) => (
-  <button
-    type="submit"
-    disabled={disabled}
-    className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${mode === 'login'
-      ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-      : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
-      }`}
-  >
-    {isLoading ? (
-      <>
-        <Loader2 className="w-4 h-4 animate-spin" />
-        {mode === 'login' ? 'Entrando...' : 'Criando conta...'}
-      </>
-    ) : (
-      <>
-        {mode === 'login' ? (
-          <>
-            <LogIn className="w-4 h-4" />
-            Entrar
-          </>
-        ) : (
-          <>
-            <UserPlus className="w-4 h-4" />
-            Criar Conta
-          </>
-        )}
-      </>
-    )}
-  </button>
-);
+}> = ({ mode, isLoading, disabled }) => {
+  const { t } = useLanguage();
+
+  const getLoadingText = () => {
+    return mode === 'login' ? t('auth.loggingIn') : t('auth.creatingAccount');
+  };
+
+  const getButtonText = () => {
+    if (mode === 'login') {
+      return (
+        <>
+          <LogIn className="w-4 h-4" />
+          {t('auth.login')}
+        </>
+      );
+    } else {
+      return (
+        <>
+          <UserPlus className="w-4 h-4" />
+          {t('auth.register')}
+        </>
+      );
+    }
+  };
+
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${mode === 'login'
+        ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+        : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+        }`}
+    >
+      {isLoading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          {getLoadingText()}
+        </>
+      ) : (
+        getButtonText()
+      )}
+    </button>
+  );
+};
 
 const GoogleLoginButton: React.FC<{
   onGoogleLogin?: () => Promise<void>;
   isLoading: boolean;
   isGoogleLoading: boolean;
 }> = ({ onGoogleLogin, isLoading, isGoogleLoading }) => {
+  const { t } = useLanguage();
+
   if (!onGoogleLogin) return null;
 
   return (
     <>
       <div className="flex items-center">
         <div className="flex-1 border-t border-gray-300"></div>
-        <span className="px-3 text-sm text-gray-500">ou</span>
+        <span className="px-3 text-sm text-gray-500">{t('auth.or')}</span>
         <div className="flex-1 border-t border-gray-300"></div>
       </div>
 
@@ -200,7 +223,7 @@ const GoogleLoginButton: React.FC<{
           className="w-5 h-5"
         />
         <span className="font-medium">
-          {isGoogleLoading ? 'Conectando...' : 'Continuar com Google'}
+          {isGoogleLoading ? t('auth.connecting') : t('auth.loginWithGoogle')}
         </span>
       </button>
     </>
@@ -212,24 +235,28 @@ const SwitchModeButton: React.FC<{
   onChange: (mode: AuthMode) => void;
   isLoading: boolean;
   isGoogleLoading: boolean;
-}> = ({ mode, onChange, isLoading, isGoogleLoading }) => (
-  <div className="text-center">
-    <p className="text-sm text-gray-600">
-      {mode === 'login' ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
-      <button
-        type="button"
-        onClick={() => onChange(mode === 'login' ? 'register' : 'login')}
-        className="text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 transition-colors"
-        disabled={isLoading || isGoogleLoading}
-      >
-        {mode === 'login' ? 'Cadastre-se' : 'Faça Login'}
-      </button>
-    </p>
-  </div>
-);
+}> = ({ mode, onChange, isLoading, isGoogleLoading }) => {
+  const { t } = useLanguage();
 
-// Hook para validação
+  return (
+    <div className="text-center">
+      <p className="text-sm text-gray-600">
+        {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
+        <button
+          type="button"
+          onClick={() => onChange(mode === 'login' ? 'register' : 'login')}
+          className="text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 transition-colors"
+          disabled={isLoading || isGoogleLoading}
+        >
+          {mode === 'login' ? t('auth.register') : t('auth.login')}
+        </button>
+      </p>
+    </div>
+  );
+};
+
 const useAuthValidation = (mode: AuthMode) => {
+  const { t } = useLanguage();
   const [localError, setLocalError] = useState('');
 
   const validateForm = (
@@ -254,15 +281,15 @@ const useAuthValidation = (mode: AuthMode) => {
 
     if (mode === 'register') {
       if (!displayName?.trim()) {
-        setLocalError('Nome é obrigatório');
+        setLocalError(t('auth.nameRequired'));
         return false;
       }
       if (displayName.trim().length < 2) {
-        setLocalError('Nome deve ter pelo menos 2 caracteres');
+        setLocalError(t('auth.nameMinLength'));
         return false;
       }
       if (password !== confirmPassword) {
-        setLocalError('As senhas não coincidem');
+        setLocalError(t('auth.passwordsDoNotMatch'));
         return false;
       }
     }
@@ -277,7 +304,6 @@ const useAuthValidation = (mode: AuthMode) => {
   };
 };
 
-// Hook para gerenciar estado do formulário
 const useAuthFormState = (mode: AuthMode) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -352,9 +378,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   message,
   showBackButton = false,
   onBack,
-  backButtonLabel = 'Voltar',
+  backButtonLabel,
   className = ''
 }) => {
+  const { t } = useLanguage();
   const formState = useAuthFormState(mode);
   const validation = useAuthValidation(mode);
 
@@ -380,7 +407,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         })
       });
     } catch (err: any) {
-      validation.setLocalError(err.message || 'Erro ao processar solicitação');
+      validation.setLocalError(err.message || t('auth.requestError'));
     }
   };
 
@@ -391,6 +418,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     formState.resetForm();
   };
 
+  const fullNameLabel = t('auth.fullName');
+  const fullNamePlaceholder = t('auth.fullNamePlaceholder');
+  const emailPlaceholder = t('auth.emailPlaceholder');
+  const passwordPlaceholder = mode === 'login' ? t('auth.passwordPlaceholder') : t('auth.createPasswordPlaceholder');
+  const confirmPasswordPlaceholder = t('auth.confirmPasswordPlaceholder');
+  const minLengthText = t('auth.minLength', { count: 2 });
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
@@ -399,7 +433,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         message={message}
         showBackButton={showBackButton}
         onBack={onBack}
-        backButtonLabel={backButtonLabel}
+        backButtonLabel={backButtonLabel || t('common.back')}
         isLoading={isLoading}
         isGoogleLoading={isGoogleLoading}
       />
@@ -411,21 +445,21 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
               <User className="w-4 h-4" />
-              Nome Completo *
+              {fullNameLabel} *
             </label>
             <input
               type="text"
               value={formState.displayName}
               onChange={(e) => formState.setDisplayName(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 transition-all duration-200"
-              placeholder="Seu nome completo"
+              placeholder={fullNamePlaceholder}
               disabled={isLoading}
               required
               minLength={2}
               maxLength={50}
             />
             <p className="text-xs text-gray-500 mt-1 flex justify-between">
-              <span>Mínimo 2 caracteres</span>
+              <span>{minLengthText}</span>
               <span>{formState.displayName.length}/50</span>
             </p>
           </div>
@@ -435,14 +469,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
             <Mail className="w-4 h-4" />
-            Email *
+            {t('auth.email')} *
           </label>
           <input
             type="email"
             value={formState.email}
             onChange={(e) => formState.setEmail(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 transition-all duration-200"
-            placeholder="seu@email.com"
+            placeholder={emailPlaceholder}
             disabled={isLoading}
             required
           />
@@ -450,10 +484,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
         {/* Password */}
         <PasswordInput
-          label="Senha *"
+          label={t('auth.password') + " *"}
           value={formState.password}
           onChange={formState.setPassword}
-          placeholder={mode === 'login' ? "••••••••" : "Crie uma senha segura"}
+          placeholder={passwordPlaceholder}
           showPassword={formState.showPassword}
           onToggleShowPassword={() => formState.setShowPassword(!formState.showPassword)}
           disabled={isLoading}
@@ -462,10 +496,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         {/* Confirm Password (only for register) */}
         {mode === 'register' && (
           <PasswordInput
-            label="Confirmar Senha *"
+            label={t('auth.confirmPassword') + " *"}
             value={formState.confirmPassword}
             onChange={formState.setConfirmPassword}
-            placeholder="Digite a senha novamente"
+            placeholder={confirmPasswordPlaceholder}
             showPassword={formState.showConfirmPassword}
             onToggleShowPassword={() => formState.setShowConfirmPassword(!formState.showConfirmPassword)}
             disabled={isLoading}

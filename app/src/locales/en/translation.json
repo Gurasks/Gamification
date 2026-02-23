@@ -1,0 +1,168 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "required": "Required field"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Create Account",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWithGoogle": "Continue with Google",
+    "or": "or",
+    "logoutSuccess": "Logout successful!",
+    "logoutError": "Error logging out",
+    "loginSuccess": "Login successful!",
+    "loginError": "Error logging in",
+    "userNotFound": "User not found.",
+    "wrongPassword": "Incorrect password.",
+    "tooManyRequests": "Too many attempts. Try again later.",
+    "genericError": "Error logging in. Please try again.",
+    "googleLoginSuccess": "Logged in with Google!",
+    "googleSignUpSuccess": "Account created with Google!",
+    "googleError": "Error logging in with Google",
+    "loginMessage": "Sign in to access your sessions",
+    "nameRequired": "Name is required",
+    "registerSuccess": "Account created successfully!",
+    "registerError": "Error creating account",
+    "registerGenericError": "Error creating account. Please try again.",
+    "emailInUse": "This email is already in use.",
+    "invalidEmail": "Invalid email.",
+    "weakPassword": "Password is too weak. Use at least 6 characters with uppercase letters and numbers.",
+    "registerMessage": "Fill in the details to register",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+    "emailPlaceholder": "your@email.com",
+    "passwordPlaceholder": "••••••••",
+    "createPasswordPlaceholder": "Create a secure password",
+    "confirmPasswordPlaceholder": "Type your password again",
+    "minLength": "Minimum {{count}} characters",
+    "loggingIn": "Logging in...",
+    "creatingAccount": "Creating account...",
+    "connecting": "Connecting...",
+    "nameMinLength": "Name must be at least 2 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "requestError": "Error processing request"
+  },
+  "join": {
+    "title": "Join a Session",
+    "protectedTitle": "Protected Session",
+    "description": "Enter the session code to join",
+    "protectedDescription": "Enter the password to access this session",
+    "sessionCode": "Session Code",
+    "sessionCodePlaceholder": "Ex: ABC123",
+    "sessionPassword": "Session Password",
+    "sessionPasswordPlaceholder": "Enter session password",
+    "authRequired": "You need to be authenticated to join the session",
+    "verifyingPassword": "Verifying password...",
+    "joining": "Joining session...",
+    "join": "Join",
+    "verifyPassword": "Verify Password",
+    "backToCode": "Back to Code",
+    "sessionCodeHint": "Session code: {{code}}",
+    "savedCode": "Saved code",
+    "pleaseWait": "This may take a few seconds..."
+  },
+  "nav": {
+    "guestMode": "Guest Mode",
+    "user": "User",
+    "profile": "My Profile",
+    "changeName": "Change Name",
+    "language": "Language"
+  },
+  "profile": {
+    "comingSoon": "Feature coming soon!"
+  },
+
+  "home": {
+    "welcome": "Welcome {{name}} to Singular!",
+    "subtitle": "Collaborate and play with your team in real-time.",
+    "createTitle": "Create a new session",
+    "createDescription": "Start a new session and invite your team",
+    "createAriaLabel": "Create a new session. Start a new session and invite your team",
+    "joinTitle": "Join a session",
+    "joinDescription": "Choose a session to join or enter a code",
+    "joinAriaLabel": "Join a session. Choose a session to participate or enter a code"
+  },
+  "nameEntry": {
+    "titles": {
+      "welcome": "Welcome!",
+      "update": "Set Name",
+      "changeName": "Change Name",
+      "identification": "Identification"
+    },
+    "subtitles": {
+      "welcome": "Identify yourself to join sessions",
+      "update": "Choose how you want to be identified"
+    },
+    "descriptions": {
+      "changeName": "Choose a name to be identified in sessions",
+      "identification": "Enter your name to continue"
+    },
+    "labels": {
+      "yourName": "Your Name"
+    },
+    "placeholders": {
+      "name": "Ex: John Doe"
+    },
+    "buttons": {
+      "continueAsGuest": "Continue as Guest",
+      "saveName": "Save Name",
+      "logout": "Logout and Login"
+    },
+    "validation": {
+      "minLength": "Minimum 2 characters"
+    },
+    "errors": {
+      "nameRequired": "Please enter your name",
+      "minLength": "Name must be at least 2 characters",
+      "networkError": "Connection error. Check your internet and try again.",
+      "tooManyRequests": "Too many attempts. Try again in a few minutes.",
+      "genericError": "Error setting up user. Please try again.",
+      "logoutError": "Error logging out"
+    },
+    "success": {
+      "welcome": "Welcome, {{name}}!",
+      "nameUpdated": "Name updated to {{name}}!",
+      "logout": "Session ended"
+    },
+    "info": {
+      "visibility": "Your name will be visible to other session participants",
+      "anonymousMode": "Anonymous mode - your data will be lost when you leave"
+    },
+    "loginPrompt": {
+      "message": "Login with your account to continue"
+    }
+  },
+  "passwordStrength": {
+    "strength": "Password strength",
+    "empty": "Empty",
+    "veryWeak": "Very weak",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "veryStrong": "Very strong",
+    "minLength": "At least 6 characters",
+    "uppercase": "At least one uppercase letter",
+    "number": "At least one number",
+    "idealLength": "8+ characters for better security",
+    "specialChar": "Special character (!@#$%&*) recommended",
+    "confirmPassword": "Confirm your password",
+    "passwordsMatch": "Passwords match",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "meetAllRequirements": "Password must meet all minimum requirements",
+    "validAndConfirmed": "Valid and confirmed password!"
+  }
+}

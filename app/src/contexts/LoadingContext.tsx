@@ -1,3 +1,4 @@
+import { useLanguage } from '@/hooks/useLanguage';
 import React, { createContext, useContext, useState } from 'react';
 
 interface LoadingContextType {
@@ -10,8 +11,10 @@ interface LoadingContextType {
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useLanguage();
+
   const [globalLoading, setGlobalLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('Carregando...');
+  const [loadingMessage, setLoadingMessage] = useState(t('loading'));
 
   return (
     <LoadingContext.Provider value={{

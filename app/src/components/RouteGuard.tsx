@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -50,17 +51,14 @@ const shouldRedirectToNameEntry = (
   anonymousUser: boolean,
   pathname: string,
 ): boolean => {
-  // Se não há usuário e não é rota pública, redirecionar
   if (!user && !isPublicRoute(pathname)) {
     return true;
   }
 
-  // Se é rota de join-session sem usuário, redirecionar
   if (isJoinSessionRoute(pathname) && !user) {
     return true;
   }
 
-  // Se é usuário anônimo sem nome válido e não está na página de name-entry, redirecionar
   if (user && anonymousUser && !hasValidDisplayName(user.displayName) && pathname !== '/name-entry') {
     return true;
   }
@@ -96,14 +94,17 @@ const handleJoinSessionRedirect = (
   return false;
 };
 
-const LoadingScreen: React.FC = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto" />
-      <p className="mt-4 text-gray-600">Carregando...</p>
+const LoadingScreen: React.FC = () => {
+  const { t } = useLanguage();
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto" />
+        <p className="mt-4 text-gray-600">{t('loading')}</p>
+      </div>
     </div>
-  </div>
-);
+  )
+};
 
 const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const { user, anonymousUser, loading } = useAuth();
@@ -115,11 +116,9 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const { pathname, search } = location;
 
-    // Primeiro, tratar redirecionamento específico para join-session
     const didRedirectForJoinSession = handleJoinSessionRedirect(pathname, user, navigate);
     if (didRedirectForJoinSession) return;
 
-    // Depois, verificar se precisa redirecionar para name-entry
     const shouldRedirect = shouldRedirectToNameEntry(user, anonymousUser, pathname);
 
     if (shouldRedirect && pathname !== '/name-entry') {

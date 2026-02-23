@@ -1,18 +1,38 @@
 import { AuthForm } from '@/components/AuthForm';
-import { ArrowLeft } from 'lucide-react';
-import React, { useState } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Button } from '@/components/Button';
+import { getFirebaseErrorMessage } from '@/utils/firebaseErrors';
 
 const LoginScene: React.FC = () => {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
 
   const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const pendingCode = sessionStorage.getItem('pending_session_code') ||
+      sessionStorage.getItem('login_redirect_code');
+
+    if (pendingCode && !joinCode) {
+      setJoinCode(pendingCode);
+    }
+  }, [joinCode]);
+
+  const pendingCode = sessionStorage.getItem('login_redirect_code') ||
+    sessionStorage.getItem('pending_session_code');
+
+  if (pendingCode) {
+    navigate(`/join-a-session/${pendingCode}`);
+    sessionStorage.removeItem('login_redirect_code');
+    sessionStorage.removeItem('pending_session_code');
+  }
 
   const handleSubmit = async (data: {
     email: string;
@@ -25,7 +45,7 @@ const LoginScene: React.FC = () => {
 
     try {
       await signIn(data.email, data.password);
-      toast.success('Login realizado com sucesso!');
+      toast.success(t('auth.loginSuccess'));
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
       if (pendingSessionCode) {
@@ -35,18 +55,9 @@ const LoginScene: React.FC = () => {
         navigate('/');
       }
     } catch (err: any) {
-      const errorMsg = err.message || 'Erro ao fazer login';
+      const errorMsg = getFirebaseErrorMessage(err, t);
       setError(errorMsg);
-
-      if (err.code === 'auth/user-not-found') {
-        toast.error('Usuário não encontrado.');
-      } else if (err.code === 'auth/wrong-password') {
-        toast.error('Senha incorreta.');
-      } else if (err.code === 'auth/too-many-requests') {
-        toast.error('Muitas tentativas. Tente novamente mais tarde.');
-      } else {
-        toast.error('Erro ao fazer login. Tente novamente.');
-      }
+      toast.error(errorMsg);
 
       throw err;
     } finally {
@@ -62,9 +73,9 @@ const LoginScene: React.FC = () => {
       const result = await signInWithGoogle();
 
       if (result.isNewUser) {
-        toast.success('Conta criada com Google!');
+        toast.success(t('auth.googleSignUpSuccess'));
       } else {
-        toast.success('Login realizado com Google!');
+        toast.success(t('auth.googleLoginSuccess'));
       }
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
@@ -75,7 +86,7 @@ const LoginScene: React.FC = () => {
         navigate('/');
       }
     } catch (err: any) {
-      const errorMsg = err.message || 'Erro ao fazer login com Google';
+      const errorMsg = err.message || t('auth.googleError');
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -104,9 +115,10 @@ const LoginScene: React.FC = () => {
                 navigate('/register');
               }
             }}
-            message="Entre com sua conta para acessar as sessões"
+            message={t('auth.loginMessage')}
             onBack={handleGoBack}
-            backButtonLabel="Voltar"
+            backButtonLabel={t('common.back')}
+            showBackButton={true}
           />
         </div>
       </div>

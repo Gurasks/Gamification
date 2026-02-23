@@ -6,7 +6,7 @@ import { User } from "firebase/auth";
 
 export const returnTimerId = (
   teamName: string | undefined,
-  session: Session
+  session: Session,
 ): string => {
   return (teamName && session.teamTimers?.[teamName]) || "";
 };
@@ -52,7 +52,7 @@ export const uuidToBytes = (uuid: string): Uint8Array => {
   if (hex.length !== 32) throw new Error("Invalid UUID format");
 
   return Uint8Array.from(
-    hex.match(/.{1,2}/g)!.map((b) => Number.parseInt(b, 16))
+    hex.match(/.{1,2}/g)!.map((b) => Number.parseInt(b, 16)),
   );
 };
 
@@ -74,7 +74,7 @@ export const getShortenedUUID = (uuid: string): string => {
 };
 
 export const calculateAverageRating = (
-  ratings: Record<string, number>
+  ratings: Record<string, number>,
 ): number => {
   if (!ratings || Object.keys(ratings).length === 0) return 0;
   const values = Object.values(ratings);
@@ -145,22 +145,32 @@ export const validatePassword = (password: string) => {
   return "";
 };
 
-export const getPasswordStrength = (pwd: string) => {
-  if (pwd.length === 0)
+export const getPasswordStrength = (
+  password: string,
+  t?: (key: string) => string,
+) => {
+  if (password.length === 0)
     return {
       score: 0,
-      label: "Vazia",
+      label: t?.("passwordStrength.empty") || "Vazia",
       color: "bg-gray-300",
       textColor: "text-gray-500",
+      requirements: {
+        length: false,
+        lengthStrong: false,
+        uppercase: false,
+        number: false,
+        special: false,
+      },
     };
 
   let score = 0;
   const requirements = {
-    length: pwd.length >= 6,
-    lengthStrong: pwd.length >= 8,
-    uppercase: /[A-Z]/.test(pwd),
-    number: /[0-9]/.test(pwd),
-    special: /[^A-Za-z0-9]/.test(pwd),
+    length: password.length >= 6,
+    lengthStrong: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
   };
 
   if (requirements.length) score++;
@@ -170,18 +180,35 @@ export const getPasswordStrength = (pwd: string) => {
   if (requirements.special) score++;
 
   const strengthLevels = [
-    { label: "Muito fraca", color: "bg-red-500", textColor: "text-red-600" },
-    { label: "Fraca", color: "bg-red-400", textColor: "text-red-500" },
-    { label: "Média", color: "bg-yellow-500", textColor: "text-yellow-600" },
-    { label: "Forte", color: "bg-green-400", textColor: "text-green-600" },
     {
-      label: "Muito forte",
+      label: t?.("passwordStrength.veryWeak") || "Muito fraca",
+      color: "bg-red-500",
+      textColor: "text-red-600",
+    },
+    {
+      label: t?.("passwordStrength.weak") || "Fraca",
+      color: "bg-red-400",
+      textColor: "text-red-500",
+    },
+    {
+      label: t?.("passwordStrength.medium") || "Média",
+      color: "bg-yellow-500",
+      textColor: "text-yellow-600",
+    },
+    {
+      label: t?.("passwordStrength.strong") || "Forte",
+      color: "bg-green-400",
+      textColor: "text-green-600",
+    },
+    {
+      label: t?.("passwordStrength.veryStrong") || "Muito forte",
       color: "bg-green-500",
       textColor: "text-green-700",
     },
   ];
 
-  const level = strengthLevels[score - 1] || strengthLevels[0];
+  const levelIndex = Math.min(score - 1, strengthLevels.length - 1);
+  const level = strengthLevels[levelIndex >= 0 ? levelIndex : 0];
 
   return {
     score,

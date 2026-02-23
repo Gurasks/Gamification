@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { Globe, User, LogOut, Edit } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Navbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const { user, anonymousUser, logout } = useAuth();
+  const { t, currentLanguage, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && showDropdown) {
@@ -22,11 +26,11 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success('Logout realizado com sucesso!');
+      toast.success(t('auth.logoutSuccess') || 'Logout realizado com sucesso!');
       navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error('Erro ao fazer logout');
+      toast.error(t('auth.logoutError') || 'Erro ao fazer logout');
     }
     setShowDropdown(false);
   };
@@ -39,7 +43,7 @@ const Navbar: React.FC = () => {
     if (anonymousUser) {
       navigate('/name-entry');
     } else {
-      toast.success('Funcionalidade em desenvolvimento!');
+      toast.success(t('profile.comingSoon') || 'Funcionalidade em desenvolvimento!');
     }
     setShowDropdown(false);
   };
@@ -54,7 +58,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo e Nome do App */}
+          {/* Logo */}
           <div className="flex items-center">
             <button
               className="flex items-center cursor-pointer"
@@ -81,19 +85,19 @@ const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Menu do Usuário */}
+          {/* User Menu */}
           <div className="flex items-center space-x-4">
-            {/* Indicador de Usuário Anônimo */}
+            {/* Anonymous Indicator */}
             {anonymousUser && (
               <span
                 className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full"
                 aria-label="Modo convidado ativo"
               >
-                Modo Convidado
+                {t('nav.guestMode') || 'Modo Convidado'}
               </span>
             )}
 
-            {/* Dropdown do Usuário */}
+            {/* User Dropdown*/}
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
@@ -105,7 +109,7 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <div className="text-right">
                     <p className="font-medium text-gray-700">
-                      {user.displayName || 'Usuário'}
+                      {user.displayName || t('nav.user') || 'Usuário'}
                     </p>
                     {user.email && (
                       <p className="text-xs text-gray-500">
@@ -124,33 +128,88 @@ const Navbar: React.FC = () => {
               {/* Dropdown Menu */}
               {showDropdown && (
                 <div
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200"
+                  className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200"
                   role="menu"
                   aria-orientation="vertical"
                 >
+                  <div className="px-4 py-2 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user.displayName || t('nav.user')}
+                    </p>
+                    {user.email && (
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {user.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Edit Anonymous Name  */}
                   <button
                     onClick={handleProfileClick}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors"
                     role="menuitem"
                     tabIndex={0}
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    {anonymousUser ? 'Alterar Nome' : 'Meu Perfil'}
+                    {anonymousUser ? (
+                      <Edit className="w-4 h-4 mr-3 text-gray-500" />
+                    ) : (
+                      <User className="w-4 h-4 mr-3 text-gray-500" />
+                    )}
+                    {anonymousUser
+                      ? (t('nav.changeName') || 'Alterar Nome')
+                      : (t('nav.profile') || 'Meu Perfil')
+                    }
                   </button>
 
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                    role="menuitem"
-                    tabIndex={0}
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Sair
-                  </button>
+                  {/* Language Selector */}
+                  <div className="border-t border-gray-200 pt-1 mt-1">
+                    <div className="px-4 py-2">
+                      <div className="flex items-center text-xs text-gray-500 mb-2">
+                        <Globe className="w-3 h-3 mr-1" />
+                        <span>{t('nav.language') || 'Idioma'}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1">
+                        <button
+                          onClick={() => {
+                            if (currentLanguage !== 'pt-BR') toggleLanguage();
+                            setShowDropdown(false);
+                          }}
+                          className={`flex items-center justify-center px-2 py-1.5 text-xs rounded-md transition-colors ${currentLanguage === 'pt-BR'
+                            ? 'bg-blue-100 text-blue-700 font-medium'
+                            : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                        >
+                          <span className="mr-1">🇧🇷</span>
+                          <span>Português</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (currentLanguage !== 'en') toggleLanguage();
+                            setShowDropdown(false);
+                          }}
+                          className={`flex items-center justify-center px-2 py-1.5 text-xs rounded-md transition-colors ${currentLanguage === 'en'
+                            ? 'bg-blue-100 text-blue-700 font-medium'
+                            : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                        >
+                          <span className="mr-1">🇺🇸</span>
+                          <span>English</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 mt-1">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus:bg-red-50 transition-colors"
+                      role="menuitem"
+                      tabIndex={0}
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      {t('auth.logout') || 'Sair'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -158,7 +217,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Overlay para fechar dropdown ao clicar fora */}
       {showDropdown && (
         <button
           className="fixed inset-0 z-40 cursor-default focus:outline-none"

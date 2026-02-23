@@ -16,6 +16,8 @@ import RegisterScene from './scenes/RegisterScene/RegisterScene';
 import { AppLayout } from './components/AppLayout';
 import RouteGuard from './components/RouteGuard';
 import AnonymousReviewScene from './scenes/AnonymousReviewScene/AnonymousReviewScene';
+import './i18n/config';
+import { LanguageSelector } from './components/LanguageSelector';
 
 const AppContent: React.FC = () => {
   const { globalLoading, loadingMessage } = useGlobalLoading();
@@ -23,6 +25,9 @@ const AppContent: React.FC = () => {
   return (
     <>
       <Router>
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector />
+        </div>
         <Toaster position="top-center" />
         <LoadingOverlay show={globalLoading} message={loadingMessage} />
 

@@ -1,0 +1,167 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "back": "Voltar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "required": "Campo obrigatório"
+  },
+  "auth": {
+    "login": "Fazer Login",
+    "register": "Criar Conta",
+    "logout": "Sair",
+    "email": "Email",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "name": "Nome",
+    "forgotPassword": "Esqueceu a senha?",
+    "noAccount": "Não tem uma conta?",
+    "hasAccount": "Já tem uma conta?",
+    "loginWithGoogle": "Continuar com Google",
+    "or": "ou",
+    "logoutSuccess": "Logout realizado com sucesso!",
+    "logoutError": "Erro ao fazer logout",
+    "loginSuccess": "Login realizado com sucesso!",
+    "loginError": "Erro ao fazer login",
+    "userNotFound": "Usuário não encontrado.",
+    "wrongPassword": "Senha incorreta.",
+    "tooManyRequests": "Muitas tentativas. Tente novamente mais tarde.",
+    "genericError": "Erro ao fazer login. Tente novamente.",
+    "googleLoginSuccess": "Login realizado com Google!",
+    "googleSignUpSuccess": "Conta criada com Google!",
+    "googleError": "Erro ao fazer login com Google",
+    "loginMessage": "Entre com sua conta para acessar as sessões",
+    "nameRequired": "Nome é obrigatório",
+    "registerSuccess": "Conta criada com sucesso!",
+    "registerError": "Erro ao criar conta",
+    "registerGenericError": "Erro ao criar conta. Tente novamente.",
+    "emailInUse": "Este email já está em uso.",
+    "invalidEmail": "Email inválido.",
+    "weakPassword": "Senha muito fraca. Use pelo menos 6 caracteres com letras maiúsculas e números.",
+    "registerMessage": "Preencha os dados para se cadastrar",
+    "fullName": "Nome Completo",
+    "fullNamePlaceholder": "Seu nome completo",
+    "emailPlaceholder": "seu@email.com",
+    "passwordPlaceholder": "••••••••",
+    "createPasswordPlaceholder": "Crie uma senha segura",
+    "confirmPasswordPlaceholder": "Digite a senha novamente",
+    "minLength": "Mínimo {{count}} caracteres",
+    "loggingIn": "Entrando...",
+    "creatingAccount": "Criando conta...",
+    "connecting": "Conectando...",
+    "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "requestError": "Erro ao processar solicitação"
+  },
+  "join": {
+    "title": "Participar de uma Sessão",
+    "protectedTitle": "Sessão Protegida",
+    "description": "Insira o código da sessão para se juntar a ela",
+    "protectedDescription": "Digite a senha para acessar esta sessão",
+    "sessionCode": "Código da Sessão",
+    "sessionCodePlaceholder": "Ex: ABC123",
+    "sessionPassword": "Senha da Sessão",
+    "sessionPasswordPlaceholder": "Digite a senha da sessão",
+    "authRequired": "Você precisa estar autenticado para entrar na sessão",
+    "verifyingPassword": "Verificando senha...",
+    "joining": "Entrando na sessão...",
+    "join": "Participar",
+    "verifyPassword": "Verificar Senha",
+    "backToCode": "Voltar ao Código",
+    "sessionCodeHint": "Código da sessão: {{code}}",
+    "savedCode": "Código salvo",
+    "pleaseWait": "Isso pode levar alguns segundos..."
+  },
+  "nav": {
+    "guestMode": "Modo Convidado",
+    "user": "Usuário",
+    "profile": "Meu Perfil",
+    "changeName": "Alterar Nome",
+    "language": "Idioma"
+  },
+  "profile": {
+    "comingSoon": "Funcionalidade em desenvolvimento!"
+  },
+   "home": {
+    "welcome": "Bem vindo {{name}} ao Singular!",
+    "subtitle": "Colabore e jogue com sua equipe em tempo real.",
+    "createTitle": "Crie uma nova sessão",
+    "createDescription": "Comece uma nova sessão e convide a sua equipe",
+    "createAriaLabel": "Crie uma nova sessão. Comece uma nova sessão e convide a sua equipe",
+    "joinTitle": "Junte-se a uma sessão",
+    "joinDescription": "Escolha uma sessão para participar ou entre com um código",
+    "joinAriaLabel": "Junte-se a uma sessão. Escolha uma sessão para participar ou entre com um código"
+  },
+  "nameEntry": {
+    "titles": {
+      "welcome": "Bem-vindo!",
+      "update": "Configurar Nome",
+      "changeName": "Alterar Nome",
+      "identification": "Identificação"
+    },
+    "subtitles": {
+      "welcome": "Identifique-se para participar das sessões",
+      "update": "Escolha como deseja ser identificado"
+    },
+    "descriptions": {
+      "changeName": "Escolha um nome para ser identificado nas sessões",
+      "identification": "Digite seu nome para continuar"
+    },
+    "labels": {
+      "yourName": "Seu Nome"
+    },
+    "placeholders": {
+      "name": "Ex: João Silva"
+    },
+    "buttons": {
+      "continueAsGuest": "Continuar como Anônimo",
+      "saveName": "Salvar Nome",
+      "logout": "Sair e Fazer Login"
+    },
+    "validation": {
+      "minLength": "Mínimo 2 caracteres"
+    },
+    "errors": {
+      "nameRequired": "Por favor, digite seu nome",
+      "minLength": "O nome deve ter pelo menos 2 caracteres",
+      "networkError": "Erro de conexão. Verifique sua internet e tente novamente.",
+      "tooManyRequests": "Muitas tentativas. Tente novamente em alguns minutos.",
+      "genericError": "Erro ao configurar usuário. Tente novamente.",
+      "logoutError": "Erro ao sair"
+    },
+    "success": {
+      "welcome": "Bem-vindo, {{name}}!",
+      "nameUpdated": "Nome atualizado para {{name}}!",
+      "logout": "Sessão encerrada"
+    },
+    "info": {
+      "visibility": "Seu nome será visível para outros participantes da sessão",
+      "anonymousMode": "Modo anônimo - seus dados serão perdidos ao sair"
+    },
+    "loginPrompt": {
+      "message": "Faça login com sua conta para continuar"
+    }
+  },
+  "passwordStrength": {
+    "strength": "Força da senha",
+    "empty": "Vazia",
+    "veryWeak": "Muito fraca",
+    "weak": "Fraca",
+    "medium": "Média",
+    "strong": "Forte",
+    "veryStrong": "Muito forte",
+    "minLength": "Pelo menos 6 caracteres",
+    "uppercase": "Pelo menos uma letra maiúscula",
+    "number": "Pelo menos um número",
+    "idealLength": "8+ caracteres para maior segurança",
+    "specialChar": "Caractere especial (!@#$%&*) recomendado",
+    "confirmPassword": "Confirme sua senha",
+    "passwordsMatch": "Senhas coincidem",
+    "passwordsDoNotMatch": "Senhas não coincidem",
+    "meetAllRequirements": "A senha precisa atender a todos os requisitos mínimos",
+    "validAndConfirmed": "Senha válida e confirmada!"
+  }
+}
