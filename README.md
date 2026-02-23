@@ -1,7 +1,7 @@
 <!-- README.md (ENGLISH - DEFAULT) -->
 
 <p align="center">
-  🇺🇸 English | <a href="./README.pt-BR.md">🇧🇷 Português</a>
+  🇺🇸 English | <a href="./README.pt-br.md">🇧🇷 Português</a>
 </p>
 
 # 🎯 Gamification - Gamified Requirements Elicitation System (SGLR)
