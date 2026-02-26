@@ -1,4 +1,7 @@
+import { useLanguage } from "@/hooks/useLanguage";
+
 export const SyncTimerSkeleton: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <div className="relative w-20 h-20 flex items-center justify-center rounded-full overflow-hidden bg-gray-200 shadow-lg">
@@ -6,7 +9,7 @@ export const SyncTimerSkeleton: React.FC = () => {
           ...
         </div>
       </div>
-      <span className="text-xs text-gray-500">Carregando...</span>
+      <span className="text-xs text-gray-500">{t('common.loading')}</span>
     </div>
   );
 };

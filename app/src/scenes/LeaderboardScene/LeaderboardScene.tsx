@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { LeaderboardSortTypes, TabType, TeamMetrics, TeamTimeData, UserContributions, UserStats } from '../../types/leaderboard';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Session, Card } from '../../types/global';
-import { getAvailableTeams } from '../../services/teamSelectionServices';
+import { getAvailableTeamIds } from '../../services/teamSelectionServices';
 import { exportToDOC, exportToPDF } from '../../services/leaderboardServices';
 import TeamLeaderboard from './components/TeamLeaderboard';
 import MembersLeaderboard from './components/MembersLeaderboard';
@@ -87,7 +87,7 @@ const LeaderboardScene: React.FC = () => {
       return;
     }
 
-    const teams = getAvailableTeams(sessionData.numOfTeams || 2);
+    const teams = getAvailableTeamIds(sessionData.numOfTeams || 2);
     const metrics: TeamMetrics[] = [];
 
     teams.forEach(teamName => {

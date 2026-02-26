@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { createSessionInFirestore } from "@/services/firestore/sessionServices";
 import { MAX_DESCRIPTION_LENGTH } from "@/scenes/CreationScene/CreationScene";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export const useSessionCreation = () => {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { setGlobalLoading, setLoadingMessage } = useGlobalLoading();
@@ -25,16 +27,18 @@ export const useSessionCreation = () => {
     const errors: string[] = [];
 
     if (!formData.name.trim()) {
-      errors.push("Nome da sessão é obrigatório");
+      errors.push(t("creation.errors.nameRequired"));
     }
 
     if (formData.name.length > 100) {
-      errors.push("Nome da sessão deve ter no máximo 100 caracteres");
+      errors.push(t("creation.errors.nameTooLong"));
     }
 
     if (formData.description.length > MAX_DESCRIPTION_LENGTH) {
       errors.push(
-        `Descrição deve ter no máximo ${MAX_DESCRIPTION_LENGTH} caracteres`
+        t("creation.errors.descriptionTooLong", {
+          max: MAX_DESCRIPTION_LENGTH,
+        }),
       );
     }
 
@@ -49,19 +53,18 @@ export const useSessionCreation = () => {
     }
 
     if (!user) {
-      toast.error("Usuário não autenticado");
+      toast.error(t("creation.errors.userNotAuthenticated"));
       return;
     }
 
     setIsCreating(true);
     setGlobalLoading(true);
-    setLoadingMessage("Criando sua sessão...");
+    setLoadingMessage(t("creation.loading.creating"));
 
     try {
       const newSessionId = uuidv4();
 
-      // Loading específico para encurtamento de UUID
-      setLoadingMessage("Configurando sessão...");
+      setLoadingMessage(t("creation.loading.configuring"));
       await shortenUUID(newSessionId);
 
       const sessionData = {
@@ -71,14 +74,14 @@ export const useSessionCreation = () => {
         requiresPassword: formData.requiresPassword,
       };
 
-      setLoadingMessage("Salvando dados...");
+      setLoadingMessage(t("creation.loading.saving"));
       await createSessionInFirestore(newSessionId, sessionData, user);
 
-      toast.success("Sessão criada com sucesso!");
+      toast.success(t("creation.success.sessionCreated"));
       navigate(`/team-selection/${newSessionId}`);
     } catch (error) {
       console.error("Error creating session:", error);
-      toast.error("Erro ao criar sessão. Tente novamente.");
+      toast.error(t("creation.errors.createFailed"));
     } finally {
       setIsCreating(false);
       setGlobalLoading(false);

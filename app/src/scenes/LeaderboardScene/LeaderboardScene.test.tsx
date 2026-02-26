@@ -11,7 +11,7 @@ jest.mock('../../services/firestore/firestoreServices', () => ({
 }));
 
 jest.mock('../../services/teamSelectionServices', () => ({
-  getAvailableTeams: jest.fn(),
+  getAvailableTeamIds: jest.fn(),
 }));
 
 jest.mock('../../services/leaderboardServices', () => ({
@@ -56,7 +56,7 @@ jest.mock('../../components/LoadingOverlay', () => ({
 const mockFetchLeaderboardData = require('../../services/firestore/firestoreServices').fetchLeaderboardData;
 const mockGetSession = require('../../services/firestore/firestoreServices').getSession;
 const mockGetCardsBySessionId = require('../../services/firestore/firestoreServices').getCardsBySessionId;
-const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeams;
+const mockGetAvailableTeams = require('../../services/teamSelectionServices').getAvailableTeamIds;
 const mockExportToPDF = require('../../services/leaderboardServices').exportToPDF;
 const mockExportToDOC = require('../../services/leaderboardServices').exportToDOC;
 
@@ -372,7 +372,7 @@ describe('LeaderboardScene', () => {
         expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument();
       });
 
-      // Verify that getAvailableTeams was called with correct number of teams
+      // Verify that getAvailableTeamIds was called with correct number of teams
       expect(mockGetAvailableTeams).toHaveBeenCalledWith(2);
 
       // Switch to teams tab to trigger team metrics display

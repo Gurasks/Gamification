@@ -164,5 +164,104 @@
     "passwordsDoNotMatch": "Passwords do not match",
     "meetAllRequirements": "Password must meet all minimum requirements",
     "validAndConfirmed": "Valid and confirmed password!"
+  },
+  "creation": {
+    "title": "Create New Session",
+    "subtitle": "Set up a new session for your team",
+    "cardTitle": "New Collaborative Requirements Session",
+    "cardDescription": "Configure your session details",
+    "sessionName": "Session Name",
+    "sessionNamePlaceholder": "Ex: Sprint 15 - Story Refinement",
+    "sessionDescription": "Session Description",
+    "descriptionPlaceholder": "Describe the purpose of this session, which stories will be refined, acceptance criteria, etc.",
+    "descriptionOptional": "Optional: This description will help participants",
+    "protectWithPassword": "Protect session with password",
+    "sessionPassword": "Session Password",
+    "passwordPlaceholder": "Enter a password for the session",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Type the password again",
+    "passwordMinLengthHint": "Password must be at least 4 characters",
+    "passwordMinLength": "Password must be at least 4 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "createButton": "Create Session",
+     "errors": {
+      "nameRequired": "Session name is required",
+      "nameTooLong": "Session name must be at most 100 characters",
+      "descriptionTooLong": "Description must be at most {{max}} characters",
+      "userNotAuthenticated": "User not authenticated",
+      "createFailed": "Error creating session. Please try again."
+    },
+    "loading": {
+      "creating": "Creating your session...",
+      "configuring": "Configuring session...",
+      "saving": "Saving data..."
+    },
+    "success": {
+      "sessionCreated": "Session created successfully!"
+    }
+  },
+  "teamSelection": {
+    "title": "Team Configuration",
+    "subtitle": "Organize participants and configure teams for the session",
+    "ownerStatus": "You are the organizer of this session",
+    "memberStatus": "Waiting for organizer configuration",
+    "exitButton": "Leave Room",
+    "numberOfTeams": "Number of Teams",
+    "numberHint": "Enter a number between 2 and 10",
+    "teams": "teams",
+    "participantsList": "Participants List ({{count}})",
+    "organizer": "Organizer",
+    "you": "You",
+    "startSession": "Start Session",
+    "ownerHint": "Configure teams and start when ready",
+    "memberHint": "Waiting for the organizer to start the session",
+    "loading": {
+      "auth": "Loading authentication...",
+      "session": "Loading session..."
+    },
+    "unauthorized": {
+      "title": "Unauthorized Access",
+      "message": "You need to be logged in to access this page."
+    },
+    "methods": {
+      "title": "Team Selection Method",
+      "helpTooltip": "Learn about team selection methods",
+      "helpText": "Choose how participants will be divided into teams for this session",
+      "selected": "Selected",
+      "random": "Random Assignment",
+      "randomDesc": "Participants are randomly assigned to teams",
+      "chooseTeam": "Choose Your Team",
+      "chooseTeamDesc": "Participants can select which team to join",
+      "ownerChooses": "Owner Assigns Teams",
+      "ownerChoosesDesc": "Session owner manually assigns participants to teams"
+    },
+    "unauthenticated": "Error: User not authenticated",
+    "waitingOwner": "Waiting for the session owner to assign your team...",
+    "selectYourTeam": "Select your team",
+    "yourTeamIs": "Your team is",
+    "assigningRandom": "Assigning you to a random team..."
+  },
+  "share": {
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "defaultTitle": "Join my session",
+    "shareText": "Join my session with code: {{code}}",
+    "buttonAriaLabel": "Share session link"
+  },
+  "collapsible": {
+    "sessionDescription": "Session Description",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "ownerAssignment": {
+    "title": "Team Assignment",
+    "participants": "Participants",
+    "currentTeam": "Current Team",
+    "unassigned": "Unassigned",
+    "assigning": "Assigning to team...",
+    "anonymous": "Anonymous"
+  },
+  "team": {
+    "team": "Team"
   }
 }

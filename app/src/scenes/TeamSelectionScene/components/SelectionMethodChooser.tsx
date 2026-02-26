@@ -1,6 +1,7 @@
 import React from 'react';
+import { Shuffle, Users, UserCog, HelpCircle } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 import type { SelectionMethod } from '../../../types/teamSelection';
-
 
 interface SelectionMethodChooserProps {
   currentMethod: SelectionMethod;
@@ -13,42 +14,98 @@ const SelectionMethodChooser: React.FC<SelectionMethodChooserProps> = ({
   onMethodChange,
   isOwner,
 }) => {
+  const { t } = useLanguage();
+
+  const methods = [
+    {
+      value: 'RANDOM' as SelectionMethod,
+      icon: Shuffle,
+      label: t('teamSelection.methods.random'),
+      description: t('teamSelection.methods.randomDesc'),
+      alwaysShow: true,
+    },
+    {
+      value: 'CHOOSE_YOUR_TEAM' as SelectionMethod,
+      icon: Users,
+      label: t('teamSelection.methods.chooseTeam'),
+      description: t('teamSelection.methods.chooseTeamDesc'),
+      alwaysShow: true,
+    },
+    {
+      value: 'OWNER_CHOOSES' as SelectionMethod,
+      icon: UserCog,
+      label: t('teamSelection.methods.ownerChooses'),
+      description: t('teamSelection.methods.ownerChoosesDesc'),
+      alwaysShow: false,
+      requiresOwner: true,
+    },
+  ];
+
+  const visibleMethods = methods.filter(
+    method => method.alwaysShow || (method.requiresOwner && isOwner)
+  );
+
   return (
     <div className="space-y-4 p-4 bg-white rounded-lg shadow">
-      <h3 className="text-lg font-semibold">Método de seleção de times</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-gray-800">
+          {t('teamSelection.methods.title')}
+        </h3>
+        <div
+          className="relative group"
+          aria-label={t('teamSelection.methods.helpTooltip')}
+        >
+          <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+          <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+            {t('teamSelection.methods.helpText')}
+          </div>
+        </div>
+      </div>
 
-      <div className="space-y-2">
-        <label className="flex items-center space-x-2">
-          <input
-            type="radio"
-            checked={currentMethod === 'RANDOM'}
-            onChange={() => onMethodChange('RANDOM')}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-          />
-          <span>Atribuição aleatória</span>
-        </label>
-
-        <label className="flex items-center space-x-2">
-          <input
-            type="radio"
-            checked={currentMethod === 'CHOOSE_YOUR_TEAM'}
-            onChange={() => onMethodChange('CHOOSE_YOUR_TEAM')}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-          />
-          <span>Participantes escolhem o time</span>
-        </label>
-
-        {isOwner && (
-          <label className="flex items-center space-x-2">
+      <div className="space-y-3" role="radiogroup" aria-labelledby="selection-method-title">
+        {visibleMethods.map(({ value, icon: Icon, label, description }) => (
+          <label
+            key={value}
+            className={`flex items-start p-3 space-x-3 rounded-lg border-2 transition-all cursor-pointer ${currentMethod === value
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              }`}
+          >
             <input
               type="radio"
-              checked={currentMethod === 'OWNER_CHOOSES'}
-              onChange={() => onMethodChange('OWNER_CHOOSES')}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+              name="selectionMethod"
+              value={value}
+              checked={currentMethod === value}
+              onChange={() => onMethodChange(value)}
+              className="sr-only" // Screen reader only - visual styling handled by parent
+              aria-describedby={`${value.toLowerCase()}-desc`}
             />
-            <span>Atribua os times</span>
+            <div className="flex-shrink-0 mt-0.5">
+              <Icon
+                className={`w-5 h-5 ${currentMethod === value ? 'text-blue-500' : 'text-gray-400'
+                  }`}
+                aria-hidden="true"
+              />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-right gap-2">
+                <span
+                  className={`font-medium ${currentMethod === value ? 'text-blue-700' : 'text-gray-700'
+                    }`}
+                >
+                  {label}
+                </span>
+                <span
+                  id={`${value.toLowerCase()}-desc`}
+                  className="text-sm text-gray-500 mt-1"
+                >
+                  - {description}
+                </span>
+              </div>
+
+            </div>
           </label>
-        )}
+        ))}
       </div>
     </div>
   );

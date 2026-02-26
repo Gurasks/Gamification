@@ -2,12 +2,12 @@ import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import type { Card, Session, UserData } from "../types/global";
-import { getAvailableTeams } from "../services/teamSelectionServices";
+import { getAvailableTeamIds } from "../services/teamSelectionServices";
 import { User } from "firebase/auth";
 
 export const createUnsubscribeSession = (
   sessionId: string,
-  setSession: (session: Session) => void
+  setSession: (session: Session) => void,
 ) => {
   const sessionRef = doc(db, "sessions", sessionId);
 
@@ -23,11 +23,11 @@ export const createUnsubscribeSession = (
 
 export const createUnsubscribeCards = (
   sessionId: string,
-  setCards: (arg0: Card[]) => void
+  setCards: (arg0: Card[]) => void,
 ) => {
   const cardsQuery = query(
     collection(db, "cards"),
-    where("sessionId", "==", sessionId)
+    where("sessionId", "==", sessionId),
   );
   const unsubscribeCards = onSnapshot(cardsQuery, (snapshot) => {
     const cards = snapshot.docs.map((doc) => ({
@@ -49,11 +49,11 @@ export const createUnsubscribeMembers = (
   setNumOfTeams: (arg0: number) => void,
   setOwner: (arg0: string) => void,
   setMembers: (arg0: UserData[]) => void,
-  navigate: ReturnType<typeof useNavigate>
+  navigate: ReturnType<typeof useNavigate>,
 ) => {
   const sessionQuery = query(
     collection(db, "sessions"),
-    where("id", "==", sessionId)
+    where("id", "==", sessionId),
   );
   const unsubscribeMembers = onSnapshot(sessionQuery, (snapshot) => {
     const sessionDataArray = snapshot.docs.map((doc) => ({
@@ -70,7 +70,7 @@ export const createUnsubscribeMembers = (
           navigate("/");
         }
       }
-      setAvailableTeams(getAvailableTeams(sessionData.numOfTeams));
+      setAvailableTeams(getAvailableTeamIds(sessionData.numOfTeams));
       setIsOwner(sessionData.owner === user.uid);
       setMembers(sessionData.members);
       setNumOfTeams(sessionData.numOfTeams);
@@ -86,7 +86,7 @@ export const createUnsubscribeSyncTimer = (
   timerId: string,
   setTimeLeft: (time: number) => void,
   setIsRunning: (running: boolean) => void,
-  setEndTime: (date: Date | null) => void
+  setEndTime: (date: Date | null) => void,
 ) => {
   const timerRef = doc(db, "timers", timerId);
 
@@ -100,7 +100,7 @@ export const createUnsubscribeSyncTimer = (
       if (startTime && isRunning) {
         const now = new Date();
         const elapsed = Math.floor(
-          (now.getTime() - startTime.getTime()) / 1000
+          (now.getTime() - startTime.getTime()) / 1000,
         );
         const remaining = Math.max(0, duration - elapsed);
 

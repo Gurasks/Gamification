@@ -163,5 +163,104 @@
     "passwordsDoNotMatch": "Senhas não coincidem",
     "meetAllRequirements": "A senha precisa atender a todos os requisitos mínimos",
     "validAndConfirmed": "Senha válida e confirmada!"
+  },
+  "creation": {
+    "title": "Criar Nova Sessão",
+    "subtitle": "Configure uma nova sessão para sua equipe",
+    "cardTitle": "Nova Sessão de levantamento de requisitos",
+    "cardDescription": "Configure os detalhes da sua sessão",
+    "sessionName": "Nome da Sessão",
+    "sessionNamePlaceholder": "Ex: Sprint 15 - Refinamento de Histórias",
+    "sessionDescription": "Descrição da Sessão",
+    "descriptionPlaceholder": "Descreva o objetivo desta sessão, quais histórias serão refinadas, critérios de aceitação, etc.",
+    "descriptionOptional": "Opcional: Esta descrição ajudará os participantes",
+    "protectWithPassword": "Proteger sessão com senha",
+    "sessionPassword": "Senha da Sessão",
+    "passwordPlaceholder": "Digite uma senha para a sessão",
+    "confirmPassword": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Digite a senha novamente",
+    "passwordMinLengthHint": "A senha deve ter pelo menos 4 caracteres",
+    "passwordMinLength": "A senha deve ter pelo menos 4 caracteres",
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "createButton": "Criar Sessão",
+     "errors": {
+      "nameRequired": "Nome da sessão é obrigatório",
+      "nameTooLong": "Nome da sessão deve ter no máximo 100 caracteres",
+      "descriptionTooLong": "Descrição deve ter no máximo {{max}} caracteres",
+      "userNotAuthenticated": "Usuário não autenticado",
+      "createFailed": "Erro ao criar sessão. Tente novamente."
+    },
+    "loading": {
+      "creating": "Criando sua sessão...",
+      "configuring": "Configurando sessão...",
+      "saving": "Salvando dados..."
+    },
+    "success": {
+      "sessionCreated": "Sessão criada com sucesso!"
+    }
+  },
+  "teamSelection": {
+    "title": "Configuração dos Times",
+    "subtitle": "Organize os participantes e configure os times para a sessão",
+    "ownerStatus": "Você é o organizador desta sessão",
+    "memberStatus": "Aguardando configuração do organizador",
+    "exitButton": "Sair da Sala",
+    "numberOfTeams": "Quantidade de Times",
+    "numberHint": "Digite um número entre 2 e 10",
+    "teams": "times",
+    "participantsList": "Lista de Participantes ({{count}})",
+    "organizer": "Organizador",
+    "you": "Você",
+    "startSession": "Iniciar Sessão",
+    "ownerHint": "Configure os times e inicie quando estiver pronto",
+    "memberHint": "Aguardando o organizador iniciar a sessão",
+    "loading": {
+      "auth": "Carregando autenticação...",
+      "session": "Carregando sessão..."
+    },
+    "unauthorized": {
+      "title": "Acesso não autorizado",
+      "message": "Você precisa estar logado para acessar esta página."
+    },
+    "methods": {
+      "title": "Método de seleção de times",
+      "helpTooltip": "Saiba mais sobre os métodos de seleção",
+      "helpText": "Escolha como os participantes serão divididos em times para esta sessão",
+      "selected": "Selecionado",
+      "random": "Atribuição aleatória",
+      "randomDesc": "Participantes são atribuídos aleatoriamente aos times",
+      "chooseTeam": "Participantes escolhem o time",
+      "chooseTeamDesc": "Participantes podem selecionar qual time participar",
+      "ownerChooses": "Organizador atribui os times",
+      "ownerChoosesDesc": "Organizador da sessão atribui manualmente os participantes aos times"
+    },
+    "unauthenticated": "Erro: Usuário não autenticado",
+    "waitingOwner": "Esperando o dono da sessão atribuir seu time...",
+    "selectYourTeam": "Selecione o seu time",
+    "yourTeamIs": "Seu time é o",
+    "assigningRandom": "Atribuindo você a um time aleatório..."
+  },
+   "share": {
+    "copyLink": "Copiar link",
+    "copied": "Copiado!",
+    "defaultTitle": "Junte-se a minha sessão",
+    "shareText": "Junte-se a minha sessão com o código: {{code}}",
+    "buttonAriaLabel": "Compartilhar link da sessão"
+  },
+  "collapsible": {
+    "sessionDescription": "Descrição da sessão",
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "ownerAssignment": {
+    "title": "Atribuição de Times",
+    "participants": "Participantes",
+    "currentTeam": "Time Atual",
+    "unassigned": "Não atribuído",
+    "assigning": "Atribuindo ao time...",
+    "anonymous": "Anônimo"
+  },
+  "team": {
+    "team": "Time"
   }
 }

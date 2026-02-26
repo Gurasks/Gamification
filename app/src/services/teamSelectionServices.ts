@@ -1,7 +1,42 @@
-export const getAvailableTeams = (numOfTeams: number) => {
-  const newAvailableTeams = [];
+interface TeamNamingConfig {
+  startFrom?: number;
+}
+
+const DEFAULT_CONFIG: TeamNamingConfig = {
+  startFrom: 65, // 'A' in ASCII
+};
+
+export const getAvailableTeamIds = (
+  numOfTeams: number,
+  config: TeamNamingConfig = {},
+): string[] => {
+  const { startFrom = 65 } = {
+    ...DEFAULT_CONFIG,
+    ...config,
+  };
+
+  const teamIds = [];
   for (let i = 0; i < numOfTeams; i++) {
-    newAvailableTeams.push(`Time ${String.fromCodePoint(65 + i)}`);
+    teamIds.push(String.fromCodePoint(startFrom + i));
   }
-  return newAvailableTeams;
+  return teamIds;
+};
+
+export const getLocalizedTeamName = (
+  teamId: string,
+  t: (key: string) => string,
+): string => {
+  const prefix = t("team.team");
+  return `${prefix} ${teamId}`;
+};
+
+export const getLocalizedTeams = (
+  teamIds: string[],
+  t: (key: string) => string,
+): string[] => {
+  return teamIds.map((teamId) => getLocalizedTeamName(teamId, t));
+};
+
+export const extractTeamId = (localizedName: string): string => {
+  return localizedName.split(" ").pop() || localizedName;
 };

@@ -21,7 +21,7 @@ import { SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { extractUserData } from "../globalServices";
-import { getAvailableTeams } from "../teamSelectionServices";
+import { getAvailableTeamIds } from "../teamSelectionServices";
 
 const sessionCache = new Map<string, Session>();
 
@@ -55,7 +55,7 @@ const validateAndCleanSessionData = (session: Session): Session => {
 const initializeTimers = async (
   sessionId: string,
   teamTimers: Record<string, string>,
-  initialDuration: number
+  initialDuration: number,
 ) => {
   await Promise.all(
     Object.values(teamTimers).map((timerId) =>
@@ -66,15 +66,15 @@ const initializeTimers = async (
         duration: initialDuration,
         isRunning: true,
         lastUpdated: serverTimestamp(),
-      })
-    )
+      }),
+    ),
   );
 };
 
 export const createSessionInFirestore = async (
   sessionId: string,
   sessionData: SessionCreationData,
-  user: User
+  user: User,
 ): Promise<string> => {
   try {
     if (!sessionData.name?.trim()) {
@@ -116,7 +116,7 @@ export const createSessionInFirestore = async (
 
 export const loadSessionWithId = async (
   sessionId: string,
-  setSession: (session: Session) => void
+  setSession: (session: Session) => void,
 ) => {
   const sessionDoc = await getDoc(doc(db, "sessions", sessionId));
   if (sessionDoc.exists()) {
@@ -130,7 +130,7 @@ export const loadSessionWithId = async (
 };
 
 export const getSession = async (
-  sessionId: string
+  sessionId: string,
 ): Promise<Session | null> => {
   if (sessionCache.has(sessionId)) {
     return sessionCache.get(sessionId)!;
@@ -177,7 +177,7 @@ export const endSession = async (sessionId: string, user: User) => {
 
 export const updateDocumentListMembers = async (
   sessionId: string,
-  user: User
+  user: User,
 ) => {
   const docRef = doc(db, "sessions", sessionId);
   const sessionDoc = await getDoc(docRef);
@@ -193,7 +193,7 @@ export const updateDocumentListMembers = async (
     const userData = extractUserData(user);
 
     const memberExists = membersList.find(
-      (member: UserData) => member.uid === user.uid
+      (member: UserData) => member.uid === user.uid,
     );
 
     if (!memberExists && !sessionData.hasStarted) {
@@ -220,7 +220,7 @@ export const updateDocumentListMembers = async (
 
 export const removeUserFromSession = async (
   sessionId: string,
-  userId: string
+  userId: string,
 ) => {
   try {
     const sessionRef = doc(db, "sessions", sessionId);
@@ -231,7 +231,7 @@ export const removeUserFromSession = async (
       let membersList = sessionData.members || ([] as UserData[]);
 
       const updatedMembers = membersList.filter(
-        (member: UserData) => member.uid !== userId
+        (member: UserData) => member.uid !== userId,
       );
 
       await updateDoc(sessionRef, {
@@ -256,7 +256,7 @@ export const deleteSession = async (sessionId: string) => {
 
 export const updateSelectionMethodToSessionInFirebase = async (
   sessionId: string,
-  method: SelectionMethod
+  method: SelectionMethod,
 ) => {
   if (!sessionId) return;
   await updateDoc(doc(db, "sessions", sessionId), {
@@ -270,7 +270,7 @@ export const updateNumOfTeamsToSessionInFirebase = async (
   setAvailableTeams: (teams: string[]) => void,
   e: {
     target: { value: SetStateAction<string> };
-  }
+  },
 ) => {
   const newNumOfTeams = Number.parseInt(e.target.value as string);
   if (!sessionId) return;
@@ -278,14 +278,15 @@ export const updateNumOfTeamsToSessionInFirebase = async (
     numOfTeams: newNumOfTeams,
     updatedAt: serverTimestamp(),
   });
-  setAvailableTeams(getAvailableTeams(newNumOfTeams));
+
+  setAvailableTeams(getAvailableTeamIds(newNumOfTeams));
 };
 
 export const startSessionInFirebase = async (
   session: DocumentData | undefined,
   sessionId: string | undefined,
   user: User,
-  navigate: ReturnType<typeof useNavigate>
+  navigate: ReturnType<typeof useNavigate>,
 ) => {
   if (
     sessionId &&
@@ -294,11 +295,14 @@ export const startSessionInFirebase = async (
   ) {
     const teamName = session.teams[user.uid];
     if (teamName) {
-      const availableTeams = getAvailableTeams(session.numOfTeams);
-      const teamTimers = availableTeams.reduce((acc, team) => {
-        acc[team] = uuidv4();
-        return acc;
-      }, {} as Record<string, string>);
+      const availableTeams = getAvailableTeamIds(session.numOfTeams);
+      const teamTimers = availableTeams.reduce(
+        (acc, team) => {
+          acc[team] = uuidv4();
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
 
       await updateDoc(doc(db, "sessions", sessionId), {
         hasStarted: true,
@@ -320,7 +324,7 @@ export const startSessionInFirebase = async (
 };
 
 export const getSessionTeamTimers = async (
-  sessionId: string
+  sessionId: string,
 ): Promise<Record<string, TeamTimer>> => {
   try {
     const session = await getSession(sessionId);
@@ -344,11 +348,11 @@ export const getSessionTeamTimers = async (
         };
 
         return [teamName, timer] as const;
-      })
+      }),
     );
 
     const validEntries = entries.filter(
-      (entry): entry is readonly [string, TeamTimer] => entry !== null
+      (entry): entry is readonly [string, TeamTimer] => entry !== null,
     );
 
     return Object.fromEntries(validEntries);
