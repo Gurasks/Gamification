@@ -1,6 +1,8 @@
 import { Button } from '@/components/Button';
 import { Trophy, Users, TrendingUp, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import React from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { getLocalizedTeamName } from '@/services/teamSelectionServices';
 
 interface TeamStats {
   name: string;
@@ -22,6 +24,7 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
   showScoreboard,
   setShowScoreboard
 }) => {
+  const { t } = useLanguage();
   const sortedTeams = [...teams].sort((a, b) => b.cardCount - a.cardCount);
   const leadingTeam = sortedTeams[0];
 
@@ -35,7 +38,7 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Placar dos times</h3>
+            <h3 className="text-lg font-semibold text-gray-800">{t('scoreboard.title')}</h3>
           </div>
         </div>
         <Button
@@ -47,19 +50,19 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
           {showScoreboard ? (
             <>
               <ChevronUp className="w-4 h-4" />
-              Ocultar placar
+              {t('scoreboard.hide')}
             </>
           ) : (
             <>
               <ChevronDown className="w-4 h-4" />
-              Mostrar placar
+              {t('scoreboard.show')}
             </>
           )}
         </Button>
       </div>
       {showScoreboard && (
         <>
-          {/* Cards dos times */}
+          {/* Team cards */}
           <div className="space-y-4">
             {sortedTeams.map((team, index) => {
               const percentage = getPercentage(team.cardCount);
@@ -76,7 +79,7 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      {/* Posição no ranking */}
+                      {/* Ranking position */}
                       <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full
                       ${rank === 1 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
                           rank === 2 ? 'bg-zinc-100 text-zinc-700 border border-grey-300' :
@@ -86,27 +89,27 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
                         <span className="text-sm font-bold">{rank}</span>
                       </div>
 
-                      {/* Nome do time */}
+                      {/* Team name */}
                       <div className="flex items-center gap-2">
                         <Users className={`w-4 h-4 ${isCurrentTeam ? 'text-blue-600' : 'text-gray-500'}`} />
                         <h4 className={`font-semibold ${isCurrentTeam ? 'text-blue-800' : 'text-gray-700'}`}>
-                          {team.name}
+                          {getLocalizedTeamName(team.name, t)}
                           {isCurrentTeam && (
                             <span className="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
-                              Seu time
+                              {t('team.yourTeam')}
                             </span>
                           )}
                         </h4>
                       </div>
                     </div>
 
-                    {/* Contagem de cards */}
+                    {/* Card count */}
                     <div className="text-right">
                       <div className="text-2xl font-bold text-gray-800">
                         {team.cardCount}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {percentage}% das sugestões
+                        {percentage}% {t('scoreboard.ofSuggestions')}
                       </div>
                     </div>
                   </div>
@@ -115,26 +118,26 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
             })}
           </div>
 
-          {/* Estatísticas resumidas */}
+          {/* Summary statistics */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-semibold text-gray-700">Líder</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('scoreboard.leader')}</span>
                 </div>
                 <div className="text-lg font-bold text-gray-800">
-                  {leadingTeam?.name || 'N/A'}
+                  {leadingTeam ? getLocalizedTeamName(leadingTeam.name, t) : t('common.na')}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {leadingTeam?.cardCount || 0} cards
+                  {leadingTeam?.cardCount || 0} {t('scoreboard.cards')}
                 </div>
               </div>
 
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <BarChart3 className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-gray-700">Média</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('scoreboard.average')}</span>
                 </div>
                 <div className="text-lg font-bold text-gray-800">
                   {teams.length > 0
@@ -143,13 +146,13 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
                   }
                 </div>
                 <div className="text-xs text-gray-500">
-                  por time
+                  {t('scoreboard.perTeam')}
                 </div>
               </div>
 
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-sm font-semibold text-gray-700 mb-1">
-                  Seu time
+                  {t('team.yourTeam')}
                 </div>
                 <div className="text-lg font-bold text-gray-800">
                   {teams.find(t => t.name === currentTeam)?.cardCount || 0}
@@ -161,19 +164,19 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
 
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-sm font-semibold text-gray-700 mb-1">
-                  Total
+                  {t('scoreboard.total')}
                 </div>
                 <div className="text-lg font-bold text-gray-800">
                   {totalCards}
                 </div>
                 <div className="text-xs text-gray-500">
-                  sugestões
+                  {t('board.suggestions')}
                 </div>
               </div>
             </div>
           </div>
-        </>)
-      }
+        </>
+      )}
     </div>
   );
 };

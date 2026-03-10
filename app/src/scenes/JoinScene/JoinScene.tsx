@@ -91,7 +91,7 @@ const JoinScene: React.FC = () => {
         sessionStorage.removeItem('pending_session_code');
         navigate(`/team-selection/${result.sessionId}`);
       } else {
-        console.log('Auto-join falhou ou sessão não encontrada');
+        console.log('Auto-join failed or session not found');
       }
     } catch (err) {
       console.error('Erro no auto-join:', err);
@@ -288,7 +288,7 @@ const JoinScene: React.FC = () => {
                   variant="secondary"
                   className="flex-1"
                 >
-                  {requiresPassword ? t('join.backToCode') : t('common.back')}
+                  {requiresPassword ? t('join.backToCode') : t('common.actions.back')}
                 </Button>
                 <Button
                   onClick={handleJoinSession}

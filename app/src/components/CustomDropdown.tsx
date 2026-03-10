@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface DropdownOption {
   value: string;
@@ -23,20 +24,25 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   value,
   onChange,
   options,
-  placeholder = "Selecione...",
+  placeholder,
   disabled = false,
   className = "",
   label,
   id = "custom-dropdown",
 }) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  const defaultPlaceholder = t('dropdown.select') || "Selecione...";
+  const finalPlaceholder = placeholder || defaultPlaceholder;
 
-  // Fechar dropdown ao clicar fora
+  const validOptions = Array.isArray(options) ? options : [];
+
+  const selectedOption = validOptions.find(opt => opt && opt.value === value);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -48,7 +54,6 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fechar dropdown ao pressionar Escape
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -62,6 +67,8 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (validOptions.length === 0) return;
+
     if (!isOpen) {
       if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
         event.preventDefault();
@@ -73,20 +80,20 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         case 'ArrowDown':
           event.preventDefault();
           setFocusedIndex(prev =>
-            prev < options.length - 1 ? prev + 1 : 0
+            prev < validOptions.length - 1 ? prev + 1 : 0
           );
           break;
         case 'ArrowUp':
           event.preventDefault();
           setFocusedIndex(prev =>
-            prev > 0 ? prev - 1 : options.length - 1
+            prev > 0 ? prev - 1 : validOptions.length - 1
           );
           break;
         case 'Enter':
         case ' ':
           event.preventDefault();
-          if (focusedIndex >= 0 && focusedIndex < options.length) {
-            onChange(options[focusedIndex].value);
+          if (focusedIndex >= 0 && focusedIndex < validOptions.length) {
+            onChange(validOptions[focusedIndex].value);
             setIsOpen(false);
             buttonRef.current?.focus();
           }
@@ -105,7 +112,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           break;
         case 'End':
           event.preventDefault();
-          setFocusedIndex(options.length - 1);
+          setFocusedIndex(validOptions.length - 1);
           break;
       }
     }
@@ -139,32 +146,32 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         aria-expanded={isOpen}
         aria-controls={`${id}-listbox`}
         aria-haspopup="listbox"
-        aria-label={label || placeholder}
+        aria-label={label || finalPlaceholder}
         aria-activedescendant={isOpen && focusedIndex >= 0 ? `${id}-option-${focusedIndex}` : undefined}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
-        disabled={disabled}
+        disabled={disabled || validOptions.length === 0}
         className={`w-full text-left text-sm p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between ${selectedOption?.color || 'text-gray-700'
           }`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 truncate">
           {selectedOption?.icon}
-          <span>{selectedOption?.label || placeholder}</span>
+          <span className="truncate">{selectedOption?.label || finalPlaceholder}</span>
         </div>
         <ChevronDown
-          className={`w-4 h-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
+          className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
           aria-hidden="true"
         />
       </button>
 
-      {isOpen && (
+      {isOpen && validOptions.length > 0 && (
         <div
           id={`${id}-listbox`}
           role="listbox"
           aria-labelledby={id}
           className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto"
         >
-          {options.map((option, index) => (
+          {validOptions.map((option, index) => (
             <button
               key={option.value}
               id={`${id}-option-${index}`}
@@ -183,8 +190,8 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 } ${option.color || ''} ${focusedIndex === index ? 'bg-gray-100' : ''
                 }`}
             >
-              {option.icon}
-              <span>{option.label}</span>
+              {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
+              <span className="truncate">{option.label}</span>
             </button>
           ))}
         </div>

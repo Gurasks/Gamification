@@ -1,22 +1,31 @@
 import React from 'react';
 import { ArrowUpDown, MessageSquare, Star, Clock, Pencil } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export type SortOption =
-  | 'newest'      // Mais recentes primeiro
-  | 'oldest'      // Mais antigos primeiro
-  | 'highest'     // Maior rating primeiro
-  | 'lowest'      // Menor rating primeiro
-  | 'mostComments'// Mais comentários primeiro
-  | 'leastComments' // Menos comentários primeiro
-  | 'author';      // Ordenar por autor alfabeticamente
+  | 'newest'      // Newest first
+  | 'oldest'      // Oldest first
+  | 'highest'     // Highest rating first
+  | 'lowest'      // Lowest rating first
+  | 'mostComments'// Most comments first
+  | 'leastComments' // Least comments first
+  | 'author';      // Sort by author alphabetically
 
 interface CardSortingSelectorProps {
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   hasAuthorOption?: boolean;
+  showRatedOptions?: boolean;
 }
 
-const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSortChange, hasAuthorOption = true }) => {
+const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({
+  sortBy,
+  onSortChange,
+  hasAuthorOption = true,
+  showRatedOptions = true,
+}) => {
+  const { t } = useLanguage();
+
   const sortOptions: Array<{
     value: SortOption;
     label: string;
@@ -25,49 +34,53 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSor
   }> = [
       {
         value: 'newest',
-        label: 'Mais Recentes',
+        label: t('sorting.options.newest'),
         icon: <Clock className="w-4 h-4" />,
-        description: 'Ordena pelos cards mais recentes primeiro'
+        description: t('sorting.descriptions.newest')
       },
       {
         value: 'oldest',
-        label: 'Mais Antigos',
+        label: t('sorting.options.oldest'),
         icon: <Clock className="w-4 h-4" />,
-        description: 'Ordena pelos cards mais antigos primeiro'
-      },
-      {
-        value: 'highest',
-        label: 'Maior Avaliação',
-        icon: <Star className="w-4 h-4" />,
-        description: 'Ordena pelos cards com melhor avaliação primeiro'
-      },
-      {
-        value: 'lowest',
-        label: 'Menor Avaliação',
-        icon: <Star className="w-4 h-4" />,
-        description: 'Ordena pelos cards com pior avaliação primeiro'
+        description: t('sorting.descriptions.oldest')
       },
       {
         value: 'mostComments',
-        label: 'Mais Comentários',
+        label: t('sorting.options.mostComments'),
         icon: <MessageSquare className="w-4 h-4" />,
-        description: 'Ordena pelos cards com mais comentários primeiro'
+        description: t('sorting.descriptions.mostComments')
       },
       {
         value: 'leastComments',
-        label: 'Menos Comentários',
+        label: t('sorting.options.leastComments'),
         icon: <MessageSquare className="w-4 h-4" />,
-        description: 'Ordena pelos cards com menos comentários primeiro'
+        description: t('sorting.descriptions.leastComments')
       }
     ];
+
+  if (showRatedOptions) {
+    sortOptions.push({
+      value: 'highest',
+      label: t('sorting.options.highest'),
+      icon: <Star className="w-4 h-4" />,
+      description: t('sorting.descriptions.highest')
+    },
+      {
+        value: 'lowest',
+        label: t('sorting.options.lowest'),
+        icon: <Star className="w-4 h-4" />,
+        description: t('sorting.descriptions.lowest')
+      }
+    )
+  }
 
   if (hasAuthorOption) {
     sortOptions.push(
       {
         value: 'author',
-        label: 'Por Autor',
+        label: t('sorting.options.author'),
         icon: <Pencil className="w-4 h-4" />,
-        description: 'Ordena pelos cards por autor alfabeticamente'
+        description: t('sorting.descriptions.author')
       });
   }
 
@@ -78,7 +91,7 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSor
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ArrowUpDown className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
+          <span className="text-sm font-medium text-gray-700">{t('sorting.sortBy')}:</span>
         </div>
 
         <div className="relative group">
@@ -102,7 +115,7 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSor
         </div>
       </div>
 
-      {/* Descrição da ordenação atual */}
+      {/* Current sort description */}
       {currentSort && (
         <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-md">
           {currentSort.icon}
@@ -110,7 +123,7 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({ sortBy, onSor
         </div>
       )}
 
-      {/* Botões de ordenação rápida*/}
+      {/* Quick sort buttons */}
       <div className="flex flex-wrap gap-1 justify-end">
         {sortOptions.map((option) => (
           <button

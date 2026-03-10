@@ -1,12 +1,23 @@
 import { calculateAverageRating } from "@/services/globalServices";
-import metadataService from "@/services/metadataOptionsService";
-import { Card, Session } from "@/types/global";
+import {
+  getCategoryOption,
+  getPriorityOption,
+  getRequirementTypeOption,
+} from "@/services/metadataOptionsService";
+import {
+  Card,
+  CategoryType,
+  PriorityLevel,
+  RequirementType,
+  Session,
+} from "@/types/global";
 import { TeamMetrics, UserStats } from "@/types/leaderboard";
 import { getStyledIcon, ExportIcons, getMetadataIconSVG } from "./exportIcons";
 import {
   calculateTotalScore,
   calculateUserGamificationPoints,
 } from "@/services/gamificationServices";
+import { t } from "i18next";
 
 const getPriorityColor = (priority: string): string => {
   const colors: Record<string, string> = {
@@ -49,7 +60,7 @@ const generateReportHeader = (session: Session): string => `
 const generateExecutiveSummary = (
   sortedData: UserStats[],
   teamMetrics: TeamMetrics[],
-  allCards: Card[]
+  allCards: Card[],
 ): string => `
   <div class="section executive-summary">
     <h2>
@@ -65,7 +76,7 @@ const generateExecutiveSummary = (
             .map(
               (user) => `
             <li>${user.userName} - ${user.totalScore || 0} pontos</li>
-          `
+          `,
             )
             .join("")}
         </ol>
@@ -78,7 +89,7 @@ const generateExecutiveSummary = (
             .map(
               (team) => `
             <li>${team.teamName} - ${team.totalScore || 0} pontos</li>
-          `
+          `,
             )
             .join("")}
         </ol>
@@ -89,22 +100,26 @@ const generateExecutiveSummary = (
           <li><strong>${
             ExportIcons.MESSAGE_SQUARE
           } Total de Comentários:</strong> ${sortedData.reduce(
-  (sum, user) => sum + user.totalComments,
-  0
-)}</li>
+            (sum, user) => sum + user.totalComments,
+            0,
+          )}</li>
           <li><strong>${ExportIcons.STAR} Avaliação Média:</strong> ${
-  sortedData.length > 0
-    ? (
-        sortedData.reduce((sum, user) => sum + user.averageRating, 0) /
-        sortedData.length
-      ).toFixed(1)
-    : 0
-}</li>
+            sortedData.length > 0
+              ? (
+                  sortedData.reduce(
+                    (sum, user) => sum + user.averageRating,
+                    0,
+                  ) / sortedData.length
+                ).toFixed(1)
+              : 0
+          }</li>
           <li><strong>${
             ExportIcons.GRAPH
           } Sugestões por Participante:</strong> ${
-  sortedData.length > 0 ? (allCards.length / sortedData.length).toFixed(1) : 0
-}</li>
+            sortedData.length > 0
+              ? (allCards.length / sortedData.length).toFixed(1)
+              : 0
+          }</li>
         </ul>
       </div>
     </div>
@@ -141,7 +156,7 @@ const generateTeamMetricsTable = (teamMetrics: TeamMetrics[]): string => `
             <td>${team.totalReplies}</td>
             <td class="rating">${team.averageRating}</td>
           </tr>
-        `
+        `,
           )
           .join("")}
       </tbody>
@@ -151,11 +166,11 @@ const generateTeamMetricsTable = (teamMetrics: TeamMetrics[]): string => `
 
 const generateGamificationData = (
   user: UserStats,
-  allCards: Card[]
+  allCards: Card[],
 ): string => {
   const gamificationPoints = calculateUserGamificationPoints(
     allCards,
-    user.userId
+    user.userId,
   );
   const totalScore = calculateTotalScore(gamificationPoints);
 
@@ -164,7 +179,7 @@ const generateGamificationData = (
       ? Math.round(
           (gamificationPoints.metadataVotes.agreeVotes /
             gamificationPoints.metadataVotes.totalVotes) *
-            100
+            100,
         )
       : 0;
 
@@ -175,8 +190,8 @@ const generateGamificationData = (
         <div class="gamification-item">
           <strong>${ExportIcons.TAG} Votos em Metadados:</strong>
           ${gamificationPoints.metadataVotes.agreeVotes} concordados / ${
-    gamificationPoints.metadataVotes.totalVotes
-  } totais
+            gamificationPoints.metadataVotes.totalVotes
+          } totais
           (${agreementRate}%)
         </div>
         <div class="gamification-item">
@@ -184,8 +199,8 @@ const generateGamificationData = (
           ${
             gamificationPoints.cardRatings.totalRatings
           } avaliações (média: ${gamificationPoints.cardRatings.averageRating.toFixed(
-    1
-  )})
+            1,
+          )})
         </div>
         <div class="gamification-item">
           <strong>${ExportIcons.MESSAGE_SQUARE} Comentários:</strong>
@@ -199,7 +214,7 @@ const generateGamificationData = (
 const generateUserRankingTable = (
   sortedData: UserStats[],
   session: Session,
-  allCards: Card[]
+  allCards: Card[],
 ): string => `
   <div class="section">
     <h2>${ExportIcons.USERS} Classificação Individual</h2>
@@ -231,7 +246,7 @@ const generateUserRankingTable = (
             <td>${user.totalCardsCreated}</td>
           </tr>
           ${generateGamificationData(user, allCards)}
-        `
+        `,
           )
           .join("")}
       </tbody>
@@ -246,37 +261,35 @@ const generateCardMetadataHTML = (card: Card): string => {
     type: "priority" | "requirementType" | "category",
     value: string,
     label: string,
-    color: string
+    color: string,
   ) => {
     const iconSVG = getMetadataIconSVG(type, value);
     const styledIcon = getStyledIcon(iconSVG, color, 14);
     metadataHTML += `<span class="metadata-badge ${type}-${value}">
       ${styledIcon} ${
-      type === "priority"
-        ? "Prioridade"
-        : type === "requirementType"
-        ? "Tipo"
-        : "Categoria"
-    }: ${label}
+        type === "priority"
+          ? "Prioridade"
+          : type === "requirementType"
+            ? "Tipo"
+            : "Categoria"
+      }: ${label}
     </span>`;
   };
 
   if (card.priority) {
-    const priorityOption = metadataService.getPriorityOption(card.priority);
+    const priorityOption = getPriorityOption(card.priority, t);
     if (priorityOption) {
       addMetadataBadge(
         "priority",
         card.priority,
         priorityOption.label,
-        getPriorityColor(card.priority)
+        getPriorityColor(card.priority),
       );
     }
   }
 
   if (card.requirementType) {
-    const requirementOption = metadataService.getRequirementTypeOption(
-      card.requirementType
-    );
+    const requirementOption = getRequirementTypeOption(card.requirementType, t);
     if (requirementOption) {
       const requirementColor =
         card.requirementType === "design" ? "#831843" : "#1e40af";
@@ -284,19 +297,19 @@ const generateCardMetadataHTML = (card: Card): string => {
         "requirementType",
         card.requirementType,
         requirementOption.label,
-        requirementColor
+        requirementColor,
       );
     }
   }
 
   if (card.category) {
-    const categoryOption = metadataService.getCategoryOption(card.category);
+    const categoryOption = getCategoryOption(card.category, t);
     if (categoryOption) {
       addMetadataBadge(
         "category",
         card.category,
         categoryOption.label,
-        getCategoryColor(card.category)
+        getCategoryColor(card.category),
       );
     }
   }
@@ -351,8 +364,8 @@ const getAgreementIcon = (agreementRate: number) => {
 const generateCardAnalysis = (allCards: Card[]): string => `
   <div class="section">
     <h2>${ExportIcons.LIGHTBULB} Análise Detalhada de Sugestões (${
-  allCards.length
-})</h2>
+      allCards.length
+    })</h2>
     <div class="cards-analysis">
       ${allCards
         .map(
@@ -373,8 +386,8 @@ const generateCardAnalysis = (allCards: Card[]): string => `
               </div>
               <div class="info-item">
                 <strong>${ExportIcons.CALENDAR} Data:</strong> ${new Date(
-            card.createdAt?.toDate() || Date.now()
-          ).toLocaleString("pt-BR")}
+                  card.createdAt?.toDate() || Date.now(),
+                ).toLocaleString("pt-BR")}
               </div>
               ${
                 card.ratings
@@ -382,7 +395,7 @@ const generateCardAnalysis = (allCards: Card[]): string => `
                     <strong>${
                       ExportIcons.STAR
                     } Avaliação Média:</strong> ${calculateAverageRating(
-                      card.ratings
+                      card.ratings,
                     ).toFixed(1)}
                     (${Object.keys(card.ratings).length} avaliações)
                   </div>`
@@ -399,8 +412,8 @@ const generateCardAnalysis = (allCards: Card[]): string => `
                 ? `
               <div class="comments-section">
                 <h4>${ExportIcons.MESSAGE_SQUARE} Comentários (${
-                    card.comments.length
-                  }):</h4>
+                  card.comments.length
+                }):</h4>
                 ${card.comments
                   .map(
                     (comment: any) => `
@@ -410,12 +423,12 @@ const generateCardAnalysis = (allCards: Card[]): string => `
                       <span class="comment-date">${
                         ExportIcons.CALENDAR
                       } ${new Date(comment.createdAt).toLocaleString(
-                      "pt-BR"
-                    )}</span>
+                        "pt-BR",
+                      )}</span>
                     </div>
                     <p class="comment-text">${comment.text}</p>
                   </div>
-                `
+                `,
                   )
                   .join("")}
               </div>
@@ -424,7 +437,7 @@ const generateCardAnalysis = (allCards: Card[]): string => `
             }
           </div>
         </div>
-      `
+      `,
         )
         .join("")}
     </div>
@@ -455,16 +468,16 @@ const generateMetadataDistribution = (allCards: Card[]): string => {
 
   const generateDistributionList = (
     counts: Record<string, number>,
-    type: "priority" | "requirementType" | "category"
+    type: "priority" | "requirementType" | "category",
   ) => {
     return Object.entries(counts)
       .map(([key, count]) => {
         const option =
           type === "priority"
-            ? metadataService.getPriorityOption(key as any)
+            ? getPriorityOption(key as PriorityLevel, t)
             : type === "requirementType"
-            ? metadataService.getRequirementTypeOption(key as any)
-            : metadataService.getCategoryOption(key as any);
+              ? getRequirementTypeOption(key as RequirementType, t)
+              : getCategoryOption(key as CategoryType, t);
 
         const icon = getMetadataIconSVG(type, key);
         const percentage = ((count / allCards.length) * 100).toFixed(1);
@@ -524,7 +537,7 @@ export const generateExportContent = (
   session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
-  allCards: Card[]
+  allCards: Card[],
 ): string => {
   const sections = [
     generateReportHeader(session),

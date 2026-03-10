@@ -6,8 +6,15 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import metadataService, { MetadataOption } from '@/services/metadataOptionsService';
-
+import { useLanguage } from '@/hooks/useLanguage';
+import {
+  getPriorityOptions,
+  getCategoryOptions,
+  getPriorityOption,
+  getCategoryOption,
+  metadataIcons
+} from '@/services/metadataOptionsService';
+import type { MetadataOption } from '@/services/metadataOptionsService';
 
 interface CardFiltersProps {
   priority: PriorityLevel[];
@@ -26,7 +33,10 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
   isExpanded = false,
   onToggleExpand,
 }) => {
+  const { t } = useLanguage();
 
+  const priorityOptions = getPriorityOptions(t);
+  const categoryOptions = getCategoryOptions(t);
 
   const togglePriority = (p: PriorityLevel) => {
     if (priority.includes(p)) {
@@ -60,7 +70,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
         >
           <Filter className="w-4 h-4" />
-          Filtros
+          {t('filters.title')}
           {hasFilters && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
               {priority.length + category.length}
@@ -79,29 +89,29 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
             className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-3 h-3" />
-            Limpar todos
+            {t('filters.clearAll')}
           </button>
         )}
       </div>
 
-      {/* Filtros expandidos */}
+      {/* Expanded filters */}
       {isExpanded && (
         <div className="space-y-6 pt-4 border-t border-gray-200">
-          {/* Filtro por Prioridade */}
+          {/* Priority filter */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              {metadataService.metadataIcons.priority}
+              {metadataIcons.priority}
               <div className="text-sm font-medium text-gray-700">
-                Prioridade
+                {t('filters.priority')}
               </div>
               {priority.length > 0 && (
                 <span className="text-xs text-gray-500">
-                  ({priority.length} selecionada{priority.length > 1 ? 's' : ''})
+                  ({priority.length} {priority.length === 1 ? t('filters.selected') : t('filters.selectedPlural')})
                 </span>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {metadataService.priorityOptions.map((option: MetadataOption<PriorityLevel>) => (
+              {priorityOptions.map((option: MetadataOption<PriorityLevel>) => (
                 <button
                   key={option.value}
                   type="button"
@@ -118,21 +128,21 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
             </div>
           </div>
 
-          {/* Filtro por Categoria */}
+          {/* Category filter */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              {metadataService.metadataIcons.category}
+              {metadataIcons.category}
               <div className="text-sm font-medium text-gray-700">
-                Categoria
+                {t('filters.category')}
               </div>
               {category.length > 0 && (
                 <span className="text-xs text-gray-500">
-                  ({category.length} selecionada{category.length > 1 ? 's' : ''})
+                  ({category.length} {category.length === 1 ? t('filters.selected') : t('filters.selectedPlural')})
                 </span>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {metadataService.categoryOptions.map((option: MetadataOption<CategoryType>) => (
+              {categoryOptions.map((option: MetadataOption<CategoryType>) => (
                 <button
                   key={option.value}
                   type="button"
@@ -151,11 +161,11 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
         </div>
       )}
 
-      {/* Badges de filtros ativos */}
+      {/* Active filter badges */}
       {hasFilters && (
         <div className={`flex flex-wrap gap-2 ${isExpanded ? 'mt-4 pt-4 border-t border-gray-200' : 'mt-2'}`}>
           {priority.map(p => {
-            const option = metadataService.getPriorityOption(p);
+            const option = getPriorityOption(p, t);
             if (!option) return null;
 
             return (
@@ -177,7 +187,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           })}
 
           {category.map(c => {
-            const option = metadataService.getCategoryOption(c);
+            const option = getCategoryOption(c, t);
             if (!option) return null;
 
             return (

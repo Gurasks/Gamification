@@ -247,9 +247,9 @@ export const deleteSession = async (sessionId: string) => {
   try {
     const sessionRef = doc(db, "sessions", sessionId);
     await deleteDoc(sessionRef);
-    console.log("Sala excluída com sucesso");
+    console.log("Session deleted successfully");
   } catch (error) {
-    console.error("Erro ao excluir sala:", error);
+    console.error("Error deleting session:", error);
     throw error;
   }
 };

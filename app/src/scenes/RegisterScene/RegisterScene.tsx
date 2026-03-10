@@ -119,7 +119,7 @@ const RegisterScene: React.FC = () => {
             }}
             message={t('auth.registerMessage')}
             onBack={handleGoBack}
-            backButtonLabel={t('common.back')}
+            backButtonLabel={t('common.actions.back')}
             showBackButton={true}
           />
         </div>

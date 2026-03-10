@@ -2,7 +2,7 @@ import { getButtonClass, getTypeText } from '@/services/metadataVoteServices';
 import { MetadataType, VoteValue } from '@/types/global';
 import { Check, Minus, ThumbsDown, ThumbsUp } from 'lucide-react';
 import React from 'react';
-
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface MetadataVoteProps {
   metadataType: MetadataType;
@@ -27,6 +27,7 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
   disagreeCount = 0,
   neutralCount = 0
 }) => {
+  const { t } = useLanguage();
   const totalVotes = agreeCount + disagreeCount + neutralCount;
   const agreementPercentage = totalVotes > 0 ? Math.round((agreeCount / totalVotes) * 100) : 0;
 
@@ -39,7 +40,7 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           </div>
           {totalVotes > 0 && (
             <div className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-              {agreementPercentage}% concordam
+              {agreementPercentage}% {t('metadataVote.agree')}
             </div>
           )}
         </div>
@@ -49,22 +50,22 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <span className="text-green-600 font-medium">{agreeCount}</span>
-              <span className="text-gray-500">concordam</span>
+              <span className="text-gray-500">{t('metadataVote.agreeCount')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-red-500"></div>
               <span className="text-red-600 font-medium">{disagreeCount}</span>
-              <span className="text-gray-500">discordam</span>
+              <span className="text-gray-500">{t('metadataVote.disagreeCount')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
               <span className="text-yellow-600 font-medium">{neutralCount}</span>
-              <span className="text-gray-500">neutros</span>
+              <span className="text-gray-500">{t('metadataVote.neutralCount')}</span>
             </div>
           </div>
         ) : (
           <div className="text-xs text-gray-500 italic">
-            Nenhum voto registrado
+            {t('metadataVote.noVotes')}
           </div>
         )}
       </div>
@@ -76,7 +77,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
       <div className="mb-3">
         <div className="mb-3">
           <div className="text-sm font-semibold text-blue-800 mb-1">
-            {getTypeText(metadataType)} "{metadataLabel || metadataValue}" está correto?
+            {t('metadataVote.question', {
+              type: getTypeText(metadataType, t),
+              value: metadataLabel || metadataValue
+            })}
           </div>
         </div>
       </div>
@@ -86,10 +90,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('agree')}
           className={getButtonClass(currentVote, 'agree')}
           disabled={isReadOnly}
-          title="Concordo com este metadado"
+          title={t('metadataVote.tooltip.agree')}
         >
           <ThumbsUp className="w-4 h-4" />
-          Concordo
+          {t('metadataVote.agree')}
           {currentVote === 'agree' && <Check className="w-3 h-3 ml-1" />}
         </button>
 
@@ -97,10 +101,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('neutral')}
           className={getButtonClass(currentVote, 'neutral')}
           disabled={isReadOnly}
-          title="Não tenho opinião sobre este metadado"
+          title={t('metadataVote.tooltip.neutral')}
         >
           <Minus className="w-4 h-4" />
-          Neutro
+          {t('metadataVote.neutral')}
           {currentVote === 'neutral' && <Check className="w-3 h-3 ml-1" />}
         </button>
 
@@ -108,10 +112,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('disagree')}
           className={getButtonClass(currentVote, 'disagree')}
           disabled={isReadOnly}
-          title="Discordo deste metadado"
+          title={t('metadataVote.tooltip.disagree')}
         >
           <ThumbsDown className="w-4 h-4" />
-          Discordo
+          {t('metadataVote.disagree')}
           {currentVote === 'disagree' && <Check className="w-3 h-3 ml-1" />}
         </button>
       </div>

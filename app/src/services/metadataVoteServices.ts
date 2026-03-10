@@ -1,8 +1,9 @@
 import { MetadataType, VoteValue } from "@/types/global";
+import { TFunction } from "i18next";
 
 export const getButtonClass = (
   currentVote: VoteValue | undefined,
-  voteType: VoteValue
+  voteType: VoteValue,
 ) => {
   const baseClass =
     "flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm font-medium";
@@ -21,16 +22,16 @@ export const getButtonClass = (
   return `${baseClass} bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:border-gray-300`;
 };
 
-export const getTypeText = (type: MetadataType) => {
+export const getTypeText = (type: MetadataType, t: TFunction): string => {
   switch (type) {
     case "priority":
-      return "A prioridade";
+      return t("cardMetadata.priority").toLowerCase();
     case "requirementType":
-      return "O tipo de requisito";
+      return t("cardMetadata.type").toLowerCase();
     case "category":
-      return "A categoria";
+      return t("cardMetadata.category").toLowerCase();
     case "estimatedEffort":
-      return "O esforço estimado";
+      return t("cardMetadata.estimatedEffort").toLowerCase();
     default:
       return "";
   }
@@ -50,7 +51,7 @@ export const calculateVotes = (votes?: Record<string, VoteValue>) => {
       else if (vote === "neutral") acc.neutral++;
       return acc;
     },
-    { agree: 0, disagree: 0, neutral: 0 }
+    { agree: 0, disagree: 0, neutral: 0 },
   );
 
   return counts;

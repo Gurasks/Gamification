@@ -43,13 +43,13 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ members, user, owne
               {member.uid === owner && (
                 <span className="px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-full font-medium flex items-center gap-1">
                   <Crown className="w-3 h-3" />
-                  {t('teamSelection.organizer')}
+                  {t('team.organizer')}
                 </span>
               )}
               {member.uid === user.uid && (
                 <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full font-medium flex items-center gap-1">
                   <UserIcon className="w-3 h-3" />
-                  {t('teamSelection.you')}
+                  {t('team.you')}
                 </span>
               )}
             </div>

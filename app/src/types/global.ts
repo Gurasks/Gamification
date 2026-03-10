@@ -73,19 +73,19 @@ export interface Card extends BaseCardData, CardMetadata {
   updatedAt?: Timestamp;
 }
 
-export type PriorityLevel = "baixa" | "media" | "alta" | "critica";
+export type PriorityLevel = "low" | "medium" | "high" | "critical";
 export type RequirementType =
-  | "funcional"
-  | "nao-funcional"
-  | "tecnico"
+  | "functional"
+  | "nonFunctional"
+  | "technical"
   | "design"
-  | "outro";
+  | "other";
 export type CategoryType =
-  | "melhoria"
+  | "improvement"
   | "bug"
   | "feature"
-  | "documentacao"
-  | "pergunta"
+  | "documentation"
+  | "question"
   | "feedback";
 
 export type MetadataType =

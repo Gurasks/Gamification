@@ -282,7 +282,7 @@ const CreationScene: React.FC = () => {
                 className="flex-1"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('common.back')}
+                {t('common.actions.back')}
               </Button>
               <Button
                 onClick={handleCreateWithValidation}

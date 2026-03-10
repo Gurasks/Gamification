@@ -1,80 +1,90 @@
 {
   "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "back": "Back",
-    "save": "Save",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "required": "Required field"
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "back": "Back",
+      "close": "Close"
+    },
+    "status": {
+      "loading": "Loading...",
+      "success": "Success!",
+      "error": "Error",
+      "updating": "Updating..."
+    },
+    "navigation": {
+      "backToHome": "Back to Home",
+      "backToTeam": "Back to Team",
+      "viewResults": "View Results"
+    },
+    "placeholders": {
+      "name": "Enter name",
+      "description": "Enter description",
+      "search": "Search..."
+    },
+    "required": "Required field",
+    "na": "N/A"
   },
+
+  "validation": {
+    "required": "{{field}} is required",
+    "minLength": "{{field}} must be at least {{count}} characters",
+    "maxLength": "{{field}} must be at most {{count}} characters",
+    "invalid": "Invalid {{field}}",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+
   "auth": {
     "login": "Login",
     "register": "Create Account",
     "logout": "Logout",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "name": "Name",
-    "forgotPassword": "Forgot password?",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
-    "loginWithGoogle": "Continue with Google",
     "or": "or",
-    "logoutSuccess": "Logout successful!",
-    "logoutError": "Error logging out",
-    "loginSuccess": "Login successful!",
-    "loginError": "Error logging in",
-    "userNotFound": "User not found.",
-    "wrongPassword": "Incorrect password.",
-    "tooManyRequests": "Too many attempts. Try again later.",
-    "genericError": "Error logging in. Please try again.",
-    "googleLoginSuccess": "Logged in with Google!",
-    "googleSignUpSuccess": "Account created with Google!",
-    "googleError": "Error logging in with Google",
-    "loginMessage": "Sign in to access your sessions",
-    "nameRequired": "Name is required",
-    "registerSuccess": "Account created successfully!",
-    "registerError": "Error creating account",
-    "registerGenericError": "Error creating account. Please try again.",
-    "emailInUse": "This email is already in use.",
-    "invalidEmail": "Invalid email.",
-    "weakPassword": "Password is too weak. Use at least 6 characters with uppercase letters and numbers.",
-    "registerMessage": "Fill in the details to register",
-    "fullName": "Full Name",
-    "fullNamePlaceholder": "Your full name",
-    "emailPlaceholder": "your@email.com",
-    "passwordPlaceholder": "••••••••",
-    "createPasswordPlaceholder": "Create a secure password",
-    "confirmPasswordPlaceholder": "Type your password again",
-    "minLength": "Minimum {{count}} characters",
-    "loggingIn": "Logging in...",
-    "creatingAccount": "Creating account...",
-    "connecting": "Connecting...",
-    "nameMinLength": "Name must be at least 2 characters",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "requestError": "Error processing request"
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "name": "Full Name"
+    },
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "••••••••",
+      "createPassword": "Create a secure password",
+      "confirmPassword": "Type your password again",
+      "name": "Your full name"
+    },
+    "messages": {
+      "loginSuccess": "Login successful!",
+      "registerSuccess": "Account created successfully!",
+      "logoutSuccess": "Logout successful!",
+      "googleLoginSuccess": "Logged in with Google!",
+      "googleSignUpSuccess": "Account created with Google!",
+      "loginMessage": "Sign in to access your sessions",
+      "registerMessage": "Fill in the details to register",
+      "connecting": "Connecting..."
+    },
+    "errors": {
+      "userNotFound": "User not found.",
+      "wrongPassword": "Incorrect password.",
+      "emailInUse": "This email is already in use.",
+      "invalidEmail": "Invalid email.",
+      "weakPassword": "Password is too weak. Use at least 6 characters with uppercase letters and numbers.",
+      "tooManyRequests": "Too many attempts. Try again later.",
+      "generic": "Error processing request",
+      "loginError": "Error logging in",
+      "registerError": "Error creating account",
+      "logoutError": "Error logging out",
+      "googleError": "Error logging in with Google",
+      "requestError": "Error processing request"
+    },
+    "links": {
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "loginWithGoogle": "Continue with Google"
+    }
   },
-  "join": {
-    "title": "Join a Session",
-    "protectedTitle": "Protected Session",
-    "description": "Enter the session code to join",
-    "protectedDescription": "Enter the password to access this session",
-    "sessionCode": "Session Code",
-    "sessionCodePlaceholder": "Ex: ABC123",
-    "sessionPassword": "Session Password",
-    "sessionPasswordPlaceholder": "Enter session password",
-    "authRequired": "You need to be authenticated to join the session",
-    "verifyingPassword": "Verifying password...",
-    "joining": "Joining session...",
-    "join": "Join",
-    "verifyPassword": "Verify Password",
-    "backToCode": "Back to Code",
-    "sessionCodeHint": "Session code: {{code}}",
-    "savedCode": "Saved code",
-    "pleaseWait": "This may take a few seconds..."
-  },
+
   "nav": {
     "guestMode": "Guest Mode",
     "user": "User",
@@ -82,6 +92,7 @@
     "changeName": "Change Name",
     "language": "Language"
   },
+
   "profile": {
     "comingSoon": "Feature coming soon!"
   },
@@ -96,6 +107,7 @@
     "joinDescription": "Choose a session to join or enter a code",
     "joinAriaLabel": "Join a session. Choose a session to participate or enter a code"
   },
+
   "nameEntry": {
     "titles": {
       "welcome": "Welcome!",
@@ -122,8 +134,12 @@
       "saveName": "Save Name",
       "logout": "Logout and Login"
     },
-    "validation": {
-      "minLength": "Minimum 2 characters"
+    "info": {
+      "visibility": "Your name will be visible to other session participants",
+      "anonymousMode": "Anonymous mode - your data will be lost when you leave"
+    },
+    "loginPrompt": {
+      "message": "Login with your account to continue"
     },
     "errors": {
       "nameRequired": "Please enter your name",
@@ -137,38 +153,33 @@
       "welcome": "Welcome, {{name}}!",
       "nameUpdated": "Name updated to {{name}}!",
       "logout": "Session ended"
-    },
-    "info": {
-      "visibility": "Your name will be visible to other session participants",
-      "anonymousMode": "Anonymous mode - your data will be lost when you leave"
-    },
-    "loginPrompt": {
-      "message": "Login with your account to continue"
     }
   },
-  "passwordStrength": {
-    "strength": "Password strength",
-    "empty": "Empty",
-    "veryWeak": "Very weak",
-    "weak": "Weak",
-    "medium": "Medium",
-    "strong": "Strong",
-    "veryStrong": "Very strong",
-    "minLength": "At least 6 characters",
-    "uppercase": "At least one uppercase letter",
-    "number": "At least one number",
-    "idealLength": "8+ characters for better security",
-    "specialChar": "Special character (!@#$%&*) recommended",
-    "confirmPassword": "Confirm your password",
-    "passwordsMatch": "Passwords match",
-    "passwordsDoNotMatch": "Passwords do not match",
-    "meetAllRequirements": "Password must meet all minimum requirements",
-    "validAndConfirmed": "Valid and confirmed password!"
+
+  "join": {
+    "title": "Join a Session",
+    "protectedTitle": "Protected Session",
+    "description": "Enter the session code to join",
+    "protectedDescription": "Enter the password to access this session",
+    "sessionCode": "Session Code",
+    "sessionCodePlaceholder": "Ex: ABC123",
+    "sessionPassword": "Session Password",
+    "sessionPasswordPlaceholder": "Enter session password",
+    "authRequired": "You need to be authenticated to join the session",
+    "verifyingPassword": "Verifying password...",
+    "joining": "Joining session...",
+    "join": "Join",
+    "verifyPassword": "Verify Password",
+    "backToCode": "Back to Code",
+    "sessionCodeHint": "Session code: {{code}}",
+    "savedCode": "Saved code",
+    "pleaseWait": "This may take a few seconds..."
   },
+
   "creation": {
     "title": "Create New Session",
     "subtitle": "Set up a new session for your team",
-    "cardTitle": "New Collaborative Requirements Session",
+    "cardTitle": "New Refinement Session",
     "cardDescription": "Configure your session details",
     "sessionName": "Session Name",
     "sessionNamePlaceholder": "Ex: Sprint 15 - Story Refinement",
@@ -181,10 +192,8 @@
     "confirmPassword": "Confirm Password",
     "confirmPasswordPlaceholder": "Type the password again",
     "passwordMinLengthHint": "Password must be at least 4 characters",
-    "passwordMinLength": "Password must be at least 4 characters",
-    "passwordsDoNotMatch": "Passwords do not match",
     "createButton": "Create Session",
-     "errors": {
+    "errors": {
       "nameRequired": "Session name is required",
       "nameTooLong": "Session name must be at most 100 characters",
       "descriptionTooLong": "Description must be at most {{max}} characters",
@@ -200,6 +209,18 @@
       "sessionCreated": "Session created successfully!"
     }
   },
+
+  "team": {
+    "team": "Team",
+    "yourTeam": "Your team",
+    "selectTeam": "Select your team",
+    "teams": "teams",
+    "members": "members",
+    "organizer": "Organizer",
+    "you": "You",
+    "unassigned": "Unassigned"
+  },
+
   "teamSelection": {
     "title": "Team Configuration",
     "subtitle": "Organize participants and configure teams for the session",
@@ -208,13 +229,15 @@
     "exitButton": "Leave Room",
     "numberOfTeams": "Number of Teams",
     "numberHint": "Enter a number between 2 and 10",
-    "teams": "teams",
     "participantsList": "Participants List ({{count}})",
-    "organizer": "Organizer",
-    "you": "You",
     "startSession": "Start Session",
     "ownerHint": "Configure teams and start when ready",
     "memberHint": "Waiting for the organizer to start the session",
+    "unauthenticated": "Error: User not authenticated",
+    "waitingOwner": "Waiting for the organizer to assign your team...",
+    "selectYourTeam": "Select your team",
+    "yourTeamIs": "Your team is",
+    "assigningRandom": "Assigning you to a random team...",
     "loading": {
       "auth": "Loading authentication...",
       "session": "Loading session..."
@@ -234,13 +257,273 @@
       "chooseTeamDesc": "Participants can select which team to join",
       "ownerChooses": "Owner Assigns Teams",
       "ownerChoosesDesc": "Session owner manually assigns participants to teams"
-    },
-    "unauthenticated": "Error: User not authenticated",
-    "waitingOwner": "Waiting for the session owner to assign your team...",
-    "selectYourTeam": "Select your team",
-    "yourTeamIs": "Your team is",
-    "assigningRandom": "Assigning you to a random team..."
+    }
   },
+
+  "ownerAssignment": {
+    "title": "Team Assignment",
+    "participants": "Participants",
+    "currentTeam": "Current Team",
+    "assigning": "Assigning to team...",
+    "anonymous": "Anonymous"
+  },
+
+  "board": {
+    "title": "Suggestion Board",
+    "participant": "Participant",
+    "addSuggestion": "Add New Suggestion",
+    "sessionClosed": "Session Closed!",
+    "sessionClosedMessage": "The session has been closed.",
+    "timeEnded": "Time's Up!",
+    "timeEndedMessage": "The suggestion and voting phase has ended.",
+    "anonymousReview": "Anonymous Review",
+    "teamSuggestions": "{{team}} Suggestions",
+    "suggestion": "suggestion",
+    "suggestions": "suggestions",
+    "filtered": "filtered",
+    "noSuggestions": "No suggestions yet",
+    "beFirst": "Be the first to add a suggestion!",
+    "useFormAbove": "Use the form above to get started",
+    "metadataUpdated": "Metadata updated!",
+    "metadataUpdateError": "Error updating metadata",
+    "loading": {
+      "session": "Loading session...",
+      "initializing": "Initializing session...",
+      "cards": "Loading cards..."
+    },
+    "errors": {
+      "sessionNotFound": "Session not found"
+    }
+  },
+
+  "review": {
+    "title": "Anonymous Review",
+    "cardsToReview": "Cards to Review",
+    "cards": "cards",
+    "mode": {
+      "readOnly": "READ-ONLY MODE",
+      "active": "ACTIVE MODE",
+      "readOnlyDescription": "The voting and commenting phase has ended. You can still view all cards and comments, but cannot interact.",
+      "activeDescription": "All cards are displayed anonymously to avoid bias. You can vote and comment on any card."
+    },
+    "stats": {
+      "totalCards": "Total Cards",
+      "comments": "Comments",
+      "voters": "Voters",
+      "readOnly": "Read Only",
+      "active": "Active"
+    },
+    "description": {
+      "viewOnly": "Browse cards organized by relevance",
+      "rateCards": "Rate cards using the star system"
+    },
+    "empty": {
+      "title": "No cards available",
+      "message": "There are no cards to review in this session."
+    },
+    "footer": {
+      "title": "Anonymous Review Mode"
+    },
+    "actions": {
+      "backToTeam": "Back to Team",
+      "viewLeaderboard": "View Leaderboard",
+      "endReview": "End Review",
+      "viewResults": "View Results"
+    },
+    "loading": {
+      "review": "Loading review..."
+    },
+    "errors": {
+      "loadSession": "Error loading session",
+      "authRequired": "You need to be authenticated to vote",
+      "phaseEnded": "The voting phase has ended",
+      "voteFailed": "Error registering vote",
+      "commentFailed": "Error adding comment",
+      "editPhaseEnded": "The editing phase has ended",
+      "commentUpdateFailed": "Error updating comment",
+      "cannotVoteNow": "You cannot vote now",
+      "endReviewFailed": "Error ending the review phase"
+    },
+    "success": {
+      "voteRegistered": "Vote registered!",
+      "commentAdded": "Comment added!",
+      "commentUpdated": "Comment updated!",
+      "commentDeleted": "Comment deleted successfully!",
+      "reviewEnded": "Review phase ended!"
+    }
+  },
+
+  "card": {
+    "comment": "comment",
+    "comments": "comments",
+    "addComment": "Add comment",
+    "editComment": "Edit comment",
+    "deleteComment": "Delete comment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editPlaceholder": "Edit comment...",
+    "editDisabled": "Editing disabled",
+    "commentPlaceholder": "Type your comment...",
+    "addMetadata": "Add metadata",
+    "editSuggestion": "Edit suggestion",
+    "deleteSuggestion": "Delete suggestion",
+    "editMetadata": "Edit metadata",
+    "voteOnMetadata": "Vote on metadata",
+    "confirmDeleteComment": "Are you sure you want to delete this comment?",
+    "confirmDeleteSuggestion": "Are you sure you want to delete this suggestion?",
+    "tooltip": {
+      "viewVotes": "View metadata votes",
+      "vote": "Vote on metadata",
+      "viewComments": "View comments",
+      "toggleComments": "Show/hide comments"
+    },
+    "success": {
+      "metadataUpdated": "Metadata updated!"
+    },
+    "errors": {
+      "deleteSuggestion": "Error deleting suggestion",
+      "deleteComment": "Error deleting comment",
+      "metadataUpdate": "Error updating metadata"
+    }
+  },
+
+  "cardMetadata": {
+    "editTitle": "Editing Metadata",
+    "priority": "Priority",
+    "priorityPlaceholder": "Priority...",
+    "type": "Type",
+    "typePlaceholder": "Requirement type...",
+    "category": "Category",
+    "categoryPlaceholder": "Category...",
+    "estimatedEffort": "Estimated Effort",
+    "effortPlaceholder": "Ex: 2",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveTitle": "Save metadata",
+    "cancelTitle": "Cancel editing"
+  },
+
+  "metadata": {
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "requirementType": {
+      "functional": "Functional",
+      "nonFunctional": "Non-Functional",
+      "technical": "Technical",
+      "design": "Design",
+      "other": "Other"
+    },
+    "category": {
+      "feature": "New Feature",
+      "improvement": "Improvement",
+      "bug": "Bug",
+      "documentation": "Documentation",
+      "question": "Question",
+      "feedback": "Feedback"
+    }
+  },
+
+  "metadataVote": {
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "neutral": "Neutral",
+    "agreeCount": "agree",
+    "disagreeCount": "disagree",
+    "neutralCount": "neutral",
+    "noVotes": "No votes registered",
+    "question": "Is {{type}} \"{{value}}\" correct?",
+    "tooltip": {
+      "agree": "I agree with this metadata",
+      "neutral": "I have no opinion on this metadata",
+      "disagree": "I disagree with this metadata"
+    }
+  },
+
+  "metadataSelectors": {
+    "title": "Suggestion Metadata",
+    "priority": "Priority",
+    "priorityPlaceholder": "Priority...",
+    "requirementType": "Requirement Type",
+    "requirementTypePlaceholder": "Requirement type...",
+    "category": "Category",
+    "categoryPlaceholder": "Category...",
+    "estimatedEffort": "Estimated Effort",
+    "effortPlaceholder": "Ex: 2",
+    "tip": "Add metadata to help organize and prioritize suggestions."
+  },
+
+  "filters": {
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "priority": "Priority",
+    "category": "Category",
+    "selected": "selected",
+    "selectedPlural": "selected"
+  },
+
+  "form": {
+    "creatingSuggestion": "Creating suggestion...",
+    "suggestionPlaceholder": "Type your suggestion...",
+    "submitSuggestion": "Submit suggestion"
+  },
+
+  "sorting": {
+    "sortBy": "Sort by",
+    "options": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "highest": "Highest Rated",
+      "lowest": "Lowest Rated",
+      "mostComments": "Most Comments",
+      "leastComments": "Least Comments",
+      "author": "By Author"
+    },
+    "descriptions": {
+      "newest": "Sorts by newest cards first",
+      "oldest": "Sorts by oldest cards first",
+      "highest": "Sorts by highest rated cards first",
+      "lowest": "Sorts by lowest rated cards first",
+      "mostComments": "Sorts by cards with most comments first",
+      "leastComments": "Sorts by cards with fewest comments first",
+      "author": "Sorts cards alphabetically by author"
+    }
+  },
+
+  "scoreboard": {
+    "title": "Team Scoreboard",
+    "show": "Show scoreboard",
+    "hide": "Hide scoreboard",
+    "ofSuggestions": "of suggestions",
+    "leader": "Leader",
+    "average": "Average",
+    "perTeam": "per team",
+    "total": "Total"
+  },
+
+  "timer": {
+    "timeExpired": "Time's up!",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds",
+    "added": "added",
+    "addError": "Error adding time",
+    "onlyMembersCanAdd": "Only members of {{team}} can add time"
+  },
+
+  "addTime": {
+    "addTimeLabel": "Add time",
+    "timePlaceholder": "Time",
+    "add": "Add",
+    "adding": "Adding...",
+    "cancel": "Cancel",
+    "addTime": "Add time"
+  },
+
   "share": {
     "copyLink": "Copy link",
     "copied": "Copied!",
@@ -248,20 +531,32 @@
     "shareText": "Join my session with code: {{code}}",
     "buttonAriaLabel": "Share session link"
   },
+
   "collapsible": {
     "sessionDescription": "Session Description",
     "show": "Show",
     "hide": "Hide"
   },
-  "ownerAssignment": {
-    "title": "Team Assignment",
-    "participants": "Participants",
-    "currentTeam": "Current Team",
-    "unassigned": "Unassigned",
-    "assigning": "Assigning to team...",
-    "anonymous": "Anonymous"
+
+  "dropdown": {
+    "select": "Select..."
   },
-  "team": {
-    "team": "Team"
+
+  "passwordStrength": {
+    "strength": "Password strength",
+    "empty": "Empty",
+    "veryWeak": "Very weak",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "veryStrong": "Very strong",
+    "uppercase": "At least one uppercase letter",
+    "number": "At least one number",
+    "idealLength": "8+ characters for better security",
+    "specialChar": "Special character (!@#$%&*) recommended",
+    "confirmPassword": "Confirm your password",
+    "passwordsMatch": "Passwords match",
+    "meetAllRequirements": "Password must meet all minimum requirements",
+    "validAndConfirmed": "Valid and confirmed password!"
   }
 }

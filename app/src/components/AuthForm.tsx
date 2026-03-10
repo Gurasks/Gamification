@@ -223,7 +223,7 @@ const GoogleLoginButton: React.FC<{
           className="w-5 h-5"
         />
         <span className="font-medium">
-          {isGoogleLoading ? t('auth.connecting') : t('auth.loginWithGoogle')}
+          {isGoogleLoading ? t('auth.connecting') : t('auth.links.loginWithGoogle')}
         </span>
       </button>
     </>
@@ -241,7 +241,7 @@ const SwitchModeButton: React.FC<{
   return (
     <div className="text-center">
       <p className="text-sm text-gray-600">
-        {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
+        {mode === 'login' ? t('auth.links.noAccount') : t('auth.links.hasAccount')}{' '}
         <button
           type="button"
           onClick={() => onChange(mode === 'login' ? 'register' : 'login')}
@@ -419,10 +419,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   };
 
   const fullNameLabel = t('auth.fullName');
-  const fullNamePlaceholder = t('auth.fullNamePlaceholder');
-  const emailPlaceholder = t('auth.emailPlaceholder');
-  const passwordPlaceholder = mode === 'login' ? t('auth.passwordPlaceholder') : t('auth.createPasswordPlaceholder');
-  const confirmPasswordPlaceholder = t('auth.confirmPasswordPlaceholder');
+  const fullNamePlaceholder = t('auth.placeholders.fullName');
+  const emailPlaceholder = t('auth.placeholders.email');
+  const passwordPlaceholder = mode === 'login' ? t('auth.placeholders.password') : t('auth.placeholders.createPassword');
+  const confirmPasswordPlaceholder = t('auth.placeholders.confirmPassword');
   const minLengthText = t('auth.minLength', { count: 2 });
 
   return (
@@ -433,7 +433,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         message={message}
         showBackButton={showBackButton}
         onBack={onBack}
-        backButtonLabel={backButtonLabel || t('common.back')}
+        backButtonLabel={backButtonLabel || t('common.actions.back')}
         isLoading={isLoading}
         isGoogleLoading={isGoogleLoading}
       />
@@ -469,7 +469,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
             <Mail className="w-4 h-4" />
-            {t('auth.email')} *
+            {t('auth.fields.email')} *
           </label>
           <input
             type="email"
@@ -484,7 +484,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
         {/* Password */}
         <PasswordInput
-          label={t('auth.password') + " *"}
+          label={t('auth.fields.password') + " *"}
           value={formState.password}
           onChange={formState.setPassword}
           placeholder={passwordPlaceholder}

@@ -129,7 +129,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
                       {getLocalizedTeamName(currentAssignments[participant.uid], t)}
                     </span>
                   ) : (
-                    <span className="badge-gray">{t('ownerAssignment.unassigned')}</span>
+                    <span className="badge-gray">{t('team.unassigned')}</span>
                   )}
                 </td>
               </tr>

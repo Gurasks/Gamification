@@ -34,7 +34,7 @@ export const createCardInFirestore = async (
   user: User,
   teamName: string | undefined,
   setNewCardText: (text: string) => void,
-  metadata?: CardMetadata
+  metadata?: CardMetadata,
 ) => {
   if (!sessionId || !teamName || !newCardText.trim() || _.isEmpty(user)) return;
   try {
@@ -72,7 +72,7 @@ export const updateCardMetadataInFirestore = async (
     requirementType?: RequirementType;
     category?: CategoryType;
     estimatedEffort?: number;
-  }
+  },
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -89,7 +89,7 @@ export const updateCardMetadataInFirestore = async (
 export const updateRatingToCardInFirestore = async (
   cardId: string,
   rating: number,
-  user: User
+  user: User,
 ) => {
   if (!user?.uid) return;
 
@@ -101,7 +101,7 @@ export const updateRatingToCardInFirestore = async (
 
 export const updateCardInFirestore = async (
   cardId: string,
-  newText: string
+  newText: string,
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -116,12 +116,12 @@ export const updateCardInFirestore = async (
 };
 
 export const getCardsBySessionId = async (
-  sessionId: string
+  sessionId: string,
 ): Promise<Card[]> => {
   try {
     const cardsQuery = query(
       collection(db, "cards"),
-      where("sessionId", "==", sessionId)
+      where("sessionId", "==", sessionId),
     );
     const cardsSnapshot = await getDocs(cardsQuery);
 
@@ -143,7 +143,7 @@ export const getCardsBySessionId = async (
 export const addCommentToCardInFirestore = async (
   cardId: string,
   commentText: string,
-  user: User
+  user: User,
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -166,7 +166,7 @@ export const addCommentToCardInFirestore = async (
 export const updateCommentToCardInFirestore = async (
   cardId: string,
   commentId: string,
-  commentText: string
+  commentText: string,
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -175,7 +175,7 @@ export const updateCommentToCardInFirestore = async (
     if (card && card.comments) {
       // Find the index of the comment to update
       const commentIndex = card.comments?.findIndex(
-        (comment: { id: string }) => comment.id === commentId
+        (comment: { id: string }) => comment.id === commentId,
       );
       if (commentIndex !== -1) {
         const updatedComments = [...card.comments];
@@ -200,7 +200,7 @@ export const deleteCardInFirestore = async (cardId: string): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
     await deleteDoc(cardRef);
-    console.log("Card deletado com sucesso");
+    console.log("Card deleted successfully");
   } catch (error) {
     console.error("Error deleting card:", error);
     throw error;
@@ -209,7 +209,7 @@ export const deleteCardInFirestore = async (cardId: string): Promise<void> => {
 
 export const deleteCommentFromCardInFirestore = async (
   cardId: string,
-  commentId: string
+  commentId: string,
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -218,7 +218,7 @@ export const deleteCommentFromCardInFirestore = async (
 
     if (card && card.comments) {
       const updatedComments = card.comments.filter(
-        (comment: { id: string }) => comment.id !== commentId
+        (comment: { id: string }) => comment.id !== commentId,
       );
 
       await updateDoc(cardRef, {
@@ -226,7 +226,7 @@ export const deleteCommentFromCardInFirestore = async (
         updatedAt: serverTimestamp(),
       });
 
-      console.log("Comentário deletado com sucesso");
+      console.log("Comment deleted successfully");
     }
   } catch (error) {
     console.error("Error deleting comment:", error);
@@ -238,7 +238,7 @@ export const voteOnCardMetadata = async (
   cardId: string,
   metadataType: MetadataType,
   vote: VoteValue,
-  user: User
+  user: User,
 ): Promise<void> => {
   try {
     const cardRef = doc(db, "cards", cardId);
@@ -261,7 +261,7 @@ export const voteOnCardMetadata = async (
 };
 
 export const getMetadataVoteSummary = (
-  metadataVotes: CardMetadataVotes | undefined
+  metadataVotes: CardMetadataVotes | undefined,
 ) => {
   const summary = {
     priority: { agree: 0, disagree: 0, neutral: 0 },

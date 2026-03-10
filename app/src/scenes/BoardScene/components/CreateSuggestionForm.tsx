@@ -9,6 +9,7 @@ import type {
   CategoryType,
   CardMetadata
 } from '@/types/global';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface CreateSuggestionFormProps {
   text: string;
@@ -44,6 +45,7 @@ const CreateSuggestionForm: React.FC<CreateSuggestionFormProps> = ({
   onSubmit,
   isSubmitting
 }) => {
+  const { t } = useLanguage();
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!text.trim() || isSubmitting) return;
@@ -66,7 +68,7 @@ const CreateSuggestionForm: React.FC<CreateSuggestionFormProps> = ({
         text={text}
         setText={setText}
         disabled={isSubmitting}
-        placeholder={isSubmitting ? 'Criando sugestão...' : 'Digite sua sugestão...'}
+        placeholder={isSubmitting ? t('form.creatingSuggestion') : t('form.suggestionPlaceholder')}
         rows={2}
         showSubmitButton={false}
         submitFormOnEnter={true}
@@ -91,7 +93,7 @@ const CreateSuggestionForm: React.FC<CreateSuggestionFormProps> = ({
           className="flex items-center gap-2"
         >
           {isSubmitting && <LoadingSpinner size="sm" />}
-          Enviar sugestão
+          {t('form.submitSuggestion')}
         </Button>
       </div>
     </form>

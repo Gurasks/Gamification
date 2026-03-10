@@ -189,7 +189,7 @@ const NameEntryScene: React.FC = () => {
                 disabled={isLoading}
               />
               <p className="text-xs text-gray-500 mt-1 flex justify-between">
-                <span>{t('nameEntry.validation.minLength')}</span>
+                <span>{t('validation.minLength', { field: t('nameEntry.labels.yourName'), count: 2 })}</span>
                 <span>{name.length}/50</span>
               </p>
             </div>

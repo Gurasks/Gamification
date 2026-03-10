@@ -45,7 +45,7 @@ const LoginScene: React.FC = () => {
 
     try {
       await signIn(data.email, data.password);
-      toast.success(t('auth.loginSuccess'));
+      toast.success(t('auth.messages.loginSuccess'));
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
       if (pendingSessionCode) {
@@ -115,9 +115,9 @@ const LoginScene: React.FC = () => {
                 navigate('/register');
               }
             }}
-            message={t('auth.loginMessage')}
+            message={t('auth.messages.loginMessage')}
             onBack={handleGoBack}
-            backButtonLabel={t('common.back')}
+            backButtonLabel={t('common.actions.back')}
             showBackButton={true}
           />
         </div>

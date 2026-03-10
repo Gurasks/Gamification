@@ -2,8 +2,9 @@ import { calculateAverageRating } from "../../../services/globalServices";
 import type { Session, Card } from "../../../types/global";
 import type { UserContributions, UserStats } from "../../../types/leaderboard";
 import { X, FileText, MessageSquare, Star, TrendingUp, Award, Clock, Tag, Zap, Shield, Users, ThumbsUp, BarChart3, ExternalLink, Calendar } from 'lucide-react';
-import metadataService from '@/services/metadataOptionsService';
 import { Button } from '@/components/Button';
+import { getPriorityOption, getRequirementTypeOption, getCategoryOption } from "@/services/metadataOptionsService";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ContributionsModalProps {
   session: Session | null;
@@ -20,6 +21,8 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
   setIsModalOpen,
   setSelectedUser
 }) => {
+  const { t } = useLanguage();
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
@@ -30,9 +33,9 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
   };
 
   const renderCardMetadata = (card: Card) => {
-    const priorityOption = card.priority ? metadataService.getPriorityOption(card.priority) : undefined;
-    const requirementTypeOption = card.requirementType ? metadataService.getRequirementTypeOption(card.requirementType) : undefined;
-    const categoryOption = card.category ? metadataService.getCategoryOption(card.category) : undefined;
+    const priorityOption = card.priority ? getPriorityOption(card.priority, t) : undefined;
+    const requirementTypeOption = card.requirementType ? getRequirementTypeOption(card.requirementType, t) : undefined;
+    const categoryOption = card.category ? getCategoryOption(card.category, t) : undefined;
 
     return (
       <div className="mt-3 space-y-2">

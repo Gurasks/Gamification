@@ -1,7 +1,8 @@
 import { CardFilters } from '@/components/CardFilters';
 import MasonryGrid from '@/components/MasonryGrid';
-import { MetadataSelectors } from '@/components/MetadataSelectors';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   addCommentToCardInFirestore,
   createCardInFirestore,
@@ -20,7 +21,6 @@ import {
   Clock,
   Eye,
   FileText,
-  LogOut,
   MessageSquare,
   Users
 } from 'lucide-react';
@@ -31,7 +31,6 @@ import { Button } from '../../components/Button';
 import CollapsibleDescriptionArea from '../../components/CollapsibleDescriptionArea';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import VariableTextArea from "../../components/VariableTextArea";
 import { createUnsubscribeCards, createUnsubscribeSession } from '../../hooks/firestoreUnsubscriber';
 import { calculateTeamStats, getSortedCards } from '../../services/boardServices';
 import { returnTimerId } from '../../services/globalServices';
@@ -39,13 +38,13 @@ import type { Card, CardMetadata, CategoryType, Metadata, PriorityLevel, Require
 import BoardCard from './components/BoardCard';
 import { CardSkeleton } from './components/CardSkeleton';
 import CardSortingSelector, { SortOption } from './components/CardSorteningSelector';
-import SyncTimer from './components/SyncTimer';
-import { TeamScoreboard } from './components/TeamScoreboard';
-import { ScrollToTopButton } from '@/components/ScrollToTopButton';
-import { SyncTimerSkeleton } from './components/SyncTimerSkeleton';
 import CreateSuggestionForm from './components/CreateSuggestionForm';
+import SyncTimer from './components/SyncTimer';
+import { SyncTimerSkeleton } from './components/SyncTimerSkeleton';
+import { TeamScoreboard } from './components/TeamScoreboard';
 
 const BoardScene: React.FC = () => {
+  const { t } = useLanguage();
   const { sessionId, teamName } = useParams<{ sessionId: string, teamName: string }>();
   const { user } = useAuth();
   const [session, setSession] = useState<Session>({} as Session);
@@ -153,10 +152,10 @@ const BoardScene: React.FC = () => {
           })
         );
 
-        toast.success('Metadados atualizados!');
+        toast.success(t('board.metadataUpdated'));
       } catch (error) {
-        console.error('Erro ao atualizar metadados:', error);
-        toast.error('Erro ao atualizar metadados');
+        console.error('Error updating metadata:', error);
+        toast.error(t('board.metadataUpdateError'));
       }
     }
   };
@@ -182,7 +181,6 @@ const BoardScene: React.FC = () => {
   useEffect(() => {
     const safetyTimeout = setTimeout(() => {
       if (!timerLoaded && session.hasStarted) {
-        console.log('Safety timeout - marcando timer como carregado');
         setTimerLoaded(true);
       }
     }, 5000);
@@ -291,25 +289,25 @@ const BoardScene: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingOverlay message="Carregando sessão..." />;
+    return <LoadingOverlay message={t('board.loading.session')} />;
   }
 
   if (!session.hasStarted || !session.timersReady) {
-    return <LoadingOverlay message="Inicializando sessão..." />;
+    return <LoadingOverlay message={t('board.loading.initializing')} />;
   }
 
   if (!session || !session.id) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Sessão não encontrada</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('board.errors.sessionNotFound')}</h2>
           <Button
             onClick={handleGoBack}
             variant="primary"
             className="flex items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Voltar ao Início
+            {t('common.navigation.backToHome')}
           </Button>
         </div>
       </div>
@@ -388,7 +386,7 @@ const BoardScene: React.FC = () => {
                   <span className="font-semibold">{teamName}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Participante:</span>
+                  <span className="text-gray-500">{t('board.participant')}:</span>
                   <span className="font-semibold">{user.displayName}</span>
                 </div>
               </div>
@@ -400,7 +398,7 @@ const BoardScene: React.FC = () => {
         {!timeEnded && isUserInTeam ? (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Adicionar Nova Sugestão
+              {t('board.addSuggestion')}
             </h2>
             <CreateSuggestionForm
               text={newCardText}
@@ -424,22 +422,22 @@ const BoardScene: React.FC = () => {
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <Ban className="w-8 h-8 text-red-600" />
                   <h2 className="text-2xl font-bold text-red-800">
-                    Sessão Encerrada!
+                    {t('board.sessionClosed')}
                   </h2>
                 </div>
                 <p className="text-red-700 mb-4">
-                  A sessão foi encerrada.
+                  {t('board.sessionClosedMessage')}
                 </p>
               </>) : (
                 <>
                   <div className="flex items-center justify-center gap-3 mb-4">
                     <Clock className="w-8 h-8 text-yellow-600" />
                     <h2 className="text-2xl font-bold text-yellow-800">
-                      Tempo Esgotado!
+                      {t('board.timeEnded')}
                     </h2>
                   </div>
                   <p className="text-yellow-700 mb-4">
-                    A fase de sugestões e votos foi encerrada.
+                    {t('board.timeEndedMessage')}
                   </p>
                 </>
               )}
@@ -451,7 +449,7 @@ const BoardScene: React.FC = () => {
                     className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                   >
                     <Eye className="w-4 h-4" />
-                    Revisão Anônima
+                    {t('board.anonymousReview')}
                   </Button>
                 )}
               </div>
@@ -478,9 +476,9 @@ const BoardScene: React.FC = () => {
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare className="w-6 h-6 text-gray-700" />
                 <h3 className="text-xl font-semibold text-gray-800">
-                  Sugestões do {teamName}
+                  {t('board.teamSuggestions', { team: teamName })}
                   <span className="text-sm font-normal text-gray-500 ml-2">
-                    ({filteredTeamCards.length} sugestões {teamCards.length === filteredTeamCards.length ? '' : ` filtradas`})
+                    ({filteredTeamCards.length} {filteredTeamCards.length === 1 ? t('board.suggestion') : t('board.suggestions')} {teamCards.length === filteredTeamCards.length ? '' : ` ${t('board.filtered')}`})
                   </span>
                 </h3>
               </div>
@@ -501,6 +499,7 @@ const BoardScene: React.FC = () => {
                   <CardSortingSelector
                     sortBy={sortBy}
                     onSortChange={setSortBy}
+                    showRatedOptions={false}
                   />
                 </div>
               )}
@@ -510,7 +509,7 @@ const BoardScene: React.FC = () => {
             {cardsLoading && (
               <div className="flex items-center gap-2 text-gray-500 text-sm">
                 <LoadingSpinner size="sm" />
-                <span>Carregando...</span>
+                <span>{t('common.loading')}</span>
               </div>
             )}
           </div>
@@ -528,12 +527,12 @@ const BoardScene: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhuma sugestão ainda</h3>
-              <p className="text-gray-500 mb-6">Seja o primeiro a adicionar uma sugestão!</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('board.noSuggestions')}</h3>
+              <p className="text-gray-500 mb-6">{t('board.beFirst')}</p>
               {!timeEnded && isUserInTeam && (
                 <div className="flex items-center justify-center gap-2 text-blue-600">
                   <ChevronRight className="w-4 h-4" />
-                  <span className="text-sm">Use o formulário acima para começar</span>
+                  <span className="text-sm">{t('board.useFormAbove')}</span>
                 </div>
               )}
             </div>
@@ -571,7 +570,7 @@ const BoardScene: React.FC = () => {
               className="flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Voltar ao Início
+              {t('common.navigation.backToHome')}
             </Button>
             {showAnonymousReview && (
               <Button
@@ -580,7 +579,7 @@ const BoardScene: React.FC = () => {
                 className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
               >
                 <Eye className="w-4 h-4" />
-                Revisão Anônima
+                {t('board.anonymousReview')}
               </Button>
             )}
           </div>

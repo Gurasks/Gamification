@@ -1,80 +1,90 @@
 {
   "common": {
-    "loading": "Carregando...",
-    "error": "Erro",
-    "success": "Sucesso",
-    "back": "Voltar",
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "required": "Campo obrigatório"
+    "actions": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "back": "Voltar",
+      "close": "Fechar"
+    },
+    "status": {
+      "loading": "Carregando...",
+      "success": "Sucesso!",
+      "error": "Erro",
+      "updating": "Atualizando..."
+    },
+    "navigation": {
+      "backToHome": "Voltar para Início",
+      "backToTeam": "Voltar para o Time",
+      "viewResults": "Ver Resultados"
+    },
+    "placeholders": {
+      "name": "Digite o nome",
+      "description": "Digite a descrição",
+      "search": "Buscar..."
+    },
+    "required": "Campo obrigatório",
+    "na": "N/D"
   },
+
+  "validation": {
+    "required": "{{field}} é obrigatório",
+    "minLength": "{{field}} deve ter pelo menos {{count}} caracteres",
+    "maxLength": "{{field}} deve ter no máximo {{count}} caracteres",
+    "invalid": "{{field}} inválido",
+    "passwordsDoNotMatch": "As senhas não coincidem"
+  },
+
   "auth": {
     "login": "Fazer Login",
     "register": "Criar Conta",
     "logout": "Sair",
-    "email": "Email",
-    "password": "Senha",
-    "confirmPassword": "Confirmar Senha",
-    "name": "Nome",
-    "forgotPassword": "Esqueceu a senha?",
-    "noAccount": "Não tem uma conta?",
-    "hasAccount": "Já tem uma conta?",
-    "loginWithGoogle": "Continuar com Google",
     "or": "ou",
-    "logoutSuccess": "Logout realizado com sucesso!",
-    "logoutError": "Erro ao fazer logout",
-    "loginSuccess": "Login realizado com sucesso!",
-    "loginError": "Erro ao fazer login",
-    "userNotFound": "Usuário não encontrado.",
-    "wrongPassword": "Senha incorreta.",
-    "tooManyRequests": "Muitas tentativas. Tente novamente mais tarde.",
-    "genericError": "Erro ao fazer login. Tente novamente.",
-    "googleLoginSuccess": "Login realizado com Google!",
-    "googleSignUpSuccess": "Conta criada com Google!",
-    "googleError": "Erro ao fazer login com Google",
-    "loginMessage": "Entre com sua conta para acessar as sessões",
-    "nameRequired": "Nome é obrigatório",
-    "registerSuccess": "Conta criada com sucesso!",
-    "registerError": "Erro ao criar conta",
-    "registerGenericError": "Erro ao criar conta. Tente novamente.",
-    "emailInUse": "Este email já está em uso.",
-    "invalidEmail": "Email inválido.",
-    "weakPassword": "Senha muito fraca. Use pelo menos 6 caracteres com letras maiúsculas e números.",
-    "registerMessage": "Preencha os dados para se cadastrar",
-    "fullName": "Nome Completo",
-    "fullNamePlaceholder": "Seu nome completo",
-    "emailPlaceholder": "seu@email.com",
-    "passwordPlaceholder": "••••••••",
-    "createPasswordPlaceholder": "Crie uma senha segura",
-    "confirmPasswordPlaceholder": "Digite a senha novamente",
-    "minLength": "Mínimo {{count}} caracteres",
-    "loggingIn": "Entrando...",
-    "creatingAccount": "Criando conta...",
-    "connecting": "Conectando...",
-    "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
-    "passwordsDoNotMatch": "As senhas não coincidem",
-    "requestError": "Erro ao processar solicitação"
+    "fields": {
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "name": "Nome Completo"
+    },
+    "placeholders": {
+      "email": "seu@email.com",
+      "password": "••••••••",
+      "createPassword": "Crie uma senha segura",
+      "confirmPassword": "Digite a senha novamente",
+      "name": "Seu nome completo"
+    },
+    "messages": {
+      "loginSuccess": "Login realizado com sucesso!",
+      "registerSuccess": "Conta criada com sucesso!",
+      "logoutSuccess": "Logout realizado com sucesso!",
+      "googleLoginSuccess": "Login realizado com Google!",
+      "googleSignUpSuccess": "Conta criada com Google!",
+      "loginMessage": "Entre com sua conta para acessar as sessões",
+      "registerMessage": "Preencha os dados para se cadastrar",
+      "connecting": "Conectando..."
+    },
+    "errors": {
+      "userNotFound": "Usuário não encontrado.",
+      "wrongPassword": "Senha incorreta.",
+      "emailInUse": "Este email já está em uso.",
+      "invalidEmail": "Email inválido.",
+      "weakPassword": "Senha muito fraca. Use pelo menos 6 caracteres com letras maiúsculas e números.",
+      "tooManyRequests": "Muitas tentativas. Tente novamente mais tarde.",
+      "generic": "Erro ao processar solicitação",
+      "loginError": "Erro ao fazer login",
+      "registerError": "Erro ao criar conta",
+      "logoutError": "Erro ao fazer logout",
+      "googleError": "Erro ao fazer login com Google",
+      "requestError": "Erro ao processar solicitação"
+    },
+    "links": {
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "hasAccount": "Já tem uma conta?",
+      "loginWithGoogle": "Continuar com Google"
+    }
   },
-  "join": {
-    "title": "Participar de uma Sessão",
-    "protectedTitle": "Sessão Protegida",
-    "description": "Insira o código da sessão para se juntar a ela",
-    "protectedDescription": "Digite a senha para acessar esta sessão",
-    "sessionCode": "Código da Sessão",
-    "sessionCodePlaceholder": "Ex: ABC123",
-    "sessionPassword": "Senha da Sessão",
-    "sessionPasswordPlaceholder": "Digite a senha da sessão",
-    "authRequired": "Você precisa estar autenticado para entrar na sessão",
-    "verifyingPassword": "Verificando senha...",
-    "joining": "Entrando na sessão...",
-    "join": "Participar",
-    "verifyPassword": "Verificar Senha",
-    "backToCode": "Voltar ao Código",
-    "sessionCodeHint": "Código da sessão: {{code}}",
-    "savedCode": "Código salvo",
-    "pleaseWait": "Isso pode levar alguns segundos..."
-  },
+
   "nav": {
     "guestMode": "Modo Convidado",
     "user": "Usuário",
@@ -82,10 +92,12 @@
     "changeName": "Alterar Nome",
     "language": "Idioma"
   },
+
   "profile": {
     "comingSoon": "Funcionalidade em desenvolvimento!"
   },
-   "home": {
+
+  "home": {
     "welcome": "Bem vindo {{name}} ao Singular!",
     "subtitle": "Colabore e jogue com sua equipe em tempo real.",
     "createTitle": "Crie uma nova sessão",
@@ -95,6 +107,7 @@
     "joinDescription": "Escolha uma sessão para participar ou entre com um código",
     "joinAriaLabel": "Junte-se a uma sessão. Escolha uma sessão para participar ou entre com um código"
   },
+
   "nameEntry": {
     "titles": {
       "welcome": "Bem-vindo!",
@@ -121,8 +134,12 @@
       "saveName": "Salvar Nome",
       "logout": "Sair e Fazer Login"
     },
-    "validation": {
-      "minLength": "Mínimo 2 caracteres"
+    "info": {
+      "visibility": "Seu nome será visível para outros participantes da sessão",
+      "anonymousMode": "Modo anônimo - seus dados serão perdidos ao sair"
+    },
+    "loginPrompt": {
+      "message": "Faça login com sua conta para continuar"
     },
     "errors": {
       "nameRequired": "Por favor, digite seu nome",
@@ -136,38 +153,33 @@
       "welcome": "Bem-vindo, {{name}}!",
       "nameUpdated": "Nome atualizado para {{name}}!",
       "logout": "Sessão encerrada"
-    },
-    "info": {
-      "visibility": "Seu nome será visível para outros participantes da sessão",
-      "anonymousMode": "Modo anônimo - seus dados serão perdidos ao sair"
-    },
-    "loginPrompt": {
-      "message": "Faça login com sua conta para continuar"
     }
   },
-  "passwordStrength": {
-    "strength": "Força da senha",
-    "empty": "Vazia",
-    "veryWeak": "Muito fraca",
-    "weak": "Fraca",
-    "medium": "Média",
-    "strong": "Forte",
-    "veryStrong": "Muito forte",
-    "minLength": "Pelo menos 6 caracteres",
-    "uppercase": "Pelo menos uma letra maiúscula",
-    "number": "Pelo menos um número",
-    "idealLength": "8+ caracteres para maior segurança",
-    "specialChar": "Caractere especial (!@#$%&*) recomendado",
-    "confirmPassword": "Confirme sua senha",
-    "passwordsMatch": "Senhas coincidem",
-    "passwordsDoNotMatch": "Senhas não coincidem",
-    "meetAllRequirements": "A senha precisa atender a todos os requisitos mínimos",
-    "validAndConfirmed": "Senha válida e confirmada!"
+
+  "join": {
+    "title": "Participar de uma Sessão",
+    "protectedTitle": "Sessão Protegida",
+    "description": "Insira o código da sessão para se juntar a ela",
+    "protectedDescription": "Digite a senha para acessar esta sessão",
+    "sessionCode": "Código da Sessão",
+    "sessionCodePlaceholder": "Ex: ABC123",
+    "sessionPassword": "Senha da Sessão",
+    "sessionPasswordPlaceholder": "Digite a senha da sessão",
+    "authRequired": "Você precisa estar autenticado para entrar na sessão",
+    "verifyingPassword": "Verificando senha...",
+    "joining": "Entrando na sessão...",
+    "join": "Participar",
+    "verifyPassword": "Verificar Senha",
+    "backToCode": "Voltar ao Código",
+    "sessionCodeHint": "Código da sessão: {{code}}",
+    "savedCode": "Código salvo",
+    "pleaseWait": "Isso pode levar alguns segundos..."
   },
+
   "creation": {
     "title": "Criar Nova Sessão",
     "subtitle": "Configure uma nova sessão para sua equipe",
-    "cardTitle": "Nova Sessão de levantamento de requisitos",
+    "cardTitle": "Nova Sessão de Refinamento",
     "cardDescription": "Configure os detalhes da sua sessão",
     "sessionName": "Nome da Sessão",
     "sessionNamePlaceholder": "Ex: Sprint 15 - Refinamento de Histórias",
@@ -180,10 +192,8 @@
     "confirmPassword": "Confirmar Senha",
     "confirmPasswordPlaceholder": "Digite a senha novamente",
     "passwordMinLengthHint": "A senha deve ter pelo menos 4 caracteres",
-    "passwordMinLength": "A senha deve ter pelo menos 4 caracteres",
-    "passwordsDoNotMatch": "As senhas não coincidem",
     "createButton": "Criar Sessão",
-     "errors": {
+    "errors": {
       "nameRequired": "Nome da sessão é obrigatório",
       "nameTooLong": "Nome da sessão deve ter no máximo 100 caracteres",
       "descriptionTooLong": "Descrição deve ter no máximo {{max}} caracteres",
@@ -199,6 +209,18 @@
       "sessionCreated": "Sessão criada com sucesso!"
     }
   },
+
+  "team": {
+    "team": "Time",
+    "yourTeam": "Seu time",
+    "selectTeam": "Selecione seu time",
+    "teams": "times",
+    "members": "membros",
+    "organizer": "Organizador",
+    "you": "Você",
+    "unassigned": "Não atribuído"
+  },
+
   "teamSelection": {
     "title": "Configuração dos Times",
     "subtitle": "Organize os participantes e configure os times para a sessão",
@@ -207,13 +229,15 @@
     "exitButton": "Sair da Sala",
     "numberOfTeams": "Quantidade de Times",
     "numberHint": "Digite um número entre 2 e 10",
-    "teams": "times",
     "participantsList": "Lista de Participantes ({{count}})",
-    "organizer": "Organizador",
-    "you": "Você",
     "startSession": "Iniciar Sessão",
     "ownerHint": "Configure os times e inicie quando estiver pronto",
     "memberHint": "Aguardando o organizador iniciar a sessão",
+    "unauthenticated": "Erro: Usuário não autenticado",
+    "waitingOwner": "Esperando o organizador atribuir seu time...",
+    "selectYourTeam": "Selecione o seu time",
+    "yourTeamIs": "Seu time é o",
+    "assigningRandom": "Atribuindo você a um time aleatório...",
     "loading": {
       "auth": "Carregando autenticação...",
       "session": "Carregando sessão..."
@@ -233,34 +257,306 @@
       "chooseTeamDesc": "Participantes podem selecionar qual time participar",
       "ownerChooses": "Organizador atribui os times",
       "ownerChoosesDesc": "Organizador da sessão atribui manualmente os participantes aos times"
-    },
-    "unauthenticated": "Erro: Usuário não autenticado",
-    "waitingOwner": "Esperando o dono da sessão atribuir seu time...",
-    "selectYourTeam": "Selecione o seu time",
-    "yourTeamIs": "Seu time é o",
-    "assigningRandom": "Atribuindo você a um time aleatório..."
+    }
   },
-   "share": {
+
+  "ownerAssignment": {
+    "title": "Atribuição de Times",
+    "participants": "Participantes",
+    "currentTeam": "Time Atual",
+    "assigning": "Atribuindo ao time...",
+    "anonymous": "Anônimo"
+  },
+
+  "board": {
+    "title": "Quadro de Sugestões",
+    "participant": "Participante",
+    "addSuggestion": "Adicionar Nova Sugestão",
+    "sessionClosed": "Sessão Encerrada!",
+    "sessionClosedMessage": "A sessão foi encerrada.",
+    "timeEnded": "Tempo Esgotado!",
+    "timeEndedMessage": "A fase de sugestões e votos foi encerrada.",
+    "anonymousReview": "Revisão Anônima",
+    "teamSuggestions": "Sugestões do {{team}}",
+    "suggestion": "sugestão",
+    "suggestions": "sugestões",
+    "filtered": "filtradas",
+    "noSuggestions": "Nenhuma sugestão ainda",
+    "beFirst": "Seja o primeiro a adicionar uma sugestão!",
+    "useFormAbove": "Use o formulário acima para começar",
+    "metadataUpdated": "Metadados atualizados!",
+    "metadataUpdateError": "Erro ao atualizar metadados",
+    "loading": {
+      "session": "Carregando sessão...",
+      "initializing": "Inicializando sessão...",
+      "cards": "Carregando cards..."
+    },
+    "errors": {
+      "sessionNotFound": "Sessão não encontrada"
+    }
+  },
+
+  "review": {
+    "title": "Revisão Anônima",
+    "cardsToReview": "Cards para Revisão",
+    "cards": "cards",
+    "mode": {
+      "readOnly": "MODO SOMENTE LEITURA",
+      "active": "MODO ATIVO",
+      "readOnlyDescription": "A fase de votação e comentários foi encerrada. Você ainda pode visualizar todos os cards e comentários, mas não pode interagir.",
+      "activeDescription": "Todos os cards são exibidos sem identificação de autor para evitar viés. Você pode votar e comentar em qualquer card."
+    },
+    "stats": {
+      "totalCards": "Total de Cards",
+      "comments": "Comentários",
+      "voters": "Votantes",
+      "readOnly": "Somente Leitura",
+      "active": "Ativo"
+    },
+    "description": {
+      "viewOnly": "Visualize os cards organizados por relevância",
+      "rateCards": "Classifique os cards usando o sistema de estrelas"
+    },
+    "empty": {
+      "title": "Nenhum card disponível",
+      "message": "Não há cards para revisão nesta sessão."
+    },
+    "footer": {
+      "title": "Modo de Revisão Anônima"
+    },
+    "actions": {
+      "backToTeam": "Voltar para o Time",
+      "viewLeaderboard": "Ver Classificação",
+      "endReview": "Encerrar Revisão",
+      "viewResults": "Ver Resultados"
+    },
+    "loading": {
+      "review": "Carregando revisão..."
+    },
+    "errors": {
+      "loadSession": "Erro ao carregar a sessão",
+      "authRequired": "Você precisa estar autenticado para votar",
+      "phaseEnded": "A fase de votação já foi encerrada",
+      "voteFailed": "Erro ao registrar voto",
+      "commentFailed": "Erro ao adicionar comentário",
+      "editPhaseEnded": "A fase de edição já foi encerrada",
+      "commentUpdateFailed": "Erro ao atualizar comentário",
+      "cannotVoteNow": "Você não pode votar agora",
+      "endReviewFailed": "Erro ao encerrar a fase de revisão"
+    },
+    "success": {
+      "voteRegistered": "Voto registrado!",
+      "commentAdded": "Comentário adicionado!",
+      "commentUpdated": "Comentário atualizado!",
+      "commentDeleted": "Comentário excluído com sucesso!",
+      "reviewEnded": "Fase de revisão encerrada!"
+    }
+  },
+
+  "card": {
+    "comment": "comentário",
+    "comments": "comentários",
+    "addComment": "Adicionar comentário",
+    "editComment": "Editar comentário",
+    "deleteComment": "Excluir comentário",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "editPlaceholder": "Editar comentário...",
+    "editDisabled": "Edição desabilitada",
+    "commentPlaceholder": "Digite seu comentário...",
+    "addMetadata": "Adicionar metadados",
+    "editSuggestion": "Editar sugestão",
+    "deleteSuggestion": "Excluir sugestão",
+    "editMetadata": "Editar metadados",
+    "voteOnMetadata": "Votar nos metadados",
+    "confirmDeleteComment": "Tem certeza que deseja excluir este comentário?",
+    "confirmDeleteSuggestion": "Tem certeza que deseja excluir esta sugestão?",
+    "tooltip": {
+      "viewVotes": "Visualizar votos nos metadados",
+      "vote": "Votar nos metadados",
+      "viewComments": "Visualizar comentários",
+      "toggleComments": "Mostrar/ocultar comentários"
+    },
+    "success": {
+      "metadataUpdated": "Metadados atualizados!"
+    },
+    "errors": {
+      "deleteSuggestion": "Erro ao deletar sugestão",
+      "deleteComment": "Erro ao deletar comentário",
+      "metadataUpdate": "Erro ao atualizar metadados"
+    }
+  },
+
+  "cardMetadata": {
+    "editTitle": "Editando Metadados",
+    "priority": "Prioridade",
+    "priorityPlaceholder": "Prioridade...",
+    "type": "Tipo",
+    "typePlaceholder": "Tipo de requisito...",
+    "category": "Categoria",
+    "categoryPlaceholder": "Categoria...",
+    "estimatedEffort": "Esforço Estimado",
+    "effortPlaceholder": "Ex: 2",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "saveTitle": "Salvar metadados",
+    "cancelTitle": "Cancelar edição"
+  },
+
+  "metadata": {
+    "priority": {
+      "low": "Baixa",
+      "medium": "Média",
+      "high": "Alta",
+      "critical": "Crítica"
+    },
+    "requirementType": {
+      "functional": "Funcional",
+      "nonFunctional": "Não Funcional",
+      "technical": "Técnico",
+      "design": "Design",
+      "other": "Outro"
+    },
+    "category": {
+      "feature": "Nova Feature",
+      "improvement": "Melhoria",
+      "bug": "Bug",
+      "documentation": "Documentação",
+      "question": "Pergunta",
+      "feedback": "Feedback"
+    }
+  },
+
+  "metadataVote": {
+    "agree": "Concordo",
+    "disagree": "Discordo",
+    "neutral": "Neutro",
+    "agreeCount": "concordam",
+    "disagreeCount": "discordam",
+    "neutralCount": "neutros",
+    "noVotes": "Nenhum voto registrado",
+    "question": "{{type}} \"{{value}}\" está correto?",
+    "tooltip": {
+      "agree": "Concordo com este metadado",
+      "neutral": "Não tenho opinião sobre este metadado",
+      "disagree": "Discordo deste metadado"
+    }
+  },
+
+  "metadataSelectors": {
+    "title": "Metadados da Sugestão",
+    "priority": "Prioridade",
+    "priorityPlaceholder": "Prioridade...",
+    "requirementType": "Tipo de Requisito",
+    "requirementTypePlaceholder": "Tipo de requisito...",
+    "category": "Categoria",
+    "categoryPlaceholder": "Categoria...",
+    "estimatedEffort": "Esforço Estimado",
+    "effortPlaceholder": "Ex: 2",
+    "tip": "Adicione metadados para ajudar na organização e priorização das sugestões."
+  },
+
+  "filters": {
+    "title": "Filtros",
+    "clearAll": "Limpar todos",
+    "priority": "Prioridade",
+    "category": "Categoria",
+    "selected": "selecionada",
+    "selectedPlural": "selecionadas"
+  },
+
+  "form": {
+    "creatingSuggestion": "Criando sugestão...",
+    "suggestionPlaceholder": "Digite sua sugestão...",
+    "submitSuggestion": "Enviar sugestão"
+  },
+
+  "sorting": {
+    "sortBy": "Ordenar por",
+    "options": {
+      "newest": "Mais Recentes",
+      "oldest": "Mais Antigos",
+      "highest": "Maior Avaliação",
+      "lowest": "Menor Avaliação",
+      "mostComments": "Mais Comentários",
+      "leastComments": "Menos Comentários",
+      "author": "Por Autor"
+    },
+    "descriptions": {
+      "newest": "Ordena pelos cards mais recentes primeiro",
+      "oldest": "Ordena pelos cards mais antigos primeiro",
+      "highest": "Ordena pelos cards com melhor avaliação primeiro",
+      "lowest": "Ordena pelos cards com pior avaliação primeiro",
+      "mostComments": "Ordena pelos cards com mais comentários primeiro",
+      "leastComments": "Ordena pelos cards com menos comentários primeiro",
+      "author": "Ordena pelos cards por autor alfabeticamente"
+    }
+  },
+
+  "scoreboard": {
+    "title": "Placar dos times",
+    "show": "Mostrar placar",
+    "hide": "Ocultar placar",
+    "ofSuggestions": "das sugestões",
+    "leader": "Líder",
+    "average": "Média",
+    "perTeam": "por time",
+    "total": "Total"
+  },
+
+  "timer": {
+    "timeExpired": "Tempo esgotado!",
+    "minute": "minuto",
+    "minutes": "minutos",
+    "second": "segundo",
+    "seconds": "segundos",
+    "added": "adicionado",
+    "addError": "Erro ao adicionar tempo",
+    "onlyMembersCanAdd": "Apenas membros do {{team}} podem adicionar tempo"
+  },
+
+  "addTime": {
+    "addTimeLabel": "Adicionar tempo",
+    "timePlaceholder": "Tempo",
+    "add": "Adicionar",
+    "adding": "Adicionando...",
+    "cancel": "Cancelar",
+    "addTime": "Adicionar tempo"
+  },
+
+  "share": {
     "copyLink": "Copiar link",
     "copied": "Copiado!",
     "defaultTitle": "Junte-se a minha sessão",
     "shareText": "Junte-se a minha sessão com o código: {{code}}",
     "buttonAriaLabel": "Compartilhar link da sessão"
   },
+
   "collapsible": {
     "sessionDescription": "Descrição da sessão",
     "show": "Mostrar",
     "hide": "Ocultar"
   },
-  "ownerAssignment": {
-    "title": "Atribuição de Times",
-    "participants": "Participantes",
-    "currentTeam": "Time Atual",
-    "unassigned": "Não atribuído",
-    "assigning": "Atribuindo ao time...",
-    "anonymous": "Anônimo"
+
+  "dropdown": {
+    "select": "Selecione..."
   },
-  "team": {
-    "team": "Time"
+
+  "passwordStrength": {
+    "strength": "Força da senha",
+    "empty": "Vazia",
+    "veryWeak": "Muito fraca",
+    "weak": "Fraca",
+    "medium": "Média",
+    "strong": "Forte",
+    "veryStrong": "Muito forte",
+    "uppercase": "Pelo menos uma letra maiúscula",
+    "number": "Pelo menos um número",
+    "idealLength": "8+ caracteres para maior segurança",
+    "specialChar": "Caractere especial (!@#$%&*) recomendado",
+    "confirmPassword": "Confirme sua senha",
+    "passwordsMatch": "Senhas coincidem",
+    "meetAllRequirements": "A senha precisa atender a todos os requisitos mínimos",
+    "validAndConfirmed": "Senha válida e confirmada!"
   }
 }

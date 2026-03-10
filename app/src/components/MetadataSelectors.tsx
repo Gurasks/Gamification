@@ -1,8 +1,9 @@
-import metadataService from '@/services/metadataOptionsService';
+import { getPriorityOptions, getRequirementTypeOptions, getCategoryOptions } from '@/services/metadataOptionsService';
 import { CategoryType, PriorityLevel, RequirementType } from '@/types/global';
 import { AlertCircle, Layers } from 'lucide-react';
 import React, { useId } from 'react';
 import { CustomDropdown } from './CustomDropdown';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface MetadataSelectorsProps {
   priority: PriorityLevel | '';
@@ -27,53 +28,58 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
   setEstimatedEffort,
   disabled = false
 }) => {
+  const { t } = useLanguage();
   const effortInputId = useId();
+
+  const priorityOptions = getPriorityOptions(t);
+  const requirementTypeOptions = getRequirementTypeOptions(t);
+  const categoryOptions = getCategoryOptions(t);
 
   return (
     <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
       <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
         <Layers className="w-4 h-4" />
-        Metadados da Sugestão
+        {t('metadataSelectors.title')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-        {/* Prioridade */}
+        {/* Priority */}
         <CustomDropdown
           value={priority}
           onChange={setPriority as (level: string) => void}
           disabled={disabled}
-          placeholder="Prioridade..."
-          options={metadataService.getCustomDropdownOptions.priority}
-          label="Prioridade"
+          placeholder={t('metadataSelectors.priorityPlaceholder')}
+          options={priorityOptions}
+          label={t('metadataSelectors.priority')}
         />
 
-        {/* Tipo de Requisito */}
+        {/* Requirement Type */}
         <CustomDropdown
           value={requirementType}
           onChange={setRequirementType as (type: string) => void}
           disabled={disabled}
-          placeholder="Tipo de requisito..."
-          options={metadataService.getCustomDropdownOptions.requirementType}
-          label="Tipo de requisito"
+          placeholder={t('metadataSelectors.requirementTypePlaceholder')}
+          options={requirementTypeOptions}
+          label={t('metadataSelectors.requirementType')}
         />
 
-        {/* Categoria */}
+        {/* Category */}
         <CustomDropdown
           value={category}
           onChange={setCategory as (category: string) => void}
           disabled={disabled}
-          placeholder="Categoria..."
-          options={metadataService.getCustomDropdownOptions.category}
-          label="Categoria"
+          placeholder={t('metadataSelectors.categoryPlaceholder')}
+          options={categoryOptions}
+          label={t('metadataSelectors.category')}
         />
 
-        {/* Esforço Estimado */}
+        {/* Estimated Effort */}
         <div className="flex flex-col gap-1">
           <label
             htmlFor={effortInputId}
             className="text-start text-xs font-medium text-gray-600 mb-1"
           >
-            Esforço estimado
+            {t('metadataSelectors.estimatedEffort')}
           </label>
 
           <input
@@ -87,17 +93,17 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
               setEstimatedEffort(value === '' ? '' : Number.parseFloat(value));
             }}
             className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder="Ex: 2"
+            placeholder={t('metadataSelectors.effortPlaceholder')}
             disabled={disabled}
             aria-describedby={`${effortInputId}-description`}
           />
         </div>
       </div>
 
-      {/* Dicas de uso */}
+      {/* Usage tips */}
       <div className="text-xs text-gray-500 flex items-start gap-2">
         <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <p>Adicione metadados para ajudar na organização e priorização das sugestões durante a revisão.</p>
+        <p>{t('metadataSelectors.tip')}</p>
       </div>
     </div>
   );

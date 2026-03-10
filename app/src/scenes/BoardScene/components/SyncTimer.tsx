@@ -6,6 +6,9 @@ import { User } from 'firebase/auth';
 import { SyncTimerSkeleton } from './SyncTimerSkeleton';
 import { AddTimeInput } from './AddTimeInput';
 import { getAdditionalTimeDisplay } from '@/services/boardServices';
+import { useLanguage } from '@/hooks/useLanguage';
+import { AlertTriangle } from 'lucide-react';
+import { getLocalizedTeamName } from '@/services/teamSelectionServices';
 
 interface SyncTimerProps {
   timerId: string;
@@ -28,6 +31,7 @@ const SyncTimer = ({
   onTimerLoaded,
   isSessionClosed = false
 }: SyncTimerProps) => {
+  const { t } = useLanguage();
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [endTime, setEndTime] = useState<Date | null>(null);
@@ -38,7 +42,6 @@ const SyncTimer = ({
   const [additionalTime, setAdditionalTime] = useState<number>(1);
   const [timeUnit, setTimeUnit] = useState<'minutes' | 'seconds'>('minutes');
 
-  // Verifica se o usuário atual pertence ao time atual
   const userTeam = sessionTeams[user.uid];
   const canAddTime = userTeam === currentTeam;
 
@@ -87,12 +90,12 @@ const SyncTimer = ({
         setIsRunning(false);
         onTimeEnd?.();
         onTimerStateChange?.(true);
-        returnToastMessage('Tempo esgotado!', 'timer');
+        returnToastMessage(t('timer.timeExpired'), 'timer');
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, endTime, timeLeft, hasEnded, onTimeEnd, onTimerStateChange]);
+  }, [isRunning, endTime, timeLeft, hasEnded, onTimeEnd, onTimerStateChange, t]);
 
   const handleAddTime = async (customSeconds?: number) => {
     if (isAddingTime || !canAddTime) return;
@@ -111,13 +114,13 @@ const SyncTimer = ({
       const additionalTimeDisplay = getAdditionalTimeDisplay(additionalTime);
 
       const timeText = timeUnit === 'minutes'
-        ? `${additionalTime} minuto${additionalTimeDisplay}`
-        : `${additionalTime} segundo${additionalTimeDisplay}`;
+        ? `${additionalTime} ${additionalTime === 1 ? t('timer.minute') : t('timer.minutes')}`
+        : `${additionalTime} ${additionalTime === 1 ? t('timer.second') : t('timer.seconds')}`;
 
-      returnToastMessage(`+${timeText} adicionado!`, 'success');
+      returnToastMessage(`+${timeText} ${t('timer.added')}!`, 'success');
     } catch (error) {
       console.error('Error adding time:', error);
-      returnToastMessage('Erro ao adicionar tempo', 'error');
+      returnToastMessage(t('timer.addError'), 'error');
     } finally {
       setIsAddingTime(false);
     }
@@ -132,7 +135,6 @@ const SyncTimer = ({
   const formattedTime = formatTime(timeLeft);
   const isLowTime = timeLeft > 0 && timeLeft <= 30;
 
-  // Mostrar loading enquanto o timer não carregou
   if (!timerLoaded) {
     return <SyncTimerSkeleton />;
   }
@@ -173,10 +175,10 @@ const SyncTimer = ({
             timeUnit={timeUnit}
             setTimeUnit={setTimeUnit}
           /> : (
-            // Mensagem quando não pode adicionar tempo
             <div className="text-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-xs text-yellow-700">
-                ⚠️ Apenas membros do <strong>{currentTeam}</strong> podem adicionar tempo
+                <AlertTriangle className="inline-block h-3 w-3 mr-2 mb-1" />
+                {t('timer.onlyMembersCanAdd', { team: getLocalizedTeamName(currentTeam, t) })}
               </p>
             </div>
           )}
@@ -186,7 +188,7 @@ const SyncTimer = ({
       {/* Indicador de loading */}
       {isAddingTime && (
         <div className="text-xs text-gray-500">
-          Atualizando timer...
+          {t('timer.updating')}
         </div>
       )}
     </div>
