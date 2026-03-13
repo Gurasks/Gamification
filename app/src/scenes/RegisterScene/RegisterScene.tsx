@@ -117,7 +117,7 @@ const RegisterScene: React.FC = () => {
                 navigate('/login');
               }
             }}
-            message={t('auth.registerMessage')}
+            message={t('auth.register')}
             onBack={handleGoBack}
             backButtonLabel={t('common.actions.back')}
             showBackButton={true}

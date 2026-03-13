@@ -17,7 +17,8 @@ import {
   calculateTotalScore,
   calculateUserGamificationPoints,
 } from "@/services/gamificationServices";
-import { t } from "i18next";
+import { TFunction } from "i18next";
+import { getLocalizedTeamName } from "@/services/teamSelectionServices";
 
 const getPriorityColor = (priority: string): string => {
   const colors: Record<string, string> = {
@@ -41,18 +42,17 @@ const getCategoryColor = (category: string): string => {
   return colors[category] || "#374151";
 };
 
-const generateReportHeader = (session: Session): string => `
+const generateReportHeader = (session: Session, t: TFunction): string => `
   <div class="report-header">
     <h1>
       ${getStyledIcon(ExportIcons.BAR_CHART, "#1e40af", 24)}
-      Relatório Completo da Sessão
+      ${t("export.fullSessionReport")}
     </h1>
     <div class="header-info">
       <div class="info-row">
         ${getStyledIcon(ExportIcons.FILE_TEXT, "#374151", 16)}
-        <strong>Sessão:</strong> ${session?.title || "N/A"}
+        <strong>${t("export.session")}:</strong> ${session?.title || t("common.na")}
       </div>
-      <!-- Adicionar mais informações do header conforme necessário -->
     </div>
   </div>
 `;
@@ -61,49 +61,50 @@ const generateExecutiveSummary = (
   sortedData: UserStats[],
   teamMetrics: TeamMetrics[],
   allCards: Card[],
+  t: TFunction,
 ): string => `
   <div class="section executive-summary">
     <h2>
       ${getStyledIcon(ExportIcons.TARGET, "#1e40af", 20)}
-      Sumário Executivo
+      ${t("export.executiveSummary")}
     </h2>
     <div class="summary-grid">
       <div class="summary-card">
-        <h3>${ExportIcons.TROPHY} Top 3 Participantes</h3>
+        <h3>${ExportIcons.TROPHY} ${t("export.topParticipants")}</h3>
         <ol>
           ${sortedData
             .slice(0, 3)
             .map(
               (user) => `
-            <li>${user.userName} - ${user.totalScore || 0} pontos</li>
+            <li>${user.userName} - ${user.totalScore || 0} ${t("common.metrics.points")}</li>
           `,
             )
             .join("")}
         </ol>
       </div>
       <div class="summary-card">
-        <h3>${ExportIcons.SHIELD} Top 3 Times</h3>
+        <h3>${ExportIcons.SHIELD} ${t("export.topTeams")}</h3>
         <ol>
           ${teamMetrics
             .slice(0, 3)
             .map(
               (team) => `
-            <li>${team.teamName} - ${team.totalScore || 0} pontos</li>
+            <li>${team.teamName} - ${team.totalScore || 0} ${t("common.metrics.points")}</li>
           `,
             )
             .join("")}
         </ol>
       </div>
       <div class="summary-card">
-        <h3>${ExportIcons.GRAPH} Estatísticas Gerais</h3>
+        <h3>${ExportIcons.GRAPH} ${t("export.generalStats")}</h3>
         <ul>
           <li><strong>${
             ExportIcons.MESSAGE_SQUARE
-          } Total de Comentários:</strong> ${sortedData.reduce(
+          } ${t("export.totalComments")}:</strong> ${sortedData.reduce(
             (sum, user) => sum + user.totalComments,
             0,
           )}</li>
-          <li><strong>${ExportIcons.STAR} Avaliação Média:</strong> ${
+          <li><strong>${ExportIcons.STAR} ${t("export.avgRating")}:</strong> ${
             sortedData.length > 0
               ? (
                   sortedData.reduce(
@@ -115,7 +116,7 @@ const generateExecutiveSummary = (
           }</li>
           <li><strong>${
             ExportIcons.GRAPH
-          } Sugestões por Participante:</strong> ${
+          } ${t("export.suggestionsPerParticipant")}:</strong> ${
             sortedData.length > 0
               ? (allCards.length / sortedData.length).toFixed(1)
               : 0
@@ -126,20 +127,23 @@ const generateExecutiveSummary = (
   </div>
 `;
 
-const generateTeamMetricsTable = (teamMetrics: TeamMetrics[]): string => `
+const generateTeamMetricsTable = (
+  teamMetrics: TeamMetrics[],
+  t: TFunction,
+): string => `
   <div class="section">
-    <h2>${ExportIcons.TROPHY} Métricas por Time</h2>
+    <h2>${ExportIcons.TROPHY} ${t("export.teamMetrics")}</h2>
     <table class="metrics-table">
       <thead>
         <tr>
-          <th>Posição</th>
-          <th>Time</th>
-          <th>${ExportIcons.USERS} Membros</th>
-          <th>Pontuação</th>
-          <th>${ExportIcons.MESSAGE_SQUARE} Comentários</th>
-          <th>${ExportIcons.FILE_TEXT} Sugestões</th>
-          <th>Respostas</th>
-          <th>${ExportIcons.STAR} Nota Média</th>
+          <th>${t("export.position")}</th>
+          <th>${t("common.entities.team")}</th>
+          <th>${ExportIcons.USERS} ${t("common.entities.members")}</th>
+          <th>${t("common.metrics.score")}</th>
+          <th>${ExportIcons.MESSAGE_SQUARE} ${t("common.content.comments")}</th>
+          <th>${ExportIcons.FILE_TEXT} ${t("common.content.suggestions")}</th>
+          <th>${t("export.replies")}</th>
+          <th>${ExportIcons.STAR} ${t("export.avgRating")}</th>
         </tr>
       </thead>
       <tbody>
@@ -167,6 +171,7 @@ const generateTeamMetricsTable = (teamMetrics: TeamMetrics[]): string => `
 const generateGamificationData = (
   user: UserStats,
   allCards: Card[],
+  t: TFunction,
 ): string => {
   const gamificationPoints = calculateUserGamificationPoints(
     allCards,
@@ -185,26 +190,26 @@ const generateGamificationData = (
 
   return `
     <div class="gamification-section">
-      <h4>${ExportIcons.ZAP} Pontuação de Gamificação: ${totalScore} pontos</h4>
+      <h4>${ExportIcons.ZAP} ${t("export.gamificationScore")}: ${totalScore} ${t("common.metrics.points")}</h4>
       <div class="gamification-grid">
         <div class="gamification-item">
-          <strong>${ExportIcons.TAG} Votos em Metadados:</strong>
-          ${gamificationPoints.metadataVotes.agreeVotes} concordados / ${
+          <strong>${ExportIcons.TAG} ${t("export.metadataVotes")}:</strong>
+          ${gamificationPoints.metadataVotes.agreeVotes} ${t("export.agreed")} / ${
             gamificationPoints.metadataVotes.totalVotes
-          } totais
+          } ${t("export.total")}
           (${agreementRate}%)
         </div>
         <div class="gamification-item">
-          <strong>${ExportIcons.STAR} Avaliações de Cards:</strong>
+          <strong>${ExportIcons.STAR} ${t("export.cardRatings")}:</strong>
           ${
             gamificationPoints.cardRatings.totalRatings
-          } avaliações (média: ${gamificationPoints.cardRatings.averageRating.toFixed(
+          } ${t("common.content.ratings")} (${t("export.avg")}: ${gamificationPoints.cardRatings.averageRating.toFixed(
             1,
           )})
         </div>
         <div class="gamification-item">
-          <strong>${ExportIcons.MESSAGE_SQUARE} Comentários:</strong>
-          ${gamificationPoints.comments.totalComments} comentários feitos
+          <strong>${ExportIcons.MESSAGE_SQUARE} ${t("common.content.comments")}:</strong>
+          ${gamificationPoints.comments.totalComments} ${t("export.commentsMade")}
         </div>
       </div>
     </div>
@@ -215,20 +220,21 @@ const generateUserRankingTable = (
   sortedData: UserStats[],
   session: Session,
   allCards: Card[],
+  t: TFunction,
 ): string => `
   <div class="section">
-    <h2>${ExportIcons.USERS} Classificação Individual</h2>
+    <h2>${ExportIcons.USERS} ${t("export.individualRanking")}</h2>
     <table class="ranking-table">
       <thead>
         <tr>
-          <th>Posição</th>
-          <th>Usuário</th>
-          <th>${ExportIcons.SHIELD} Time</th>
-          <th>Pontuação Total</th>
-          <th>${ExportIcons.MESSAGE_SQUARE} Comentários</th>
-          <th>${ExportIcons.STAR} Nota Média</th>
-          <th>Respostas</th>
-          <th>${ExportIcons.FILE_TEXT} Sugestões</th>
+          <th>${t("export.position")}</th>
+          <th>${t("export.user")}</th>
+          <th>${ExportIcons.SHIELD} ${t("common.entities.team")}</th>
+          <th>${t("export.totalScore")}</th>
+          <th>${ExportIcons.MESSAGE_SQUARE} ${t("common.content.comments")}</th>
+          <th>${ExportIcons.STAR} ${t("export.avgRating")}</th>
+          <th>${t("export.replies")}</th>
+          <th>${ExportIcons.FILE_TEXT} ${t("common.content.suggestions")}</th>
         </tr>
       </thead>
       <tbody>
@@ -238,14 +244,18 @@ const generateUserRankingTable = (
           <tr class="${index < 3 ? "top-three" : ""}">
             <td class="rank">${`#${index + 1}`}</td>
             <td><strong>${user.userName}</strong></td>
-            <td>${session?.teams?.[user.userId] || "N/A"}</td>
+            <td>${
+              session?.teams?.[user.userId]
+                ? getLocalizedTeamName(session.teams[user.userId], t)
+                : t("common.na")
+            }</td>
             <td class="score">${user.totalScore || 0}</td>
             <td>${user.totalComments}</td>
             <td class="rating">${user.averageRating.toFixed(1)}</td>
             <td>${user.totalReplies}</td>
             <td>${user.totalCardsCreated}</td>
           </tr>
-          ${generateGamificationData(user, allCards)}
+          ${generateGamificationData(user, allCards, t)}
         `,
           )
           .join("")}
@@ -254,7 +264,7 @@ const generateUserRankingTable = (
   </div>
 `;
 
-const generateCardMetadataHTML = (card: Card): string => {
+const generateCardMetadataHTML = (card: Card, t: TFunction): string => {
   let metadataHTML = "";
 
   const addMetadataBadge = (
@@ -268,10 +278,10 @@ const generateCardMetadataHTML = (card: Card): string => {
     metadataHTML += `<span class="metadata-badge ${type}-${value}">
       ${styledIcon} ${
         type === "priority"
-          ? "Prioridade"
+          ? t("export.priority")
           : type === "requirementType"
-            ? "Tipo"
-            : "Categoria"
+            ? t("export.type")
+            : t("export.category")
       }: ${label}
     </span>`;
   };
@@ -317,7 +327,7 @@ const generateCardMetadataHTML = (card: Card): string => {
   if (card.estimatedEffort) {
     const clockIcon = getStyledIcon(ExportIcons.CLOCK, "#7c3aed", 14);
     metadataHTML += `<span class="metadata-badge effort">
-      ${clockIcon} Esforço: ${card.estimatedEffort}
+      ${clockIcon} ${t("export.effort")}: ${card.estimatedEffort}
     </span>`;
   }
 
@@ -328,7 +338,7 @@ const generateCardMetadataHTML = (card: Card): string => {
     if (totalVotes > 0) {
       const agreementRate = Math.round((counts.agree / totalVotes) * 100);
       const icon = getAgreementIcon(agreementRate);
-      metadataHTML += `<span class="metadata-badge votes">${icon} Concordância: ${agreementRate}% (${counts.agree}/${totalVotes})</span>`;
+      metadataHTML += `<span class="metadata-badge votes">${icon} ${t("export.agreement")}: ${agreementRate}% (${counts.agree}/${totalVotes})</span>`;
     }
   }
 
@@ -361,9 +371,9 @@ const getAgreementIcon = (agreementRate: number) => {
   return ExportIcons.X_CIRCLE;
 };
 
-const generateCardAnalysis = (allCards: Card[]): string => `
+const generateCardAnalysis = (allCards: Card[], t: TFunction): string => `
   <div class="section">
-    <h2>${ExportIcons.LIGHTBULB} Análise Detalhada de Sugestões (${
+    <h2>${ExportIcons.LIGHTBULB} ${t("export.detailedAnalysis")} (${
       allCards.length
     })</h2>
     <div class="cards-analysis">
@@ -372,46 +382,46 @@ const generateCardAnalysis = (allCards: Card[]): string => `
           (card, index) => `
         <div class="card-detail">
           <div class="card-header">
-            <h3>${ExportIcons.FILE_TEXT} Sugestão #${index + 1}</h3>
+            <h3>${ExportIcons.FILE_TEXT} ${t("export.suggestion")} #${index + 1}</h3>
             <span class="card-id">ID: ${card.id.substring(0, 8)}...</span>
           </div>
           <div class="card-content">
             <p class="card-text">${card.text}</p>
             <div class="card-info">
               <div class="info-item">
-                <strong>${ExportIcons.USERS} Autor:</strong> ${card.createdBy}
+                <strong>${ExportIcons.USERS} ${t("export.author")}:</strong> ${card.createdBy}
               </div>
               <div class="info-item">
-                <strong>${ExportIcons.SHIELD} Time:</strong> ${card.teamName}
+                <strong>${ExportIcons.SHIELD} ${t("common.entities.team")}:</strong> ${getLocalizedTeamName(card.teamName, t)}
               </div>
               <div class="info-item">
-                <strong>${ExportIcons.CALENDAR} Data:</strong> ${new Date(
+                <strong>${ExportIcons.CALENDAR} ${t("export.date")}:</strong> ${new Date(
                   card.createdAt?.toDate() || Date.now(),
-                ).toLocaleString("pt-BR")}
+                ).toLocaleString()}
               </div>
               ${
                 card.ratings
                   ? `<div class="info-item">
                     <strong>${
                       ExportIcons.STAR
-                    } Avaliação Média:</strong> ${calculateAverageRating(
+                    } ${t("export.avgRating")}:</strong> ${calculateAverageRating(
                       card.ratings,
                     ).toFixed(1)}
-                    (${Object.keys(card.ratings).length} avaliações)
+                    (${Object.keys(card.ratings).length} ${t("common.content.ratings")})
                   </div>`
                   : ""
               }
             </div>
 
-            <!-- Metadados do Card -->
-            ${generateCardMetadataHTML(card)}
+            <!-- Card Metadata -->
+            ${generateCardMetadataHTML(card, t)}
 
-            <!-- Comentários -->
+            <!-- Comments -->
             ${
               card.comments && card.comments.length > 0
                 ? `
               <div class="comments-section">
-                <h4>${ExportIcons.MESSAGE_SQUARE} Comentários (${
+                <h4>${ExportIcons.MESSAGE_SQUARE} ${t("common.content.comments")} (${
                   card.comments.length
                 }):</h4>
                 ${card.comments
@@ -422,9 +432,7 @@ const generateCardAnalysis = (allCards: Card[]): string => `
                       <strong>${ExportIcons.USERS} ${comment.createdBy}</strong>
                       <span class="comment-date">${
                         ExportIcons.CALENDAR
-                      } ${new Date(comment.createdAt).toLocaleString(
-                        "pt-BR",
-                      )}</span>
+                      } ${new Date(comment.createdAt).toLocaleString()}</span>
                     </div>
                     <p class="comment-text">${comment.text}</p>
                   </div>
@@ -433,7 +441,7 @@ const generateCardAnalysis = (allCards: Card[]): string => `
                   .join("")}
               </div>
             `
-                : '<p class="no-comments">Nenhum comentário</p>'
+                : `<p class="no-comments">${t("export.noComments")}</p>`
             }
           </div>
         </div>
@@ -444,7 +452,10 @@ const generateCardAnalysis = (allCards: Card[]): string => `
   </div>
 `;
 
-const generateMetadataDistribution = (allCards: Card[]): string => {
+const generateMetadataDistribution = (
+  allCards: Card[],
+  t: TFunction,
+): string => {
   const priorityCounts: Record<string, number> = {};
   const requirementCounts: Record<string, number> = {};
   const categoryCounts: Record<string, number> = {};
@@ -491,35 +502,35 @@ const generateMetadataDistribution = (allCards: Card[]): string => {
 
   return `
     <div class="section">
-      <h2>${ExportIcons.GRAPH} Distribuição de Metadados</h2>
+      <h2>${ExportIcons.GRAPH} ${t("export.metadataDistribution")}</h2>
       <div class="metadata-distribution">
         <div class="distribution-grid">
           <div class="distribution-card">
-            <h3>${ExportIcons.BAR_CHART} Prioridades</h3>
+            <h3>${ExportIcons.BAR_CHART} ${t("export.priorities")}</h3>
             <ul>
               ${generateDistributionList(priorityCounts, "priority")}
             </ul>
           </div>
           <div class="distribution-card">
-            <h3>${ExportIcons.FILE_TEXT} Tipos de Requisito</h3>
+            <h3>${ExportIcons.FILE_TEXT} ${t("export.requirementTypes")}</h3>
             <ul>
               ${generateDistributionList(requirementCounts, "requirementType")}
             </ul>
           </div>
           <div class="distribution-card">
-            <h3>${ExportIcons.TAG} Categorias</h3>
+            <h3>${ExportIcons.TAG} ${t("export.categories")}</h3>
             <ul>
               ${generateDistributionList(categoryCounts, "category")}
             </ul>
           </div>
           <div class="distribution-card">
-            <h3>${ExportIcons.CLOCK} Esforço Total</h3>
+            <h3>${ExportIcons.CLOCK} ${t("export.totalEffort")}</h3>
             <p><strong>${totalEffort}</strong></p>
-            <p>Média: ${
+            <p>${t("export.average")}: ${
               allCards.length > 0
                 ? (totalEffort / allCards.length).toFixed(1)
                 : 0
-            } por sugestão</p>
+            } ${t("export.perSuggestion")}</p>
           </div>
         </div>
       </div>
@@ -527,9 +538,9 @@ const generateMetadataDistribution = (allCards: Card[]): string => {
   `;
 };
 
-const generateReportFooter = (): string => `
+const generateReportFooter = (t: TFunction): string => `
   <div class="report-footer">
-    <p>${ExportIcons.CHECK_CIRCLE} Relatório gerado automaticamente pelo Singular</p>
+    <p>${ExportIcons.CHECK_CIRCLE} ${t("export.generatedBy")}</p>
   </div>
 `;
 
@@ -538,15 +549,16 @@ export const generateExportContent = (
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
   allCards: Card[],
+  t: TFunction,
 ): string => {
   const sections = [
-    generateReportHeader(session),
-    generateExecutiveSummary(sortedData, teamMetrics, allCards),
-    generateTeamMetricsTable(teamMetrics),
-    generateUserRankingTable(sortedData, session, allCards),
-    generateCardAnalysis(allCards),
-    generateMetadataDistribution(allCards),
-    generateReportFooter(),
+    generateReportHeader(session, t),
+    generateExecutiveSummary(sortedData, teamMetrics, allCards, t),
+    generateTeamMetricsTable(teamMetrics, t),
+    generateUserRankingTable(sortedData, session, allCards, t),
+    generateCardAnalysis(allCards, t),
+    generateMetadataDistribution(allCards, t),
+    generateReportFooter(t),
   ];
 
   return `

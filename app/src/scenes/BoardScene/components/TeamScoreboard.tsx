@@ -130,7 +130,7 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
                   {leadingTeam ? getLocalizedTeamName(leadingTeam.name, t) : t('common.na')}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {leadingTeam?.cardCount || 0} {t('scoreboard.cards')}
+                  {leadingTeam?.cardCount || 0} {t('review.cards')}
                 </div>
               </div>
 
@@ -158,7 +158,7 @@ export const TeamScoreboard: React.FC<TeamScoreboardProps> = ({
                   {teams.find(t => t.name === currentTeam)?.cardCount || 0}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {getPercentage(teams.find(t => t.name === currentTeam)?.cardCount || 0)}%
+                  {getPercentage(teams.find(t => t.name === currentTeam)?.cardCount || 0)}% {t('scoreboard.ofTotal')}
                 </div>
               </div>
 

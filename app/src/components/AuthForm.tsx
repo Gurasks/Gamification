@@ -418,12 +418,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     formState.resetForm();
   };
 
-  const fullNameLabel = t('auth.fullName');
-  const fullNamePlaceholder = t('auth.placeholders.fullName');
+  const fullNameLabel = t('nameEntry.labels.yourName');
+  const fullNamePlaceholder = t('nameEntry.placeholders.name');
   const emailPlaceholder = t('auth.placeholders.email');
   const passwordPlaceholder = mode === 'login' ? t('auth.placeholders.password') : t('auth.placeholders.createPassword');
   const confirmPasswordPlaceholder = t('auth.placeholders.confirmPassword');
-  const minLengthText = t('auth.minLength', { count: 2 });
+  const minLengthText = t('validation.minLength', { field: t('auth.fields.name'), count: 2 });
 
   return (
     <div className={`space-y-6 ${className}`}>

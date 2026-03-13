@@ -286,7 +286,7 @@ const AnonymousReviewScene: React.FC = () => {
                 <MessageSquare className="w-4 h-4 text-green-700" />
                 <div className="text-2xl font-bold text-green-700">{totalComments}</div>
               </div>
-              <div className="text-sm font-medium text-green-800">{t('review.stats.comments')}</div>
+              <div className="text-sm font-medium text-green-800">{t('common.content.comments')}</div>
             </div>
 
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">

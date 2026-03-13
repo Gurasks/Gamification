@@ -26,7 +26,7 @@ export const getLocalizedTeamName = (
   teamId: string,
   t: (key: string) => string,
 ): string => {
-  const prefix = t("team.team");
+  const prefix = t("common.entities.team");
   return `${prefix} ${teamId}`;
 };
 

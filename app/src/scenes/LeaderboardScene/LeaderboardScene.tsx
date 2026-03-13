@@ -11,15 +11,31 @@ import { LoadingOverlay } from '../../components/LoadingOverlay';
 import { getCardsBySessionId } from '@/services/firestore/cardServices';
 import { fetchLeaderboardData } from '@/services/firestore/firestoreServices';
 import { getSession, getSessionTeamTimers } from '@/services/firestore/sessionServices';
-import { Trophy, Download, Users, TrendingUp, RefreshCw, ChevronLeft, Home, FileText, BarChart3, Shield, MessageSquare, Clock } from 'lucide-react';
+import {
+  Trophy,
+  Download,
+  Users,
+  TrendingUp,
+  RefreshCw,
+  ChevronLeft,
+  Home,
+  FileText,
+  BarChart3,
+  Shield,
+  MessageSquare,
+  Clock
+} from 'lucide-react';
 import CollapsibleDescriptionArea from '@/components/CollapsibleDescriptionArea';
 import { Button } from '@/components/Button';
 import { calculateUserGamificationPoints, calculateTotalScore, calculateTeamTimes } from '@/services/gamificationServices';
 import ScoreExplanationFooter from './components/ScoreExplanationFooter';
 import TimeEfficiencySection from './components/TimeEfficiencySection';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
+import { useLanguage } from '@/hooks/useLanguage';
+import { getLocalizedTeamName } from '@/services/teamSelectionServices';
 
 const LeaderboardScene: React.FC = () => {
+  const { t } = useLanguage();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [leaderboardData, setLeaderboardData] = useState<UserStats[]>([]);
   const [session, setSession] = useState<Session | null>(null);
@@ -66,7 +82,7 @@ const LeaderboardScene: React.FC = () => {
           ...user,
           gamificationPoints,
           totalScore,
-          timeBonus: gamificationPoints.timeEfficiency.bonusPoints // Adicionar bônus de tempo
+          timeBonus: gamificationPoints.timeEfficiency.bonusPoints
         };
       });
 
@@ -90,15 +106,15 @@ const LeaderboardScene: React.FC = () => {
     const teams = getAvailableTeamIds(sessionData.numOfTeams || 2);
     const metrics: TeamMetrics[] = [];
 
-    teams.forEach(teamName => {
+    teams.forEach(teamId => {
       const teamMembers = users.filter(user =>
-        sessionData.teams && sessionData.teams[user.userId] === teamName
+        sessionData.teams && sessionData.teams[user.userId] === teamId
       );
 
-      const teamCards = cards.filter(card => card.teamName === teamName);
+      const teamCards = cards.filter(card => card.teamName === teamId);
 
       const teamMetric: TeamMetrics = {
-        teamName,
+        teamName: teamId,
         members: teamMembers.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0)),
         totalComments: teamMembers.reduce((sum, user) => sum + user.totalComments, 0),
         totalCards: teamCards.length,
@@ -134,7 +150,7 @@ const LeaderboardScene: React.FC = () => {
   if (loading) {
     return (
       <LoadingOverlay
-        message="Carregando tabela de classificação..."
+        message={t('leaderboard.loading')}
       />
     );
   }
@@ -143,10 +159,10 @@ const LeaderboardScene: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Sessão não encontrada</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('leaderboard.sessionNotFound')}</h2>
           <Button onClick={() => navigate('/')} variant="outline-primary">
             <Home className="w-4 h-4 mr-2" />
-            Voltar ao Início
+            {t('common.navigation.backToHome')}
           </Button>
         </div>
       </div>
@@ -167,12 +183,12 @@ const LeaderboardScene: React.FC = () => {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col gap-4">
-            {/* Título e descrição */}
+            {/* Title and description */}
             <div className="flex-1">
               <div className="flex justify-center gap-3 mb-2">
                 <Trophy className="w-8 h-8 text-yellow-500" />
                 <h1 className="text-3xl font-bold text-gray-800">
-                  Tabela de Classificação - {session.title}
+                  {t('leaderboard.title')} - {session.title}
                 </h1>
               </div>
 
@@ -184,19 +200,19 @@ const LeaderboardScene: React.FC = () => {
                 />
               )}
 
-              {/* Estatísticas de resumo */}
+              {/* Summary statistics */}
               <div className="mt-4 p-4 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200">
                 <div className="flex justify-center items-center gap-3 mb-2">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <span className="text-lg font-semibold text-blue-700">RESUMO DA COMPETIÇÃO</span>
+                  <span className="text-lg font-semibold text-blue-700">{t('leaderboard.competitionSummary').toUpperCase()}</span>
                 </div>
                 <p className="text-gray-700 text-center">
-                  Acompanhe o desempenho dos participantes e times nesta sessão de levantamento de requisitos.
+                  {t('leaderboard.summaryDescription')}
                 </p>
               </div>
             </div>
 
-            {/* Botões de ação */}
+            {/* Action buttons */}
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4 border-t border-gray-200">
               <Button
                 onClick={handleGoBack}
@@ -204,38 +220,38 @@ const LeaderboardScene: React.FC = () => {
                 className="flex items-center justify-center gap-2"
               >
                 <ChevronLeft className="w-4 h-4" />
-                Voltar
+                {t('common.actions.back')}
               </Button>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
-                  onClick={() => session && exportToPDF(session, teamMetrics, sortedData, allCards)}
+                  onClick={() => session && exportToPDF(session, teamMetrics, sortedData, allCards, t)}
                   variant="outline-danger"
                   className="flex items-center justify-center gap-2"
                 >
                   <FileText className="w-4 h-4" />
-                  Exportar PDF
+                  {t('leaderboard.exportPDF')}
                 </Button>
                 <Button
-                  onClick={() => session && exportToDOC(session, teamMetrics, sortedData, allCards)}
+                  onClick={() => session && exportToDOC(session, teamMetrics, sortedData, allCards, t)}
                   variant="outline-primary"
                   className="flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  Exportar DOC
+                  {t('leaderboard.exportDOC')}
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Estatísticas */}
+          {/* Statistics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 text-center">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Users className="w-4 h-4 text-blue-700" />
                 <div className="text-2xl font-bold text-blue-700">{totalParticipants}</div>
               </div>
-              <div className="text-sm font-medium text-blue-800">Participantes</div>
+              <div className="text-sm font-medium text-blue-800">{t('leaderboard.participants')}</div>
             </div>
 
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
@@ -243,7 +259,7 @@ const LeaderboardScene: React.FC = () => {
                 <BarChart3 className="w-4 h-4 text-green-700" />
                 <div className="text-2xl font-bold text-green-700">{totalCards}</div>
               </div>
-              <div className="text-sm font-medium text-green-800">Sugestões</div>
+              <div className="text-sm font-medium text-green-800">{t('common.content.suggestions')}</div>
             </div>
 
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
@@ -251,7 +267,7 @@ const LeaderboardScene: React.FC = () => {
                 <MessageSquare className="w-4 h-4 text-purple-700" />
                 <div className="text-2xl font-bold text-purple-700">{totalComments}</div>
               </div>
-              <div className="text-sm font-medium text-purple-800">Comentários</div>
+              <div className="text-sm font-medium text-purple-800">{t('common.content.comments')}</div>
             </div>
 
             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
@@ -259,7 +275,7 @@ const LeaderboardScene: React.FC = () => {
                 <Trophy className="w-4 h-4 text-yellow-700" />
                 <div className="text-2xl font-bold text-yellow-700">{averageScore}</div>
               </div>
-              <div className="text-sm font-medium text-yellow-800">Pontuação Média</div>
+              <div className="text-sm font-medium text-yellow-800">{t('leaderboard.averageScore')}</div>
             </div>
           </div>
         </div>
@@ -270,13 +286,13 @@ const LeaderboardScene: React.FC = () => {
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-yellow-500" />
-                Classificação Geral
+                {t('leaderboard.overallRanking')}
                 <span className="text-sm font-normal text-gray-500">
-                  ({sortedData.length} participantes)
+                  ({sortedData.length} {t('leaderboard.participants').toLowerCase()})
                 </span>
               </h2>
               <p className="text-sm text-gray-600 text-start mt-1">
-                Visualize o ranking por pontuação total ou outras métricas
+                {t('leaderboard.rankingDescription')}
               </p>
             </div>
 
@@ -287,7 +303,7 @@ const LeaderboardScene: React.FC = () => {
                 className="flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
-                Atualizar
+                {t('leaderboard.refresh')}
               </Button>
             </div>
           </div>
@@ -315,7 +331,9 @@ const LeaderboardScene: React.FC = () => {
                       <div>
                         <h3 className="font-bold text-gray-800">{user.userName}</h3>
                         <p className="text-sm text-gray-600">
-                          {session?.teams?.[user.userId] || 'Sem time'}
+                          {session?.teams?.[user.userId]
+                            ? getLocalizedTeamName(session.teams[user.userId], t)
+                            : t('team.unassigned')}
                         </p>
                       </div>
                     </div>
@@ -325,7 +343,7 @@ const LeaderboardScene: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-gray-800 mb-1">{user.totalScore || 0}</div>
-                    <div className="text-sm text-gray-600">pontos totais</div>
+                    <div className="text-sm text-gray-600">{t('leaderboard.totalPoints')}</div>
                   </div>
                 </div>
               ))}
@@ -344,7 +362,7 @@ const LeaderboardScene: React.FC = () => {
                 }`}
             >
               <Users className="w-5 h-5" />
-              Participantes
+              {t('leaderboard.participants')}
             </button>
             <button
               onClick={() => setActiveTab('teams')}
@@ -354,12 +372,12 @@ const LeaderboardScene: React.FC = () => {
                 }`}
             >
               <Shield className="w-5 h-5" />
-              Times
+              {t('common.entities.teams')}
             </button>
           </div>
         </div>
 
-        {/* Conteúdo das Tabs */}
+        {/* Tab Content */}
         <div className="mb-6">
           {activeTab === 'participants' && session && (
             <MembersLeaderboard
@@ -387,17 +405,13 @@ const LeaderboardScene: React.FC = () => {
 
         <TimeEfficiencySection teamTimers={teamTimers} allCards={allCards} />
 
-        {/* Footer com informações */}
-        <ScoreExplanationFooter
-          loadLeaderboardData={loadLeaderboardData}
-          sessionId={sessionId || ''}
-          handleGoBack={handleGoBack}
-        />
+        {/* Footer with information */}
+        <ScoreExplanationFooter />
 
         <ScrollToTopButton />
       </div>
 
-      {/* Modal de Contribuições do Usuário */}
+      {/* User Contributions Modal */}
       {isModalOpen && selectedUser &&
         <ContributionsModal
           session={session}

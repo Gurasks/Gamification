@@ -6,18 +6,21 @@ import type {
   UserContributions,
   UserStats,
 } from "../types/leaderboard";
+import { TFunction } from "i18next";
 
 export const exportToPDF = (
   session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
-  allCards: Card[]
+  allCards: Card[],
+  t: TFunction,
 ) => {
   const printContent = generateExportContent(
     session,
     teamMetrics,
     sortedData,
-    allCards
+    allCards,
+    t,
   );
 
   const sessionTitle = session?.title || "sessao";
@@ -78,13 +81,15 @@ export const exportToDOC = (
   session: Session,
   teamMetrics: TeamMetrics[],
   sortedData: UserStats[],
-  allCards: Card[]
+  allCards: Card[],
+  t: TFunction,
 ) => {
   const content = generateExportContent(
     session,
     teamMetrics,
     sortedData,
-    allCards
+    allCards,
+    t,
   );
   const blob = new Blob(
     [
@@ -102,7 +107,7 @@ export const exportToDOC = (
       </html>
     `,
     ],
-    { type: "application/msword" }
+    { type: "application/msword" },
   );
 
   const url = URL.createObjectURL(blob);
@@ -127,10 +132,10 @@ export const openUserContributions = (
   setSelectedUser: React.Dispatch<
     React.SetStateAction<UserContributions | null>
   >,
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   const cardsCreated = allCards.filter(
-    (card) => card.createdById === user.userId
+    (card) => card.createdById === user.userId,
   );
 
   const userComments: Array<{ card: Card; comment: any }> = [];
@@ -155,7 +160,7 @@ export const openUserContributions = (
 export const toggleTeamExpansion = (
   teamName: string,
   expandedTeams: Set<string>,
-  setExpandedTeams: React.Dispatch<React.SetStateAction<Set<string>>>
+  setExpandedTeams: React.Dispatch<React.SetStateAction<Set<string>>>,
 ) => {
   const newExpanded = new Set(expandedTeams);
   if (newExpanded.has(teamName)) {

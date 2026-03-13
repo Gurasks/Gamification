@@ -144,7 +144,7 @@ const usePasswordRequirements = (
   const getBasicRequirements = (): PasswordRequirement[] => [
     {
       id: 'length',
-      label: t('passwordStrength.minLength'),
+      label: t('validation.minLength', { field: t('auth.fields.password'), count: 6 }),
       met: password.length >= 6,
     },
     {

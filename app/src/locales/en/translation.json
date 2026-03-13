@@ -1,11 +1,14 @@
 {
-  "common": {
+   "common": {
     "actions": {
       "save": "Save",
       "cancel": "Cancel",
       "confirm": "Confirm",
       "back": "Back",
-      "close": "Close"
+      "close": "Close",
+      "refresh": "Refresh",
+      "view": "View",
+      "export": "Export"
     },
     "status": {
       "loading": "Loading...",
@@ -22,6 +25,65 @@
       "name": "Enter name",
       "description": "Enter description",
       "search": "Search..."
+    },
+    "metrics": {
+      "points": "points",
+      "totalPoints": "total points",
+      "score": "Score",
+      "totalScore": "Total Score",
+      "average": "average",
+      "total": "total",
+      "rank": "#{{rank}}",
+      "position": "Position"
+    },
+    "entities": {
+      "team": "Team",
+      "teams": "Teams",
+      "member": "Member",
+      "members": "Members",
+      "user": "User",
+      "participant": "Participant",
+      "participants": "Participants",
+      "author": "Author"
+    },
+    "content": {
+      "comment": "Comment",
+      "comments": "Comments",
+      "suggestion": "Suggestion",
+      "suggestions": "Suggestions",
+      "reply": "Reply",
+      "replies": "Replies",
+      "rating": "Rating",
+      "ratings": "Ratings",
+      "vote": "Vote",
+      "votes": "Votes"
+    },
+    "gamification": {
+      "metadataVotes": "Metadata Votes",
+      "agreedVotes": "agreed votes",
+      "cardRatings": "Card Ratings",
+      "qualityContributions": "quality contributions"
+    },
+    "time": {
+      "minute": "minute",
+      "minutes": "minutes",
+      "second": "second",
+      "seconds": "seconds",
+      "hour": "hour",
+      "hours": "hours",
+      "totalTime": "Total time",
+      "efficiency": "Efficiency"
+    },
+    "export": {
+      "pdf": "PDF",
+      "doc": "DOC"
+    },
+    "labels": {
+      "noData": "No data",
+      "notAvailable": "N/A",
+      "noTeam": "No team",
+      "noComments": "No comments",
+      "noSuggestions": "No suggestions"
     },
     "required": "Required field",
     "na": "N/A"
@@ -211,11 +273,8 @@
   },
 
   "team": {
-    "team": "Team",
     "yourTeam": "Your team",
     "selectTeam": "Select your team",
-    "teams": "teams",
-    "members": "members",
     "organizer": "Organizer",
     "you": "You",
     "unassigned": "Unassigned"
@@ -308,7 +367,6 @@
     },
     "stats": {
       "totalCards": "Total Cards",
-      "comments": "Comments",
       "voters": "Voters",
       "readOnly": "Read Only",
       "active": "Active"
@@ -501,7 +559,8 @@
     "leader": "Leader",
     "average": "Average",
     "perTeam": "per team",
-    "total": "Total"
+    "total": "Total",
+    "ofTotal": "of total"
   },
 
   "timer": {
@@ -558,5 +617,164 @@
     "passwordsMatch": "Passwords match",
     "meetAllRequirements": "Password must meet all minimum requirements",
     "validAndConfirmed": "Valid and confirmed password!"
+  },
+
+  "leaderboard": {
+    "title": "Leaderboard",
+    "loading": "Loading leaderboard...",
+    "sessionNotFound": "Session not found",
+    "competitionSummary": "Competition Summary",
+    "summaryDescription": "Track the performance of participants and teams in this requirements gathering session.",
+    "exportPDF": "Export PDF",
+    "exportDOC": "Export DOC",
+    "participants": "Participants",
+    "averageScore": "Average Score",
+    "overallRanking": "Overall Ranking",
+    "rankingDescription": "View ranking by total score or other metrics",
+    "refresh": "Refresh",
+    "totalPoints": "total points"
+  },
+
+  "scoreExplanation": {
+    "title": "Scoring System",
+    "howItWorks": "How is the score calculated?",
+    "totalScoreDescription": "Your total score is the sum of 4 main components:",
+    "metadataVotes": "Metadata Votes",
+    "agreement90": "Agreement ≥ 90%: {{points}} pts per vote",
+    "agreement70": "Agreement ≥ 70%: {{points}} pts per vote",
+    "agreement50": "Agreement ≥ 50%: {{points}} pt per vote",
+    "agreementLow": "Agreement < 50%: 0 points",
+    "agreeOnly": "* Only 'agree' votes count",
+    "disagreePenalty": "** 'Disagree' votes decrease the score",
+    "cardRatings": "Card Ratings",
+    "rating4": "Rating ≥ 4.0: {{points}} pts per rating",
+    "rating3": "Rating ≥ 3.0: {{points}} pts per rating",
+    "ratingLow": "Rating < 3.0: 0 points",
+    "ratingMultiplier": "* Your average rating determines the multiplier",
+    "commentFixed": "Each comment: 1 fixed point",
+    "commentQuality": "Quality matters: Relevant comments",
+    "commentParticipation": "Active participation: Encourages discussions",
+    "commentEqual": "* All valid comments score equally",
+    "timeEfficiency": "Time Efficiency",
+    "timeEfficiencyDesc": "Efficiency based on average time per card",
+    "fastestTeam": "Fastest team receives maximum bonus",
+    "slowTeams": "Very slow teams receive penalty",
+    "bonusAdjusted": "Bonus adjusted by number of cards",
+    "efficiencyRelative": "* Efficiency is relative to the fastest team"
+  },
+
+  "contributions": {
+    "totalPoints": "total points",
+    "suggestionsCreated": "Suggestions Created",
+    "commentsMade": "Comments Made",
+    "averageRating": "Average Rating",
+    "replies": "Replies",
+    "gamificationScore": "Gamification Score",
+    "metadataVotes": "Metadata Votes",
+    "agreedVotes": "agreed votes",
+    "total": "total",
+    "cardRatings": "Card Ratings",
+    "average": "avg",
+    "qualityContributions": "quality contributions",
+    "createdSuggestions": "Created Suggestions",
+    "suggestionsBy": "Requirement cards created by {{name}}",
+    "items": "items",
+    "noSuggestions": "No suggestions created",
+    "noSuggestionsBy": "{{name}} hasn't created any requirement cards in this session yet.",
+    "commentsBy": "Feedback and discussions participated by {{name}}",
+    "originalSuggestion": "Original Suggestion",
+    "author": "Author",
+    "commentBy": "Comment by {{name}}",
+    "commentsInThread": "comments in this thread",
+    "positionInThread": "Position in thread",
+    "noComments": "No comments made",
+    "noCommentsBy": "{{name}} hasn't participated in discussions in this session yet.",
+    "realTimeStats": "Real-time statistics",
+    "viewFullDetails": "View Full Details"
+  },
+
+  "timeEfficiency": {
+    "title": "Team Time Efficiency",
+    "fastest": "Fastest",
+    "cards": "Cards"
+  },
+
+   "membersLeaderboard": {
+    "totalScore": "Total Score",
+    "mostComments": "Most Comments",
+    "bestRatings": "Best Ratings",
+    "mostSuggestions": "Most Suggestions",
+    "noParticipants": "No participants yet",
+    "noParticipantsDescription": "The leaderboard will be populated as participants start interacting."
+  },
+
+  "participantCard": {
+    "ariaLabel": "View details of {{name}}'s contributions, rank {{rank}} with {{points}} points",
+    "noTeam": "No team",
+    "avgRating": "Avg Rating",
+    "replies": "Replies",
+    "gamification": "Gamification contributions",
+    "agreedVotes": "agreed votes",
+    "viewDetails": "View detailed contributions"
+  },
+
+  "teamLeaderboard": {
+    "firstPlace": "First Place",
+    "secondPlace": "Second Place",
+    "thirdPlace": "Third Place",
+    "rankPlace": "#{{rank}} in ranking",
+    "teamAriaLabel": "{{teamName}}, {{rank}}. Click to {{action}} details. {{points}} points, {{members}} members",
+    "avgRating": "Avg Rating",
+    "membersAriaLabel": "{{count}} members in team",
+    "commentsAriaLabel": "{{count}} team comments",
+    "suggestionsAriaLabel": "{{count}} team suggestions",
+    "avgRatingAriaLabel": "Team average rating: {{rating}}",
+    "teamMembers": "Team Members ({{count}})",
+    "memberAriaLabel": "View {{name}}'s contributions. {{points}} points, {{comments}} comments, average rating {{rating}}, {{suggestions}} suggestions",
+    "noTeams": "No teams formed",
+    "noTeamsDescription": "Team data will be displayed when participants are assigned to teams"
+  },
+
+  "export": {
+    "fullSessionReport": "Complete Session Report",
+    "session": "Session",
+    "executiveSummary": "Executive Summary",
+    "topParticipants": "Top 3 Participants",
+    "topTeams": "Top 3 Teams",
+    "generalStats": "General Statistics",
+    "totalComments": "Total Comments",
+    "avgRating": "Average Rating",
+    "suggestionsPerParticipant": "Suggestions per Participant",
+    "teamMetrics": "Team Metrics",
+    "position": "Position",
+    "replies": "Replies",
+    "gamificationScore": "Gamification Score",
+    "metadataVotes": "Metadata Votes",
+    "agreed": "agreed",
+    "total": "total",
+    "cardRatings": "Card Ratings",
+    "avg": "avg",
+    "commentsMade": "comments made",
+    "individualRanking": "Individual Ranking",
+    "user": "User",
+    "totalScore": "Total Score",
+    "detailedAnalysis": "Detailed Suggestion Analysis",
+    "suggestion": "Suggestion",
+    "author": "Author",
+    "date": "Date",
+    "priority": "Priority",
+    "type": "Type",
+    "category": "Category",
+    "effort": "Effort",
+    "agreement": "Agreement",
+    "noComments": "No comments",
+    "metadataDistribution": "Metadata Distribution",
+    "priorities": "Priorities",
+    "requirementTypes": "Requirement Types",
+    "categories": "Categories",
+    "totalEffort": "Total Effort",
+    "average": "Average",
+    "perSuggestion": "per suggestion",
+    "generatedBy": "Report automatically generated by Singular"
   }
 }

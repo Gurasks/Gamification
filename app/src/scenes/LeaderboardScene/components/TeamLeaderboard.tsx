@@ -2,6 +2,8 @@ import { ChevronDown, FileText, MessageSquare, Shield, Star, Trophy, Users } fro
 import { openUserContributions, toggleTeamExpansion } from "../../../services/leaderboardServices";
 import type { Card } from "../../../types/global";
 import type { TeamMetrics, UserContributions, UserStats } from "../../../types/leaderboard";
+import { useLanguage } from "@/hooks/useLanguage";
+import { getLocalizedTeamName } from "@/services/teamSelectionServices";
 
 interface TeamLeaderboardProps {
   teamMetrics: TeamMetrics[];
@@ -14,9 +16,16 @@ interface TeamLeaderboardProps {
   setExpandedTeams: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
-  { teamMetrics, expandedTeams, allCards, setSelectedUser, setIsModalOpen, setExpandedTeams }
-) => {
+const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
+  teamMetrics,
+  expandedTeams,
+  allCards,
+  setSelectedUser,
+  setIsModalOpen,
+  setExpandedTeams
+}) => {
+  const { t } = useLanguage();
+
   const handleTeamToggleKeyDown = (e: React.KeyboardEvent, teamName: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -31,6 +40,15 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
     }
   };
 
+  const getTeamRankLabel = (index: number) => {
+    switch (index) {
+      case 0: return t('teamLeaderboard.firstPlace');
+      case 1: return t('teamLeaderboard.secondPlace');
+      case 2: return t('teamLeaderboard.thirdPlace');
+      default: return t('teamLeaderboard.rankPlace', { rank: index + 1 });
+    }
+  };
+
   return (
     <div>
       {teamMetrics.length > 0 ? (
@@ -41,7 +59,13 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
                 role="button"
                 tabIndex={0}
                 aria-expanded={expandedTeams.has(team.teamName)}
-                aria-label={`${team.teamName}, ${index === 0 ? 'Primeiro Lugar' : index === 1 ? 'Segundo Lugar' : index === 2 ? 'Terceiro Lugar' : `#${index + 1} na classificação`}. Clique para ${expandedTeams.has(team.teamName) ? 'recolher' : 'expandir'} detalhes. ${team.totalScore || 0} pontos, ${team.totalMembers} membros`}
+                aria-label={t('teamLeaderboard.teamAriaLabel', {
+                  teamName: getLocalizedTeamName(team.teamName, t),
+                  rank: getTeamRankLabel(index),
+                  action: expandedTeams.has(team.teamName) ? t('common.actions.collapse') : t('common.actions.expand'),
+                  points: team.totalScore || 0,
+                  members: team.totalMembers
+                })}
                 onClick={() => toggleTeamExpansion(team.teamName, expandedTeams, setExpandedTeams)}
                 onKeyDown={(e) => handleTeamToggleKeyDown(e, team.teamName)}
                 className="flex justify-between items-center cursor-pointer mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-2"
@@ -59,21 +83,20 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
                     {index > 2 && <Shield className="w-6 h-6 text-blue-600" aria-hidden="true" />}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">{team.teamName}</h3>
+                    <h3 className="text-xl font-bold text-gray-800">{getLocalizedTeamName(team.teamName, t)}</h3>
                     <p className="text-sm text-gray-600">
-                      {index === 0 ? 'Primeiro Lugar' :
-                        index === 1 ? 'Segundo Lugar' :
-                          index === 2 ? 'Terceiro Lugar' : `#${index + 1} na classificação`}
+                      {getTeamRankLabel(index)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-800">{team.totalScore || 0}</div>
-                    <div className="text-sm text-gray-600">pontos</div>
+                    <div className="text-sm text-gray-600">{t('common.metrics.points')}</div>
                   </div>
                   <ChevronDown
-                    className={`w-6 h-6 text-gray-400 transform transition-transform ${expandedTeams.has(team.teamName) ? 'rotate-180' : ''}`}
+                    className={`w-6 h-6 text-gray-400 transform transition-transform ${expandedTeams.has(team.teamName) ? 'rotate-180' : ''
+                      }`}
                     aria-hidden="true"
                   />
                 </div>
@@ -81,33 +104,33 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
 
               {/* Team Summary */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg" aria-label={`${team.totalMembers} membros no time`}>
+                <div className="text-center p-3 bg-blue-50 rounded-lg" aria-label={t('teamLeaderboard.membersAriaLabel', { count: team.totalMembers })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Users className="w-4 h-4 text-blue-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-blue-700">{team.totalMembers}</div>
                   </div>
-                  <div className="text-sm text-blue-800">Membros</div>
+                  <div className="text-sm text-blue-800">{t('common.entities.members')}</div>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg" aria-label={`${team.totalComments} comentários do time`}>
+                <div className="text-center p-3 bg-green-50 rounded-lg" aria-label={t('teamLeaderboard.commentsAriaLabel', { count: team.totalComments })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <MessageSquare className="w-4 h-4 text-green-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-green-700">{team.totalComments}</div>
                   </div>
-                  <div className="text-sm text-green-800">Comentários</div>
+                  <div className="text-sm text-green-800">{t('common.content.comments')}</div>
                 </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg" aria-label={`${team.totalCards} sugestões do time`}>
+                <div className="text-center p-3 bg-purple-50 rounded-lg" aria-label={t('teamLeaderboard.suggestionsAriaLabel', { count: team.totalCards })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <FileText className="w-4 h-4 text-purple-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-purple-700">{team.totalCards}</div>
                   </div>
-                  <div className="text-sm text-purple-800">Sugestões</div>
+                  <div className="text-sm text-purple-800">{t('common.content.suggestions')}</div>
                 </div>
-                <div className="text-center p-3 bg-yellow-50 rounded-lg" aria-label={`Nota média do time: ${team.averageRating}`}>
+                <div className="text-center p-3 bg-yellow-50 rounded-lg" aria-label={t('teamLeaderboard.avgRatingAriaLabel', { rating: team.averageRating })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Star className="w-4 h-4 text-yellow-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-yellow-700">{team.averageRating}</div>
                   </div>
-                  <div className="text-sm text-yellow-800">Nota Média</div>
+                  <div className="text-sm text-yellow-800">{t('teamLeaderboard.avgRating')}</div>
                 </div>
               </div>
 
@@ -116,7 +139,7 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5" aria-hidden="true" />
-                    Membros do Time ({team.members.length})
+                    {t('teamLeaderboard.teamMembers', { count: team.members.length })}
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {team.members.map((member) => (
@@ -124,7 +147,13 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
                         key={member.userId}
                         role="button"
                         tabIndex={0}
-                        aria-label={`Ver contribuições de ${member.userName}. ${(member as UserStats).totalScore || 0} pontos, ${member.totalComments} comentários, nota média ${member.averageRating}, ${member.totalCardsCreated} sugestões`}
+                        aria-label={t('teamLeaderboard.memberAriaLabel', {
+                          name: member.userName,
+                          points: (member as UserStats).totalScore || 0,
+                          comments: member.totalComments,
+                          rating: member.averageRating,
+                          suggestions: member.totalCardsCreated
+                        })}
                         onClick={() => openUserContributions(member, allCards, setSelectedUser, setIsModalOpen)}
                         onKeyDown={(e) => handleMemberKeyDown(e, member)}
                         className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
@@ -133,7 +162,7 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
                           <div>
                             <div className="font-medium text-gray-900">{member.userName}</div>
                             <div className="text-sm text-gray-600 mt-1">
-                              {(member as UserStats).totalScore || 0} pontos
+                              {(member as UserStats).totalScore || 0} {t('common.metrics.points')}
                             </div>
                           </div>
                           <div className="text-right">
@@ -167,9 +196,9 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = (
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-gray-400" aria-hidden="true" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Nenhum time formado</h3>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('teamLeaderboard.noTeams')}</h3>
           <p className="text-gray-500 text-sm">
-            Os dados dos times serão exibidos quando os participantes forem atribuídos a times
+            {t('teamLeaderboard.noTeamsDescription')}
           </p>
         </div>
       )}

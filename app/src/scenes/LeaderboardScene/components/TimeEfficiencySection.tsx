@@ -1,6 +1,8 @@
+import { useLanguage } from "@/hooks/useLanguage";
 import { formatTimeLeaderboard } from "@/services/leaderboardServices";
-import { Card, TeamTimer } from "@/types/global";
-import { TeamMetrics, TeamTimeData, UserContributions } from "@/types/leaderboard";
+import { getLocalizedTeamName } from "@/services/teamSelectionServices";
+import { Card } from "@/types/global";
+import { TeamTimeData } from "@/types/leaderboard";
 import { Clock } from "lucide-react";
 
 interface TimeEfficiencySectionProps {
@@ -8,9 +10,12 @@ interface TimeEfficiencySectionProps {
   allCards: Card[]
 }
 
-const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = (
-  { teamTimers, allCards }
-) => {
+const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = ({
+  teamTimers,
+  allCards
+}) => {
+  const { t } = useLanguage();
+
   if (teamTimers.length === 0) return null;
 
   const fastestTeam = teamTimers.reduce((prev, current) =>
@@ -21,35 +26,36 @@ const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
       <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <Clock className="w-5 h-5 text-green-600" />
-        Eficiência de Tempo por Time
+        {t('timeEfficiency.title')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {teamTimers.map((team) => {
           const efficiency = Math.round(team.efficiency)
+          const teamCards = allCards.filter(c => c.teamName === team.teamName);
 
           return (
             <div key={team.teamName} className="border rounded-lg p-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold">{team.teamName}</span>
+                <span className="font-semibold">{getLocalizedTeamName(team.teamName, t)}</span>
                 {team.teamName === fastestTeam.teamName && (
                   <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    Menor Tempo
+                    {t('timeEfficiency.fastest')}
                   </span>
                 )}
               </div>
 
               <div className="text-sm text-gray-600 mb-2">
-                Tempo total: {formatTimeLeaderboard(team.totalTime)}
+                {t('common.time.totalTime')}: {formatTimeLeaderboard(team.totalTime)}
               </div>
 
               <div className="text-sm text-gray-600 mb-2">
-                Cards: {allCards.filter(c => c.teamName === team.teamName).length}
+                {t('timeEfficiency.cards')}: {teamCards.length}
               </div>
 
               <div className="mt-2">
                 <div className="flex justify-between text-sm mb-1">
-                  <span>Eficiência:</span>
+                  <span>{t('common.time.efficiency')}:</span>
                   <span className="font-semibold">{efficiency}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
