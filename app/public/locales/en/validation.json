@@ -1,0 +1,7 @@
+{
+  "required": "{{field}} is required",
+  "minLength": "{{field}} must be at least {{count}} characters",
+  "maxLength": "{{field}} must be at most {{count}} characters",
+  "invalid": "Invalid {{field}}",
+  "passwordsDoNotMatch": "Passwords do not match"
+}

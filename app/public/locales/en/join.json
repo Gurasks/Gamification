@@ -1,0 +1,19 @@
+{
+  "title": "Join a Session",
+  "protectedTitle": "Protected Session",
+  "description": "Enter the session code to join",
+  "protectedDescription": "Enter the password to access this session",
+  "sessionCode": "Session Code",
+  "sessionCodePlaceholder": "Ex: ABC123",
+  "sessionPassword": "Session Password",
+  "sessionPasswordPlaceholder": "Enter session password",
+  "authRequired": "You need to be authenticated to join the session",
+  "verifyingPassword": "Verifying password...",
+  "joining": "Joining session...",
+  "join": "Join",
+  "verifyPassword": "Verify Password",
+  "backToCode": "Back to Code",
+  "sessionCodeHint": "Session code: {{code}}",
+  "savedCode": "Saved code",
+  "pleaseWait": "This may take a few seconds..."
+}

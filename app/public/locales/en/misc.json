@@ -1,0 +1,19 @@
+{
+  "share": {
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "defaultTitle": "Join my session",
+    "shareText": "Join my session with code: {{code}}",
+    "buttonAriaLabel": "Share session link"
+  },
+
+  "collapsible": {
+    "sessionDescription": "Session Description",
+    "show": "Show",
+    "hide": "Hide"
+  },
+
+  "dropdown": {
+    "select": "Select..."
+  }
+}

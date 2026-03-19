@@ -1,0 +1,53 @@
+{
+  "yourTeam": "Your team",
+  "selectTeam": "Select your team",
+  "teams": "teams",
+  "members": "members",
+  "organizer": "Organizer",
+  "unassigned": "Unassigned",
+  "selection": {
+    "title": "Team Configuration",
+    "subtitle": "Organize participants and configure teams for the session",
+    "ownerStatus": "You are the organizer of this session",
+    "memberStatus": "Waiting for organizer configuration",
+    "exitButton": "Leave Room",
+    "numberOfTeams": "Number of Teams",
+    "numberHint": "Enter a number between 2 and 10",
+    "participantsList": "Participants List ({{count}})",
+    "startSession": "Start Session",
+    "ownerHint": "Configure teams and start when ready",
+    "memberHint": "Waiting for the organizer to start the session",
+    "unauthenticated": "Error: User not authenticated",
+    "waitingOwner": "Waiting for the organizer to assign your team...",
+    "selectYourTeam": "Select your team",
+    "yourTeamIs": "Your team is",
+    "assigningRandom": "Assigning you to a random team...",
+    "loading": {
+      "auth": "Loading authentication...",
+      "session": "Loading session..."
+    },
+    "unauthorized": {
+      "title": "Unauthorized Access",
+      "message": "You need to be logged in to access this page."
+    },
+    "methods": {
+      "title": "Team Selection Method",
+      "helpTooltip": "Learn about team selection methods",
+      "helpText": "Choose how participants will be divided into teams for this session",
+      "selected": "Selected",
+      "random": "Random Assignment",
+      "randomDesc": "Participants are randomly assigned to teams",
+      "chooseTeam": "Choose Your Team",
+      "chooseTeamDesc": "Participants can select which team to join",
+      "ownerChooses": "Owner Assigns Teams",
+      "ownerChoosesDesc": "Session owner manually assigns participants to teams"
+    },
+    "ownerAssignment": {
+      "title": "Team Assignment",
+      "participants": "Participants",
+      "currentTeam": "Current Team",
+      "assigning": "Assigning to team...",
+      "anonymous": "Anonymous"
+    }
+  }
+}

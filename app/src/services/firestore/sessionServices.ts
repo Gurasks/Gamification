@@ -114,21 +114,6 @@ export const createSessionInFirestore = async (
   }
 };
 
-export const loadSessionWithId = async (
-  sessionId: string,
-  setSession: (session: Session) => void,
-) => {
-  const sessionDoc = await getDoc(doc(db, "sessions", sessionId));
-  if (sessionDoc.exists()) {
-    const sessionData = sessionDoc.data() as Session;
-    if (!sessionData) {
-      console.error("Session data is undefined");
-      return;
-    }
-    setSession(sessionData);
-  }
-};
-
 export const getSession = async (
   sessionId: string,
 ): Promise<Session | null> => {

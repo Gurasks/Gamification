@@ -1,0 +1,19 @@
+{
+  "title": "Entrar em uma sessão",
+  "protectedTitle": "Sessão protegida",
+  "description": "Digite o código da sessão para entrar",
+  "protectedDescription": "Digite a senha para acessar esta sessão",
+  "sessionCode": "Código da sessão",
+  "sessionCodePlaceholder": "Ex: ABC123",
+  "sessionPassword": "Senha da sessão",
+  "sessionPasswordPlaceholder": "Digite a senha da sessão",
+  "authRequired": "Você precisa estar autenticado para entrar na sessão",
+  "verifyingPassword": "Verificando senha...",
+  "joining": "Entrando na sessão...",
+  "join": "Entrar",
+  "verifyPassword": "Verificar senha",
+  "backToCode": "Voltar para o código",
+  "sessionCodeHint": "Código da sessão: {{code}}",
+  "savedCode": "Código salvo",
+  "pleaseWait": "Isso pode levar alguns segundos..."
+}

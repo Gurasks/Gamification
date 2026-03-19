@@ -25,14 +25,15 @@ const LoginScene: React.FC = () => {
     }
   }, [joinCode]);
 
-  const pendingCode = sessionStorage.getItem('login_redirect_code') ||
-    sessionStorage.getItem('pending_session_code');
+  useEffect(() => {
+    const pendingCode =
+      sessionStorage.getItem("login_redirect_code") ||
+      sessionStorage.getItem("pending_session_code");
 
-  if (pendingCode) {
-    navigate(`/join-a-session/${pendingCode}`);
-    sessionStorage.removeItem('login_redirect_code');
-    sessionStorage.removeItem('pending_session_code');
-  }
+    if (pendingCode) {
+      navigate(`/join-a-session/${pendingCode}`);
+    }
+  }, [navigate]);
 
   const handleSubmit = async (data: {
     email: string;
@@ -45,7 +46,7 @@ const LoginScene: React.FC = () => {
 
     try {
       await signIn(data.email, data.password);
-      toast.success(t('auth.messages.loginSuccess'));
+      toast.success(t('auth:messages.loginSuccess'));
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
       if (pendingSessionCode) {
@@ -73,9 +74,9 @@ const LoginScene: React.FC = () => {
       const result = await signInWithGoogle();
 
       if (result.isNewUser) {
-        toast.success(t('auth.googleSignUpSuccess'));
+        toast.success(t('auth:messages.googleSignUpSuccess'));
       } else {
-        toast.success(t('auth.googleLoginSuccess'));
+        toast.success(t('auth:messages.googleLoginSuccess'));
       }
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
@@ -86,7 +87,7 @@ const LoginScene: React.FC = () => {
         navigate('/');
       }
     } catch (err: any) {
-      const errorMsg = err.message || t('auth.googleError');
+      const errorMsg = err.message || t('auth:messages.googleError');
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -115,7 +116,7 @@ const LoginScene: React.FC = () => {
                 navigate('/register');
               }
             }}
-            message={t('auth.messages.loginMessage')}
+            message={t('auth:messages.loginMessage')}
             onBack={handleGoBack}
             backButtonLabel={t('common.actions.back')}
             showBackButton={true}

@@ -40,7 +40,7 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           </div>
           {totalVotes > 0 && (
             <div className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-700">
-              {agreementPercentage}% {t('metadataVote.agree')}
+              {agreementPercentage}% {t('metadata:vote.agree')}
             </div>
           )}
         </div>
@@ -50,22 +50,22 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <span className="text-green-600 font-medium">{agreeCount}</span>
-              <span className="text-gray-500">{t('metadataVote.agreeCount')}</span>
+              <span className="text-gray-500">{t('metadata:vote.agreeCount')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-red-500"></div>
               <span className="text-red-600 font-medium">{disagreeCount}</span>
-              <span className="text-gray-500">{t('metadataVote.disagreeCount')}</span>
+              <span className="text-gray-500">{t('metadata:vote.disagreeCount')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
               <span className="text-yellow-600 font-medium">{neutralCount}</span>
-              <span className="text-gray-500">{t('metadataVote.neutralCount')}</span>
+              <span className="text-gray-500">{t('metadata:vote.neutralCount')}</span>
             </div>
           </div>
         ) : (
           <div className="text-xs text-gray-500 italic">
-            {t('metadataVote.noVotes')}
+            {t('metadata:vote.noVotes')}
           </div>
         )}
       </div>
@@ -77,7 +77,7 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
       <div className="mb-3">
         <div className="mb-3">
           <div className="text-sm font-semibold text-blue-800 mb-1">
-            {t('metadataVote.question', {
+            {t('metadata:vote.question', {
               type: getTypeText(metadataType, t),
               value: metadataLabel || metadataValue
             })}
@@ -90,10 +90,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('agree')}
           className={getButtonClass(currentVote, 'agree')}
           disabled={isReadOnly}
-          title={t('metadataVote.tooltip.agree')}
+          title={t('metadata:vote.tooltip.agree')}
         >
           <ThumbsUp className="w-4 h-4" />
-          {t('metadataVote.agree')}
+          {t('metadata:vote.agree')}
           {currentVote === 'agree' && <Check className="w-3 h-3 ml-1" />}
         </button>
 
@@ -101,10 +101,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('neutral')}
           className={getButtonClass(currentVote, 'neutral')}
           disabled={isReadOnly}
-          title={t('metadataVote.tooltip.neutral')}
+          title={t('metadata:vote.tooltip.neutral')}
         >
           <Minus className="w-4 h-4" />
-          {t('metadataVote.neutral')}
+          {t('metadata:vote.neutral')}
           {currentVote === 'neutral' && <Check className="w-3 h-3 ml-1" />}
         </button>
 
@@ -112,10 +112,10 @@ const MetadataVote: React.FC<MetadataVoteProps> = ({
           onClick={() => onVote('disagree')}
           className={getButtonClass(currentVote, 'disagree')}
           disabled={isReadOnly}
-          title={t('metadataVote.tooltip.disagree')}
+          title={t('metadata:vote.tooltip.disagree')}
         >
           <ThumbsDown className="w-4 h-4" />
-          {t('metadataVote.disagree')}
+          {t('metadata:vote.disagree')}
           {currentVote === 'disagree' && <Check className="w-3 h-3 ml-1" />}
         </button>
       </div>

@@ -1,0 +1,47 @@
+{
+  "titles": {
+    "welcome": "Welcome!",
+    "update": "Set Name",
+    "changeName": "Change Name",
+    "identification": "Identification"
+  },
+  "subtitles": {
+    "welcome": "Identify yourself to join sessions",
+    "update": "Choose how you want to be identified"
+  },
+  "descriptions": {
+    "changeName": "Choose a name to be identified in sessions",
+    "identification": "Enter your name to continue"
+  },
+  "labels": {
+    "yourName": "Your Name"
+  },
+  "placeholders": {
+    "name": "Ex: John Doe"
+  },
+  "buttons": {
+    "continueAsGuest": "Continue as Guest",
+    "saveName": "Save Name",
+    "logout": "Logout and Login"
+  },
+  "info": {
+    "visibility": "Your name will be visible to other session participants",
+    "anonymousMode": "Anonymous mode - your data will be lost when you leave"
+  },
+  "loginPrompt": {
+    "message": "Login with your account to continue"
+  },
+  "errors": {
+    "nameRequired": "Please enter your name",
+    "minLength": "Name must be at least 2 characters",
+    "networkError": "Connection error. Check your internet and try again.",
+    "tooManyRequests": "Too many attempts. Try again in a few minutes.",
+    "genericError": "Error setting up user. Please try again.",
+    "logoutError": "Error logging out"
+  },
+  "success": {
+    "welcome": "Welcome, {{name}}!",
+    "nameUpdated": "Name updated to {{name}}!",
+    "logout": "Session ended"
+  }
+}

@@ -42,10 +42,10 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
 
   const getTeamRankLabel = (index: number) => {
     switch (index) {
-      case 0: return t('teamLeaderboard.firstPlace');
-      case 1: return t('teamLeaderboard.secondPlace');
-      case 2: return t('teamLeaderboard.thirdPlace');
-      default: return t('teamLeaderboard.rankPlace', { rank: index + 1 });
+      case 0: return t('leaderboard:team.firstPlace');
+      case 1: return t('leaderboard:team.secondPlace');
+      case 2: return t('leaderboard:team.thirdPlace');
+      default: return t('leaderboard:team.rankPlace', { rank: index + 1 });
     }
   };
 
@@ -59,7 +59,7 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
                 role="button"
                 tabIndex={0}
                 aria-expanded={expandedTeams.has(team.teamName)}
-                aria-label={t('teamLeaderboard.teamAriaLabel', {
+                aria-label={t('leaderboard:team.teamAriaLabel', {
                   teamName: getLocalizedTeamName(team.teamName, t),
                   rank: getTeamRankLabel(index),
                   action: expandedTeams.has(team.teamName) ? t('common.actions.collapse') : t('common.actions.expand'),
@@ -104,33 +104,33 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
 
               {/* Team Summary */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg" aria-label={t('teamLeaderboard.membersAriaLabel', { count: team.totalMembers })}>
+                <div className="text-center p-3 bg-blue-50 rounded-lg" aria-label={t('leaderboard:team.membersAriaLabel', { count: team.totalMembers })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Users className="w-4 h-4 text-blue-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-blue-700">{team.totalMembers}</div>
                   </div>
                   <div className="text-sm text-blue-800">{t('common.entities.members')}</div>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg" aria-label={t('teamLeaderboard.commentsAriaLabel', { count: team.totalComments })}>
+                <div className="text-center p-3 bg-green-50 rounded-lg" aria-label={t('leaderboard:team.commentsAriaLabel', { count: team.totalComments })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <MessageSquare className="w-4 h-4 text-green-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-green-700">{team.totalComments}</div>
                   </div>
                   <div className="text-sm text-green-800">{t('common.content.comments')}</div>
                 </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg" aria-label={t('teamLeaderboard.suggestionsAriaLabel', { count: team.totalCards })}>
+                <div className="text-center p-3 bg-purple-50 rounded-lg" aria-label={t('leaderboard:team.suggestionsAriaLabel', { count: team.totalCards })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <FileText className="w-4 h-4 text-purple-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-purple-700">{team.totalCards}</div>
                   </div>
                   <div className="text-sm text-purple-800">{t('common.content.suggestions')}</div>
                 </div>
-                <div className="text-center p-3 bg-yellow-50 rounded-lg" aria-label={t('teamLeaderboard.avgRatingAriaLabel', { rating: team.averageRating })}>
+                <div className="text-center p-3 bg-yellow-50 rounded-lg" aria-label={t('leaderboard:team.avgRatingAriaLabel', { rating: team.averageRating })}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <Star className="w-4 h-4 text-yellow-600" aria-hidden="true" />
                     <div className="text-2xl font-bold text-yellow-700">{team.averageRating}</div>
                   </div>
-                  <div className="text-sm text-yellow-800">{t('teamLeaderboard.avgRating')}</div>
+                  <div className="text-sm text-yellow-800">{t('leaderboard:team.avgRating')}</div>
                 </div>
               </div>
 
@@ -139,7 +139,7 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
                     <Users className="w-5 h-5" aria-hidden="true" />
-                    {t('teamLeaderboard.teamMembers', { count: team.members.length })}
+                    {t('leaderboard:team.teamMembers', { count: team.members.length })}
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {team.members.map((member) => (
@@ -147,7 +147,7 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
                         key={member.userId}
                         role="button"
                         tabIndex={0}
-                        aria-label={t('teamLeaderboard.memberAriaLabel', {
+                        aria-label={t('leaderboard:team.memberAriaLabel', {
                           name: member.userName,
                           points: (member as UserStats).totalScore || 0,
                           comments: member.totalComments,
@@ -196,9 +196,9 @@ const TeamLeaderboard: React.FC<TeamLeaderboardProps> = ({
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-gray-400" aria-hidden="true" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('teamLeaderboard.noTeams')}</h3>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('leaderboard:team.noTeams')}</h3>
           <p className="text-gray-500 text-sm">
-            {t('teamLeaderboard.noTeamsDescription')}
+            {t('leaderboard:team.noTeamsDescription')}
           </p>
         </div>
       )}

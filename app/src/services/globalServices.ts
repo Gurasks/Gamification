@@ -47,7 +47,7 @@ export const returnToastMessage = (message: string, type: string): void => {
   }
 };
 
-export const uuidToBytes = (uuid: string): Uint8Array => {
+const uuidToBytes = (uuid: string): Uint8Array => {
   const hex = uuid.replaceAll("-", "");
   if (hex.length !== 32) throw new Error("Invalid UUID format");
 
@@ -56,7 +56,7 @@ export const uuidToBytes = (uuid: string): Uint8Array => {
   );
 };
 
-export const toBase64Url = (bytes: Uint8Array): string => {
+const toBase64Url = (bytes: Uint8Array): string => {
   let binary = "";
   bytes.forEach((b) => {
     binary += String.fromCodePoint(b);

@@ -70,12 +70,12 @@ const CreationScene: React.FC = () => {
     if (!formData.requiresPassword) return true;
 
     if (formData.password.length < 4) {
-      setPasswordError(t('creation.passwordMinLength'));
+      setPasswordError(t('creation:passwordMinLength'));
       return false;
     }
 
     if (formData.password !== confirmPassword) {
-      setPasswordError(t('creation.passwordsDoNotMatch'));
+      setPasswordError(t('validation:passwordsDoNotMatch'));
       return false;
     }
 
@@ -100,10 +100,10 @@ const CreationScene: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            {t('creation.title')}
+            {t('creation:title')}
           </h1>
           <p className="text-gray-600">
-            {t('creation.subtitle')}
+            {t('creation:subtitle')}
           </p>
         </div>
 
@@ -114,10 +114,10 @@ const CreationScene: React.FC = () => {
               <PlusCircle className="w-8 h-8 text-blue-500" />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {t('creation.cardTitle')}
+              {t('creation:cardTitle')}
             </h3>
             <p className="text-gray-600 text-sm">
-              {t('creation.cardDescription')}
+              {t('creation:cardDescription')}
             </p>
           </div>
 
@@ -126,12 +126,12 @@ const CreationScene: React.FC = () => {
             <div>
               <label htmlFor="sessionName" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                 <FileText className="w-4 h-4" />
-                {t('creation.sessionName')} *
+                {t('creation:sessionName')} *
               </label>
               <input
                 id="sessionName"
                 type="text"
-                placeholder={t('creation.sessionNamePlaceholder')}
+                placeholder={t('creation:sessionNamePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={formData.name}
                 onChange={(e) => updateFormData('name', (e.target as HTMLInputElement).value)}
@@ -147,11 +147,11 @@ const CreationScene: React.FC = () => {
             <div>
               <label htmlFor="sessionDescription" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                 <HelpCircle className="w-4 h-4" />
-                {t('creation.sessionDescription')}
+                {t('creation:sessionDescription')}
               </label>
               <textarea
                 id="sessionDescription"
-                placeholder={t('creation.descriptionPlaceholder')}
+                placeholder={t('creation:descriptionPlaceholder')}
                 rows={4}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
                 value={formData.description}
@@ -160,7 +160,7 @@ const CreationScene: React.FC = () => {
                 disabled={isCreating}
               />
               <p className="text-xs text-gray-500 mt-1 flex justify-between">
-                <span>{t('creation.descriptionOptional')}</span>
+                <span>{t('creation:descriptionOptional')}</span>
                 <span>{formData.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
               </p>
             </div>
@@ -174,7 +174,7 @@ const CreationScene: React.FC = () => {
                   ) : (
                     <Unlock className="w-4 h-4 text-gray-400" />
                   )}
-                  {t('creation.protectWithPassword')}
+                  {t('creation:protectWithPassword')}
                 </span>
                 <button
                   type="button"
@@ -198,13 +198,13 @@ const CreationScene: React.FC = () => {
                   {/* Password Field */}
                   <div>
                     <label htmlFor="sessionPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('creation.sessionPassword')} *
+                      {t('creation:sessionPassword')} *
                     </label>
                     <div className="relative">
                       <input
                         id="sessionPassword"
                         type={showPassword ? "text" : "password"}
-                        placeholder={t('creation.passwordPlaceholder')}
+                        placeholder={t('creation:passwordPlaceholder')}
                         className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
                         value={formData.password}
                         onChange={(e) => handlePasswordChange((e.target as HTMLInputElement).value)}
@@ -225,20 +225,20 @@ const CreationScene: React.FC = () => {
                       </button>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      {t('creation.passwordMinLengthHint')}
+                      {t('creation:passwordMinLengthHint')}
                     </p>
                   </div>
 
                   {/* Confirm Password Field */}
                   <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('creation.confirmPassword')} *
+                      {t('creation:confirmPassword')} *
                     </label>
                     <div className="relative">
                       <input
                         id="confirmPassword"
                         type={showPassword ? "text" : "password"}
-                        placeholder={t('creation.confirmPasswordPlaceholder')}
+                        placeholder={t('creation:confirmPasswordPlaceholder')}
                         className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
                         value={confirmPassword}
                         onChange={(e) => handleConfirmPasswordChange((e.target as HTMLInputElement).value)}
@@ -290,7 +290,7 @@ const CreationScene: React.FC = () => {
                 loading={isCreating}
                 className="flex-1"
               >
-                {t('creation.createButton')}
+                {t('creation:createButton')}
               </Button>
             </div>
           </div>

@@ -11,7 +11,7 @@ interface ShareButtonProps {
 const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) => {
   const { t } = useLanguage();
   const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipMessage, setTooltipMessage] = useState(t('share.copyLink'));
+  const [tooltipMessage, setTooltipMessage] = useState(t('misc:share.copyLink'));
   const [copySuccess, setCopySuccess] = useState(false);
 
   const shortenedUUID = getShortenedUUID(sessionId);
@@ -21,14 +21,14 @@ const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) =>
     setTimeout(() => {
       setShowTooltip(false);
       setCopySuccess(false);
-      setTooltipMessage(t('share.copyLink'));
+      setTooltipMessage(t('misc:share.copyLink'));
     }, 2000);
   };
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setTooltipMessage(t('share.copied'));
+      setTooltipMessage(t('misc:share.copied'));
       setCopySuccess(true);
       setShowTooltip(true);
       resetTooltip();
@@ -41,7 +41,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) =>
       document.execCommand('copy');
       document.body.removeChild(textArea);
 
-      setTooltipMessage(t('share.copied'));
+      setTooltipMessage(t('misc:share.copied'));
       setCopySuccess(true);
       setShowTooltip(true);
       resetTooltip();
@@ -52,8 +52,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) =>
     if (navigator.share) {
       try {
         await navigator.share({
-          title: sessionTitle || t('share.defaultTitle'),
-          text: t('share.shareText', { code: shortenedUUID }),
+          title: sessionTitle || t('misc:share.defaultTitle'),
+          text: t('misc:share.shareText', { code: shortenedUUID }),
           url: shareUrl,
         });
       } catch (err) {
@@ -71,7 +71,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ sessionId, sessionTitle }) =>
       <button
         onClick={handleNativeShare}
         className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        aria-label={t('share.buttonAriaLabel')}
+        aria-label={t('misc:share.buttonAriaLabel')}
       >
         <Share2 className="w-5 h-5" />
         <span className="font-mono font-medium">{shortenedUUID}</span>

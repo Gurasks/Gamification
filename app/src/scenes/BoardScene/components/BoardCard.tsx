@@ -84,12 +84,12 @@ const BoardCard: React.FC<BoardCardProps> = ({
   };
 
   const handleDeleteCard = async () => {
-    if (!timeEnded && onDelete && window.confirm(t('card.confirmDeleteSuggestion'))) {
+    if (!timeEnded && onDelete && window.confirm(t('card:confirmDeleteSuggestion'))) {
       setIsDeletingCard(true);
       try {
         await onDelete(card.id);
       } catch (error) {
-        toast.error(t('card.errors.deleteSuggestion'));
+        toast.error(t('card:errors.deleteSuggestion'));
       } finally {
         setIsDeletingCard(false);
       }
@@ -97,12 +97,12 @@ const BoardCard: React.FC<BoardCardProps> = ({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!timeEnded && onCommentDelete && window.confirm(t('card.confirmDeleteComment'))) {
+    if (!timeEnded && onCommentDelete && window.confirm(t('card:confirmDeleteComment'))) {
       setDeletingCommentId(commentId);
       try {
         await onCommentDelete(card.id, commentId);
       } catch (error) {
-        toast.error(t('card.errors.deleteComment'));
+        toast.error(t('card:errors.deleteComment'));
       } finally {
         setDeletingCommentId(null);
       }
@@ -140,13 +140,13 @@ const BoardCard: React.FC<BoardCardProps> = ({
 
       if (Object.keys(updatedMetadata).length > 0) {
         await onMetadataUpdate(card.id, updatedMetadata);
-        toast.success(t('card.success.metadataUpdated'));
+        toast.success(t('card:success.metadataUpdated'));
       }
 
       setIsEditingMetadata(false);
     } catch (error) {
       console.error('Error updating metadata:', error);
-      toast.error(t('card.errors.metadataUpdate'));
+      toast.error(t('card:errors.metadataUpdate'));
     }
   };
 
@@ -175,14 +175,14 @@ const BoardCard: React.FC<BoardCardProps> = ({
             <button
               onClick={handleEditSubmit}
               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              title={t('card.save')}
+              title={t('card:save')}
             >
               <Check className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsEditing(false)}
               className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
-              title={t('card.cancel')}
+              title={t('card:cancel')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -242,10 +242,10 @@ const BoardCard: React.FC<BoardCardProps> = ({
                 <button
                   onClick={() => setIsEditingMetadata(true)}
                   className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-100 rounded-full border border-gray-300 hover:bg-gray-200"
-                  title={t('card.addMetadata')}
+                  title={t('card:addMetadata')}
                 >
                   <Tag className="w-3 h-3" />
-                  {t('card.addMetadata')}
+                  {t('card:addMetadata')}
                 </button>
               )}
             </div>
@@ -260,10 +260,10 @@ const BoardCard: React.FC<BoardCardProps> = ({
           onClick={() => setShowComments(!showComments)}
           className={`text-xs flex items-center gap-1 mb-2 ${timeEnded ? 'text-gray-700 cursor-pointer' : 'text-gray-700 hover:text-gray-700'
             }`}
-          title={timeEnded ? t('card.tooltip.viewComments') : t('card.tooltip.comments')}
+          title={timeEnded ? t('card:tooltip.viewComments') : t('card:tooltip.comments')}
         >
           <MessageSquareMore size={14} />
-          {card.comments?.length || 0} {card.comments?.length === 1 ? t('card.comment') : t('card.comments')}
+          {card.comments?.length || 0} {card.comments?.length === 1 ? t('card:comment') : t('card:comments')}
         </button>
 
         {showComments && (
@@ -283,21 +283,21 @@ const BoardCard: React.FC<BoardCardProps> = ({
                           setText={setEditCommentText}
                           handleSubmit={handleCommentEditSubmit}
                           disabled={timeEnded}
-                          placeholder={timeEnded ? t('card.editDisabled') : t('card.editPlaceholder')}
+                          placeholder={timeEnded ? t('card:editDisabled') : t('card:editPlaceholder')}
                         />
                         {!timeEnded && (
                           <div className="flex gap-2 mt-2">
                             <button
                               onClick={handleCommentEditSubmit}
                               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                              title={t('card.save')}
+                              title={t('card:save')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setCommentIdToEdit("")}
                               className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
-                              title={t('card.cancel')}
+                              title={t('card:cancel')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -317,7 +317,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                                   setEditCommentText(comment.text);
                                 }}
                                 className="text-xs text-indigo-500 hover:text-indigo-700"
-                                title={t('card.editComment')}
+                                title={t('card:editComment')}
                               >
                                 <PencilLine className="w-4 h-4" />
                               </button>
@@ -325,7 +325,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                                 onClick={() => handleDeleteComment(comment.id)}
                                 disabled={isDeleting}
                                 className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50"
-                                title={t('card.deleteComment')}
+                                title={t('card:deleteComment')}
                               >
                                 {isDeleting ? (
                                   <Clock className="w-4 h-4 animate-pulse" />
@@ -345,12 +345,12 @@ const BoardCard: React.FC<BoardCardProps> = ({
 
             {!timeEnded && (
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-xs text-gray-700 mb-2">{t('card.addComment')}:</p>
+                <p className="text-xs text-gray-700 mb-2">{t('card:addComment')}:</p>
                 <VariableTextArea
                   text={commentText}
                   setText={setCommentText}
                   handleSubmit={handleCommentSubmit}
-                  placeholder={t('card.commentPlaceholder')}
+                  placeholder={t('card:commentPlaceholder')}
                 />
               </div>
             )}
@@ -366,7 +366,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
             <button
               onClick={() => setIsEditing(true)}
               className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
-              title={t('card.editSuggestion')}
+              title={t('card:editSuggestion')}
             >
               <PencilLine className="w-4 h-4" />
             </button>
@@ -377,7 +377,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
               onClick={handleDeleteCard}
               disabled={isDeletingCard}
               className="text-xs text-red-500 hover:text-red-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={t('card.deleteSuggestion')}
+              title={t('card:deleteSuggestion')}
             >
               {isDeletingCard ? (
                 <Clock className="w-4 h-4 animate-pulse" />
@@ -391,7 +391,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
             <button
               onClick={() => setIsEditingMetadata(true)}
               className="ml-1 text-zinc-500 hover:text-zinc-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={t('card.editMetadata')}
+              title={t('card:editMetadata')}
             >
               <Settings className="w-4 h-4" />
             </button>

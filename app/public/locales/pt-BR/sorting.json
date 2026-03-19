@@ -1,0 +1,21 @@
+{
+  "sortBy": "Ordenar por",
+  "options": {
+    "newest": "Mais recentes",
+    "oldest": "Mais antigos",
+    "highest": "Mais bem avaliados",
+    "lowest": "Menos bem avaliados",
+    "mostComments": "Mais comentários",
+    "leastComments": "Menos comentários",
+    "author": "Por autor"
+  },
+  "descriptions": {
+    "newest": "Ordena pelos cards mais recentes primeiro",
+    "oldest": "Ordena pelos cards mais antigos primeiro",
+    "highest": "Ordena pelos cards com melhor avaliação primeiro",
+    "lowest": "Ordena pelos cards com pior avaliação primeiro",
+    "mostComments": "Ordena pelos cards com mais comentários primeiro",
+    "leastComments": "Ordena pelos cards com menos comentários primeiro",
+    "author": "Ordena os cards alfabeticamente pelo autor"
+  }
+}

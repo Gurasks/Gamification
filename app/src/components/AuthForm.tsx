@@ -68,7 +68,7 @@ const FormHeader: React.FC<{
         )}
       </div>
       <h2 className="text-2xl font-bold text-gray-800 mb-2">
-        {mode === 'login' ? t('auth.login') : t('auth.register')}
+        {mode === 'login' ? t('auth:login') : t('auth:register')}
       </h2>
       {message && (
         <p className="text-gray-600 text-sm">{message}</p>
@@ -153,7 +153,7 @@ const SubmitButton: React.FC<{
   const { t } = useLanguage();
 
   const getLoadingText = () => {
-    return mode === 'login' ? t('auth.loggingIn') : t('auth.creatingAccount');
+    return mode === 'login' ? t('auth:loggingIn') : t('auth:creatingAccount');
   };
 
   const getButtonText = () => {
@@ -161,14 +161,14 @@ const SubmitButton: React.FC<{
       return (
         <>
           <LogIn className="w-4 h-4" />
-          {t('auth.login')}
+          {t('auth:login')}
         </>
       );
     } else {
       return (
         <>
           <UserPlus className="w-4 h-4" />
-          {t('auth.register')}
+          {t('auth:register')}
         </>
       );
     }
@@ -208,7 +208,7 @@ const GoogleLoginButton: React.FC<{
     <>
       <div className="flex items-center">
         <div className="flex-1 border-t border-gray-300"></div>
-        <span className="px-3 text-sm text-gray-500">{t('auth.or')}</span>
+        <span className="px-3 text-sm text-gray-500">{t('auth:or')}</span>
         <div className="flex-1 border-t border-gray-300"></div>
       </div>
 
@@ -223,7 +223,7 @@ const GoogleLoginButton: React.FC<{
           className="w-5 h-5"
         />
         <span className="font-medium">
-          {isGoogleLoading ? t('auth.connecting') : t('auth.links.loginWithGoogle')}
+          {isGoogleLoading ? t('auth:connecting') : t('auth:links.loginWithGoogle')}
         </span>
       </button>
     </>
@@ -241,14 +241,14 @@ const SwitchModeButton: React.FC<{
   return (
     <div className="text-center">
       <p className="text-sm text-gray-600">
-        {mode === 'login' ? t('auth.links.noAccount') : t('auth.links.hasAccount')}{' '}
+        {mode === 'login' ? t('auth:links.noAccount') : t('auth:links.hasAccount')}{' '}
         <button
           type="button"
           onClick={() => onChange(mode === 'login' ? 'register' : 'login')}
           className="text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 transition-colors"
           disabled={isLoading || isGoogleLoading}
         >
-          {mode === 'login' ? t('auth.register') : t('auth.login')}
+          {mode === 'login' ? t('auth:register') : t('auth:login')}
         </button>
       </p>
     </div>
@@ -281,15 +281,15 @@ const useAuthValidation = (mode: AuthMode) => {
 
     if (mode === 'register') {
       if (!displayName?.trim()) {
-        setLocalError(t('auth.nameRequired'));
+        setLocalError(t('auth:nameRequired'));
         return false;
       }
       if (displayName.trim().length < 2) {
-        setLocalError(t('auth.nameMinLength'));
+        setLocalError(t('auth:nameMinLength'));
         return false;
       }
       if (password !== confirmPassword) {
-        setLocalError(t('auth.passwordsDoNotMatch'));
+        setLocalError(t('validation:passwordsDoNotMatch'));
         return false;
       }
     }
@@ -407,7 +407,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         })
       });
     } catch (err: any) {
-      validation.setLocalError(err.message || t('auth.requestError'));
+      validation.setLocalError(err.message || t('auth:requestError'));
     }
   };
 
@@ -418,12 +418,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     formState.resetForm();
   };
 
-  const fullNameLabel = t('nameEntry.labels.yourName');
-  const fullNamePlaceholder = t('nameEntry.placeholders.name');
-  const emailPlaceholder = t('auth.placeholders.email');
-  const passwordPlaceholder = mode === 'login' ? t('auth.placeholders.password') : t('auth.placeholders.createPassword');
-  const confirmPasswordPlaceholder = t('auth.placeholders.confirmPassword');
-  const minLengthText = t('validation.minLength', { field: t('auth.fields.name'), count: 2 });
+  const fullNameLabel = t('login:labels.yourName');
+  const fullNamePlaceholder = t('login:placeholders.name');
+  const emailPlaceholder = t('auth:placeholders.email');
+  const passwordPlaceholder = mode === 'login' ? t('auth:placeholders.password') : t('auth:placeholders.createPassword');
+  const confirmPasswordPlaceholder = t('auth:placeholders.confirmPassword');
+  const minLengthText = t('validation:minLength', { field: t('auth:fields.name'), count: 2 });
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -469,7 +469,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
             <Mail className="w-4 h-4" />
-            {t('auth.fields.email')} *
+            {t('auth:fields.email')} *
           </label>
           <input
             type="email"
@@ -484,7 +484,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
         {/* Password */}
         <PasswordInput
-          label={t('auth.fields.password') + " *"}
+          label={t('auth:fields.password') + " *"}
           value={formState.password}
           onChange={formState.setPassword}
           placeholder={passwordPlaceholder}
@@ -496,7 +496,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         {/* Confirm Password (only for register) */}
         {mode === 'register' && (
           <PasswordInput
-            label={t('auth.confirmPassword') + " *"}
+            label={t('auth:confirmPassword') + " *"}
             value={formState.confirmPassword}
             onChange={formState.setConfirmPassword}
             placeholder={confirmPasswordPlaceholder}

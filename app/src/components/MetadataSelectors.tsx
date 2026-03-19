@@ -39,7 +39,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
     <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
       <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
         <Layers className="w-4 h-4" />
-        {t('metadataSelectors.title')}
+        {t('metadata:selector.title')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
@@ -48,9 +48,9 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           value={priority}
           onChange={setPriority as (level: string) => void}
           disabled={disabled}
-          placeholder={t('metadataSelectors.priorityPlaceholder')}
+          placeholder={t('metadata:selector.priorityPlaceholder')}
           options={priorityOptions}
-          label={t('metadataSelectors.priority')}
+          label={t('metadata:selector.priority')}
         />
 
         {/* Requirement Type */}
@@ -58,9 +58,9 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           value={requirementType}
           onChange={setRequirementType as (type: string) => void}
           disabled={disabled}
-          placeholder={t('metadataSelectors.requirementTypePlaceholder')}
+          placeholder={t('metadata:selector.requirementTypePlaceholder')}
           options={requirementTypeOptions}
-          label={t('metadataSelectors.requirementType')}
+          label={t('metadata:selector.requirementType')}
         />
 
         {/* Category */}
@@ -68,9 +68,9 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
           value={category}
           onChange={setCategory as (category: string) => void}
           disabled={disabled}
-          placeholder={t('metadataSelectors.categoryPlaceholder')}
+          placeholder={t('metadata:selector.categoryPlaceholder')}
           options={categoryOptions}
-          label={t('metadataSelectors.category')}
+          label={t('metadata:selector.category')}
         />
 
         {/* Estimated Effort */}
@@ -79,7 +79,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
             htmlFor={effortInputId}
             className="text-start text-xs font-medium text-gray-600 mb-1"
           >
-            {t('metadataSelectors.estimatedEffort')}
+            {t('metadata:selector.estimatedEffort')}
           </label>
 
           <input
@@ -93,7 +93,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
               setEstimatedEffort(value === '' ? '' : Number.parseFloat(value));
             }}
             className="w-full text-xs p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder={t('metadataSelectors.effortPlaceholder')}
+            placeholder={t('metadata:selector.effortPlaceholder')}
             disabled={disabled}
             aria-describedby={`${effortInputId}-description`}
           />
@@ -103,7 +103,7 @@ export const MetadataSelectors: React.FC<MetadataSelectorsProps> = ({
       {/* Usage tips */}
       <div className="text-xs text-gray-500 flex items-start gap-2">
         <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <p>{t('metadataSelectors.tip')}</p>
+        <p>{t('metadata:selector.tip')}</p>
       </div>
     </div>
   );

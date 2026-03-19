@@ -1,0 +1,53 @@
+{
+  "yourTeam": "Sua equipe",
+  "selectTeam": "Selecione sua equipe",
+  "teams": "equipes",
+  "members": "membros",
+  "organizer": "Organizador",
+  "unassigned": "Sem equipe",
+  "selection": {
+    "title": "Configuração de equipes",
+    "subtitle": "Organize os participantes e configure as equipes para a sessão",
+    "ownerStatus": "Você é o organizador desta sessão",
+    "memberStatus": "Aguardando configuração do organizador",
+    "exitButton": "Sair da sala",
+    "numberOfTeams": "Número de equipes",
+    "numberHint": "Digite um número entre 2 e 10",
+    "participantsList": "Lista de participantes ({{count}})",
+    "startSession": "Iniciar sessão",
+    "ownerHint": "Configure as equipes e inicie quando estiver pronto",
+    "memberHint": "Aguardando o organizador iniciar a sessão",
+    "unauthenticated": "Erro: usuário não autenticado",
+    "waitingOwner": "Aguardando o organizador atribuir sua equipe...",
+    "selectYourTeam": "Selecione sua equipe",
+    "yourTeamIs": "Sua equipe é",
+    "assigningRandom": "Atribuindo você a uma equipe aleatória...",
+    "loading": {
+      "auth": "Carregando autenticação...",
+      "session": "Carregando sessão..."
+    },
+    "unauthorized": {
+      "title": "Acesso não autorizado",
+      "message": "Você precisa estar logado para acessar esta página."
+    },
+    "methods": {
+      "title": "Método de seleção de equipes",
+      "helpTooltip": "Saiba mais sobre os métodos de seleção de equipes",
+      "helpText": "Escolha como os participantes serão divididos em equipes nesta sessão",
+      "selected": "Selecionado",
+      "random": "Atribuição aleatória",
+      "randomDesc": "Os participantes são distribuídos aleatoriamente entre as equipes",
+      "chooseTeam": "Escolher equipe",
+      "chooseTeamDesc": "Os participantes podem escolher em qual equipe entrar",
+      "ownerChooses": "Organizador define as equipes",
+      "ownerChoosesDesc": "O organizador da sessão atribui manualmente os participantes às equipes"
+    },
+    "ownerAssignment": {
+      "title": "Atribuição de equipes",
+      "participants": "Participantes",
+      "currentTeam": "Equipe atual",
+      "assigning": "Atribuindo à equipe...",
+      "anonymous": "Anônimo"
+    }
+  }
+}

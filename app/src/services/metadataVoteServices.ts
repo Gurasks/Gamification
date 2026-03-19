@@ -25,13 +25,13 @@ export const getButtonClass = (
 export const getTypeText = (type: MetadataType, t: TFunction): string => {
   switch (type) {
     case "priority":
-      return t("cardMetadata.priority").toLowerCase();
+      return t("card:metadata.question.priority");
     case "requirementType":
-      return t("cardMetadata.type").toLowerCase();
+      return t("card:metadata.question.type");
     case "category":
-      return t("cardMetadata.category").toLowerCase();
+      return t("card:metadata.question.category");
     case "estimatedEffort":
-      return t("cardMetadata.estimatedEffort").toLowerCase();
+      return t("card:metadata.question.estimatedEffort");
     default:
       return "";
   }

@@ -1,0 +1,92 @@
+{
+  "common": {
+    "actions": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "back": "Voltar",
+      "close": "Fechar",
+      "refresh": "Atualizar",
+      "view": "Ver",
+      "export": "Exportar"
+    },
+    "status": {
+      "loading": "Carregando...",
+      "success": "Sucesso!",
+      "error": "Erro",
+      "updating": "Atualizando..."
+    },
+    "navigation": {
+      "backToHome": "Voltar para a página inicial",
+      "backToTeam": "Voltar para a equipe",
+      "viewResults": "Ver resultados"
+    },
+    "placeholders": {
+      "name": "Digite o nome",
+      "description": "Digite a descrição",
+      "search": "Buscar..."
+    },
+    "metrics": {
+      "points": "pontos",
+      "totalPoints": "total de pontos",
+      "score": "Pontuação",
+      "totalScore": "Pontuação total",
+      "average": "média",
+      "total": "total",
+      "rank": "#{{rank}}",
+      "position": "Posição"
+    },
+    "entities": {
+      "team": "Equipe",
+      "teams": "Equipes",
+      "member": "Membro",
+      "members": "Membros",
+      "user": "Usuário",
+      "participant": "Participante",
+      "participants": "Participantes",
+      "author": "Autor"
+    },
+    "content": {
+      "comment": "Comentário",
+      "comments": "Comentários",
+      "suggestion": "Sugestão",
+      "suggestions": "Sugestões",
+      "reply": "Resposta",
+      "replies": "Respostas",
+      "rating": "Avaliação",
+      "ratings": "Avaliações",
+      "vote": "Voto",
+      "votes": "Votos"
+    },
+    "gamification": {
+      "metadataVotes": "Votos de metadados",
+      "agreedVotes": "votos de concordância",
+      "cardRatings": "Avaliações de cards",
+      "qualityContributions": "contribuições de qualidade"
+    },
+    "time": {
+      "minute": "minuto",
+      "minutes": "minutos",
+      "second": "segundo",
+      "seconds": "segundos",
+      "hour": "hora",
+      "hours": "horas",
+      "totalTime": "Tempo total",
+      "efficiency": "Eficiência"
+    },
+    "export": {
+      "pdf": "PDF",
+      "doc": "DOC"
+    },
+    "labels": {
+      "noData": "Sem dados",
+      "notAvailable": "N/D",
+      "noTeam": "Sem equipe",
+      "noComments": "Sem comentários",
+      "noSuggestions": "Sem sugestões"
+    },
+    "required": "Campo obrigatório",
+    "na": "N/D",
+    "you": "Você"
+  }
+}

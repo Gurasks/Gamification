@@ -1,0 +1,55 @@
+{
+  "title": "Revisão anônima",
+  "cardsToReview": "Cards para revisar",
+  "cards": "cards",
+  "mode": {
+    "readOnly": "MODO SOMENTE LEITURA",
+    "active": "MODO ATIVO",
+    "readOnlyDescription": "A fase de votação e comentários terminou. Você ainda pode visualizar todos os cards e comentários, mas não pode interagir.",
+    "activeDescription": "Todos os cards são exibidos anonimamente para evitar viés. Você pode votar e comentar em qualquer card."
+  },
+  "stats": {
+    "totalCards": "Total de cards",
+    "voters": "Votantes",
+    "readOnly": "Somente leitura",
+    "active": "Ativo"
+  },
+  "description": {
+    "viewOnly": "Navegue pelos cards organizados por relevância",
+    "rateCards": "Avalie os cards usando o sistema de estrelas"
+  },
+  "empty": {
+    "title": "Nenhum card disponível",
+    "message": "Não há cards para revisar nesta sessão."
+  },
+  "footer": {
+    "title": "Modo de revisão anônima"
+  },
+  "actions": {
+    "backToTeam": "Voltar para a equipe",
+    "viewLeaderboard": "Ver classificação",
+    "endReview": "Encerrar revisão",
+    "viewResults": "Ver resultados"
+  },
+  "loading": {
+    "review": "Carregando revisão..."
+  },
+  "errors": {
+    "loadSession": "Erro ao carregar a sessão",
+    "authRequired": "Você precisa estar autenticado para votar",
+    "phaseEnded": "A fase de votação terminou",
+    "voteFailed": "Erro ao registrar voto",
+    "commentFailed": "Erro ao adicionar comentário",
+    "editPhaseEnded": "A fase de edição terminou",
+    "commentUpdateFailed": "Erro ao atualizar comentário",
+    "cannotVoteNow": "Você não pode votar agora",
+    "endReviewFailed": "Erro ao encerrar a fase de revisão"
+  },
+  "success": {
+    "voteRegistered": "Voto registrado!",
+    "commentAdded": "Comentário adicionado!",
+    "commentUpdated": "Comentário atualizado!",
+    "commentDeleted": "Comentário excluído com sucesso!",
+    "reviewEnded": "Fase de revisão encerrada!"
+  }
+}

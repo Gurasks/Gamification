@@ -29,14 +29,3 @@ export const getLocalizedTeamName = (
   const prefix = t("common.entities.team");
   return `${prefix} ${teamId}`;
 };
-
-export const getLocalizedTeams = (
-  teamIds: string[],
-  t: (key: string) => string,
-): string[] => {
-  return teamIds.map((teamId) => getLocalizedTeamName(teamId, t));
-};
-
-export const extractTeamId = (localizedName: string): string => {
-  return localizedName.split(" ").pop() || localizedName;
-};

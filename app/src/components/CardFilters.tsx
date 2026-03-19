@@ -70,7 +70,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
           className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
         >
           <Filter className="w-4 h-4" />
-          {t('filters.title')}
+          {t('board:filters.title')}
           {hasFilters && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-blue-600 rounded-full">
               {priority.length + category.length}
@@ -89,7 +89,7 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
             className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-3 h-3" />
-            {t('filters.clearAll')}
+            {t('board:filters.clearAll')}
           </button>
         )}
       </div>
@@ -102,11 +102,11 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
             <div className="flex items-center gap-2 mb-3">
               {metadataIcons.priority}
               <div className="text-sm font-medium text-gray-700">
-                {t('filters.priority')}
+                {t('board:filters.priority')}
               </div>
               {priority.length > 0 && (
                 <span className="text-xs text-gray-500">
-                  ({priority.length} {priority.length === 1 ? t('filters.selected') : t('filters.selectedPlural')})
+                  ({priority.length} {priority.length === 1 ? t('board:filters.selected') : t('board:filters.selectedPlural')})
                 </span>
               )}
             </div>
@@ -133,11 +133,11 @@ export const CardFilters: React.FC<CardFiltersProps> = ({
             <div className="flex items-center gap-2 mb-3">
               {metadataIcons.category}
               <div className="text-sm font-medium text-gray-700">
-                {t('filters.category')}
+                {t('board:filters.category')}
               </div>
               {category.length > 0 && (
                 <span className="text-xs text-gray-500">
-                  ({category.length} {category.length === 1 ? t('filters.selected') : t('filters.selectedPlural')})
+                  ({category.length} {category.length === 1 ? t('board:filters.selected') : t('board:filters.selectedPlural')})
                 </span>
               )}
             </div>

@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome {{name}} to Singular!",
+  "subtitle": "Collaborate and play with your team in real-time.",
+  "createTitle": "Create a new session",
+  "createDescription": "Start a new session and invite your team",
+  "createAriaLabel": "Create a new session. Start a new session and invite your team",
+  "joinTitle": "Join a session",
+  "joinDescription": "Choose a session to join or enter a code",
+  "joinAriaLabel": "Join a session. Choose a session to participate or enter a code"
+}

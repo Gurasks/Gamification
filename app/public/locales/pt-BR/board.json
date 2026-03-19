@@ -1,0 +1,58 @@
+{
+  "title": "Quadro de Sugestões",
+  "participant": "Participante",
+  "addSuggestion": "Adicionar sugestão",
+  "sessionClosed": "Sessão encerrada!",
+  "sessionClosedMessage": "A sessão foi encerrada.",
+  "timeEnded": "Tempo esgotado!",
+  "timeEndedMessage": "A fase de sugestões e votação terminou.",
+  "anonymousReview": "Revisão anônima",
+  "teamSuggestions": "Sugestões de {{team}}",
+  "suggestion": "sugestão",
+  "suggestions": "sugestões",
+  "filtered": "filtradas",
+  "noSuggestions": "Ainda não há sugestões",
+  "beFirst": "Seja o primeiro a adicionar uma sugestão!",
+  "useFormAbove": "Use o formulário acima para começar",
+  "metadataUpdated": "Metadados atualizados!",
+  "metadataUpdateError": "Erro ao atualizar metadados",
+  "loading": {
+    "session": "Carregando sessão...",
+    "initializing": "Inicializando sessão...",
+    "cards": "Carregando cards..."
+  },
+  "errors": {
+    "sessionNotFound": "Sessão não encontrada"
+  },
+  "filters": {
+    "title": "Filtros",
+    "clearAll": "Limpar tudo",
+    "priority": "Prioridade",
+    "category": "Categoria",
+    "selected": "selecionado",
+    "selectedPlural": "selecionados"
+  },
+  "form": {
+    "creatingSuggestion": "Criando sugestão...",
+    "suggestionPlaceholder": "Digite sua sugestão...",
+    "submitSuggestion": "Enviar sugestão"
+  },
+  "timer": {
+    "timeExpired": "Tempo esgotado!",
+    "minute": "minuto",
+    "minutes": "minutos",
+    "second": "segundo",
+    "seconds": "segundos",
+    "added": "adicionado",
+    "addError": "Erro ao adicionar tempo",
+    "onlyMembersCanAdd": "Apenas membros de {{team}} podem adicionar tempo"
+  },
+  "addTime": {
+    "addTimeLabel": "Adicionar tempo",
+    "timePlaceholder": "Tempo",
+    "add": "Adicionar",
+    "adding": "Adicionando...",
+    "cancel": "Cancelar",
+    "addTime": "Adicionar tempo"
+  }
+}

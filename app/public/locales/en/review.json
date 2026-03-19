@@ -1,0 +1,55 @@
+{
+  "title": "Anonymous Review",
+  "cardsToReview": "Cards to Review",
+  "cards": "cards",
+  "mode": {
+    "readOnly": "READ-ONLY MODE",
+    "active": "ACTIVE MODE",
+    "readOnlyDescription": "The voting and commenting phase has ended. You can still view all cards and comments, but cannot interact.",
+    "activeDescription": "All cards are displayed anonymously to avoid bias. You can vote and comment on any card."
+  },
+  "stats": {
+    "totalCards": "Total Cards",
+    "voters": "Voters",
+    "readOnly": "Read Only",
+    "active": "Active"
+  },
+  "description": {
+    "viewOnly": "Browse cards organized by relevance",
+    "rateCards": "Rate cards using the star system"
+  },
+  "empty": {
+    "title": "No cards available",
+    "message": "There are no cards to review in this session."
+  },
+  "footer": {
+    "title": "Anonymous Review Mode"
+  },
+  "actions": {
+    "backToTeam": "Back to Team",
+    "viewLeaderboard": "View Leaderboard",
+    "endReview": "End Review",
+    "viewResults": "View Results"
+  },
+  "loading": {
+    "review": "Loading review..."
+  },
+  "errors": {
+    "loadSession": "Error loading session",
+    "authRequired": "You need to be authenticated to vote",
+    "phaseEnded": "The voting phase has ended",
+    "voteFailed": "Error registering vote",
+    "commentFailed": "Error adding comment",
+    "editPhaseEnded": "The editing phase has ended",
+    "commentUpdateFailed": "Error updating comment",
+    "cannotVoteNow": "You cannot vote now",
+    "endReviewFailed": "Error ending the review phase"
+  },
+  "success": {
+    "voteRegistered": "Vote registered!",
+    "commentAdded": "Comment added!",
+    "commentUpdated": "Comment updated!",
+    "commentDeleted": "Comment deleted successfully!",
+    "reviewEnded": "Review phase ended!"
+  }
+}

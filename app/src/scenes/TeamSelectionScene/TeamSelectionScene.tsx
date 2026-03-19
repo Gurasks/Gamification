@@ -98,7 +98,7 @@ const TeamSelectionScene: React.FC = () => {
   if (authLoading) {
     return (
       <LoadingOverlay
-        message={t('teamSelection.loading.auth')}
+        message={t('team:selection.loading.auth')}
       />
     );
   }
@@ -111,16 +111,16 @@ const TeamSelectionScene: React.FC = () => {
             <XCircle className="w-8 h-8 text-red-500" />
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            {t('teamSelection.unauthorized.title')}
+            {t('team:selection.unauthorized.title')}
           </h2>
           <p className="text-gray-600 mb-4">
-            {t('teamSelection.unauthorized.message')}
+            {t('team:selection.unauthorized.message')}
           </p>
           <button
             onClick={() => navigate('/login')}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            {t('auth.login')}
+            {t('auth:login')}
           </button>
         </div>
       </div>
@@ -130,7 +130,7 @@ const TeamSelectionScene: React.FC = () => {
   if (!sessionId || loadingSession || !session) {
     return (
       <LoadingOverlay
-        message={t('teamSelection.loading.session')}
+        message={t('team:selection.loading.session')}
       />
     );
   }
@@ -141,10 +141,10 @@ const TeamSelectionScene: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            {t('teamSelection.title')}
+            {t('team:selection.title')}
           </h1>
           <p className="text-gray-600">
-            {t('teamSelection.subtitle')}
+            {t('team:selection.subtitle')}
           </p>
         </div>
 
@@ -159,7 +159,7 @@ const TeamSelectionScene: React.FC = () => {
                 {session.title}
               </h2>
               <p className="text-gray-600 text-sm">
-                {isOwner ? t('teamSelection.ownerStatus') : t('teamSelection.memberStatus')}
+                {isOwner ? t('team:selection.ownerStatus') : t('team:selection.memberStatus')}
               </p>
             </div>
           </div>
@@ -171,7 +171,7 @@ const TeamSelectionScene: React.FC = () => {
               className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors duration-200"
             >
               <LogOut className="w-5 h-5" />
-              <span>{t('teamSelection.exitButton')}</span>
+              <span>{t('team:selection.exitButton')}</span>
             </button>
           </div>
 
@@ -190,7 +190,7 @@ const TeamSelectionScene: React.FC = () => {
                 <div className="flex-1">
                   <label htmlFor="teamNumbers" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                     <Users className="w-4 h-4" />
-                    {t('teamSelection.numberOfTeams')}
+                    {t('team:selection.numberOfTeams')}
                   </label>
                   {isOwner ? (
                     <div>
@@ -205,13 +205,13 @@ const TeamSelectionScene: React.FC = () => {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-2xl font-bold"
                       />
                       <p className="text-gray-500 text-xs mt-1 block text-center">
-                        {t('teamSelection.numberHint')}
+                        {t('team:selection.numberHint')}
                       </p>
                     </div>
                   ) : (
                     <div className="text-center" aria-labelledby="teamNumbersLabel">
                       <p className="text-3xl font-bold text-gray-800">{numOfTeams}</p>
-                      <p className="text-sm text-gray-500 mt-1">{t('teamSelection.teams')}</p>
+                      <p className="text-sm text-gray-500 mt-1">{t('team:teams')}</p>
                     </div>
                   )}
                 </div>
@@ -267,7 +267,7 @@ const TeamSelectionScene: React.FC = () => {
                     }`}
                 >
                   <Play className="w-4 h-4" />
-                  {t('teamSelection.startSession')}
+                  {t('team:selection.startSession')}
                 </button>
               )}
             </div>
@@ -279,8 +279,8 @@ const TeamSelectionScene: React.FC = () => {
           <p className="text-gray-500 text-sm flex items-center justify-center gap-1">
             <Info className="w-4 h-4" />
             {isOwner
-              ? t('teamSelection.ownerHint')
-              : t('teamSelection.memberHint')
+              ? t('team:selection.ownerHint')
+              : t('team:selection.memberHint')
             }
           </p>
         </div>

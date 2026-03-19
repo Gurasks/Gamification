@@ -1,0 +1,63 @@
+{
+  "comment": "comentário",
+  "comments": "comentários",
+  "addComment": "Adicionar comentário",
+  "editComment": "Editar comentário",
+  "deleteComment": "Excluir comentário",
+  "save": "Salvar",
+  "cancel": "Cancelar",
+  "editPlaceholder": "Editar comentário...",
+  "editDisabled": "Edição desativada",
+  "commentPlaceholder": "Digite seu comentário...",
+  "addMetadata": "Adicionar metadados",
+  "editSuggestion": "Editar sugestão",
+  "deleteSuggestion": "Excluir sugestão",
+  "editMetadata": "Editar metadados",
+  "voteOnMetadata": "Votar nos metadados",
+  "confirmDeleteComment": "Tem certeza de que deseja excluir este comentário?",
+  "confirmDeleteSuggestion": "Tem certeza de que deseja excluir esta sugestão?",
+  "tooltip": {
+    "viewVotes": "Ver votos dos metadados",
+    "vote": "Votar nos metadados",
+    "viewComments": "Ver comentários",
+    "toggleComments": "Mostrar/ocultar comentários"
+  },
+  "success": {
+    "metadataUpdated": "Metadados atualizados!"
+  },
+  "errors": {
+    "deleteSuggestion": "Erro ao excluir sugestão",
+    "deleteComment": "Erro ao excluir comentário",
+    "metadataUpdate": "Erro ao atualizar metadados"
+  },
+  "metadata": {
+    "editTitle": "Editando metadados",
+    "priority": "Prioridade",
+    "priorityPlaceholder": "Prioridade...",
+    "type": "Tipo",
+    "typePlaceholder": "Tipo de requisito...",
+    "category": "Categoria",
+    "categoryPlaceholder": "Categoria...",
+    "estimatedEffort": "Esforço estimado",
+    "effortPlaceholder": "Ex: 2",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "saveTitle": "Salvar metadados",
+    "cancelTitle": "Cancelar edição",
+    "question": {
+      "priority": "A prioridade",
+      "category": "A categoria",
+      "estimatedEffort": "O esforço estimado",
+      "type": "O tipo"
+    }
+  },
+  "participant": {
+    "ariaLabel": "Ver detalhes das contribuições de {{name}}, posição {{rank}} com {{points}} pontos",
+    "noTeam": "Sem equipe",
+    "avgRating": "Avaliação média",
+    "replies": "Respostas",
+    "gamification": "Contribuições de gamificação",
+    "agreedVotes": "votos de concordância",
+    "viewDetails": "Ver contribuições detalhadas"
+  }
+}

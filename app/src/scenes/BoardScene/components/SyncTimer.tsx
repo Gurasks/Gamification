@@ -90,7 +90,7 @@ const SyncTimer = ({
         setIsRunning(false);
         onTimeEnd?.();
         onTimerStateChange?.(true);
-        returnToastMessage(t('timer.timeExpired'), 'timer');
+        returnToastMessage(t('board:timer.timeExpired'), 'timer');
       }
     }, 1000);
 
@@ -114,13 +114,13 @@ const SyncTimer = ({
       const additionalTimeDisplay = getAdditionalTimeDisplay(additionalTime);
 
       const timeText = timeUnit === 'minutes'
-        ? `${additionalTime} ${additionalTime === 1 ? t('timer.minute') : t('timer.minutes')}`
-        : `${additionalTime} ${additionalTime === 1 ? t('timer.second') : t('timer.seconds')}`;
+        ? `${additionalTime} ${additionalTime === 1 ? t('board:timer.minute') : t('board:timer.minutes')}`
+        : `${additionalTime} ${additionalTime === 1 ? t('board:timer.second') : t('board:timer.seconds')}`;
 
-      returnToastMessage(`+${timeText} ${t('timer.added')}!`, 'success');
+      returnToastMessage(`+${timeText} ${t('board:timer.added')}!`, 'success');
     } catch (error) {
       console.error('Error adding time:', error);
-      returnToastMessage(t('timer.addError'), 'error');
+      returnToastMessage(t('board:timer.addError'), 'error');
     } finally {
       setIsAddingTime(false);
     }
@@ -178,7 +178,7 @@ const SyncTimer = ({
             <div className="text-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-xs text-yellow-700">
                 <AlertTriangle className="inline-block h-3 w-3 mr-2 mb-1" />
-                {t('timer.onlyMembersCanAdd', { team: getLocalizedTeamName(currentTeam, t) })}
+                {t('board:timer.onlyMembersCanAdd', { team: getLocalizedTeamName(currentTeam, t) })}
               </p>
             </div>
           )}
@@ -188,7 +188,7 @@ const SyncTimer = ({
       {/* Indicador de loading */}
       {isAddingTime && (
         <div className="text-xs text-gray-500">
-          {t('timer.updating')}
+          {t('board:timer.updating')}
         </div>
       )}
     </div>

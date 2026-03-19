@@ -42,11 +42,11 @@ const CollapsibleDescriptionArea: React.FC<CollapsibleDescriptionAreaProps> = ({
             aria-hidden="true"
           />
           <span className="text-sm font-medium text-gray-700">
-            {t('collapsible.sessionDescription')}
+            {t('misc:collapsible.sessionDescription')}
           </span>
         </div>
         <span className="text-xs text-gray-500">
-          {showDescription ? t('collapsible.hide') : t('collapsible.show')}
+          {showDescription ? t('misc:collapsible.hide') : t('misc:collapsible.show')}
         </span>
       </button>
 

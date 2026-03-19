@@ -26,11 +26,11 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success(t('auth.logoutSuccess') || 'Logout realizado com sucesso!');
+      toast.success(t('auth:messages.logoutSuccess') || 'Logout realizado com sucesso!');
       navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error(t('auth.logoutError') || 'Erro ao fazer logout');
+      toast.error(t('auth:messages.logoutError') || 'Erro ao fazer logout');
     }
     setShowDropdown(false);
   };
@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
     if (anonymousUser) {
       navigate('/name-entry');
     } else {
-      toast.success(t('profile.comingSoon') || 'Funcionalidade em desenvolvimento!');
+      toast.success(t('profile:comingSoon') || 'Funcionalidade em desenvolvimento!');
     }
     setShowDropdown(false);
   };
@@ -93,7 +93,7 @@ const Navbar: React.FC = () => {
                 className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full"
                 aria-label="Modo convidado ativo"
               >
-                {t('nav.guestMode') || 'Modo Convidado'}
+                {t('nav:guestMode') || 'Modo Convidado'}
               </span>
             )}
 
@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <div className="text-right">
                     <p className="font-medium text-gray-700">
-                      {user.displayName || t('nav.user') || 'Usuário'}
+                      {user.displayName || t('nav:user') || 'Usuário'}
                     </p>
                     {user.email && (
                       <p className="text-xs text-gray-500">
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
                 >
                   <div className="px-4 py-2 border-b border-gray-200">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {user.displayName || t('nav.user')}
+                      {user.displayName || t('nav:user')}
                     </p>
                     {user.email && (
                       <p className="text-xs text-gray-500 truncate mt-0.5">
@@ -156,8 +156,8 @@ const Navbar: React.FC = () => {
                       <User className="w-4 h-4 mr-3 text-gray-500" />
                     )}
                     {anonymousUser
-                      ? (t('nav.changeName') || 'Alterar Nome')
-                      : (t('nav.profile') || 'Meu Perfil')
+                      ? (t('nav:changeName') || 'Alterar Nome')
+                      : (t('nav:profile') || 'Meu Perfil')
                     }
                   </button>
 
@@ -166,7 +166,7 @@ const Navbar: React.FC = () => {
                     <div className="px-4 py-2">
                       <div className="flex items-center text-xs text-gray-500 mb-2">
                         <Globe className="w-3 h-3 mr-1" />
-                        <span>{t('nav.language') || 'Idioma'}</span>
+                        <span>{t('nav:language') || 'Idioma'}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-1">
                         <button
@@ -207,7 +207,7 @@ const Navbar: React.FC = () => {
                       tabIndex={0}
                     >
                       <LogOut className="w-4 h-4 mr-3" />
-                      {t('auth.logout') || 'Sair'}
+                      {t('auth:logout') || 'Sair'}
                     </button>
                   </div>
                 </div>

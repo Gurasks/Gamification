@@ -36,11 +36,11 @@ const RegisterScene: React.FC = () => {
 
     try {
       if (!data.displayName) {
-        throw new Error(t('auth.nameRequired'));
+        throw new Error(t('auth:nameRequired'));
       }
 
       await signUp(data.email, data.password, data.displayName);
-      toast.success(t('auth.registerSuccess'));
+      toast.success(t('auth:registerSuccess'));
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code') ||
         sessionStorage.getItem('register_redirect_code');
@@ -69,9 +69,9 @@ const RegisterScene: React.FC = () => {
       const result = await signInWithGoogle();
 
       if (result.isNewUser) {
-        toast.success(t('auth.googleSignUpSuccess'));
+        toast.success(t('auth:googleSignUpSuccess'));
       } else {
-        toast.success(t('auth.googleLoginSuccess'));
+        toast.success(t('auth:googleLoginSuccess'));
       }
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code') ||
@@ -117,7 +117,7 @@ const RegisterScene: React.FC = () => {
                 navigate('/login');
               }
             }}
-            message={t('auth.register')}
+            message={t('auth:register')}
             onBack={handleGoBack}
             backButtonLabel={t('common.actions.back')}
             showBackButton={true}

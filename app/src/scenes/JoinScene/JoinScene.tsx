@@ -195,17 +195,17 @@ const JoinScene: React.FC = () => {
                 )}
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {requiresPassword ? t('join.protectedTitle') : t('join.title')}
+                {requiresPassword ? t('join:protectedTitle') : t('join:title')}
               </h3>
               <p className="text-gray-600 text-sm">
-                {requiresPassword ? t('join.protectedDescription') : t('join.description')}
+                {requiresPassword ? t('join:protectedDescription') : t('join:description')}
               </p>
 
               {!user && !requiresPassword && (
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-700 text-sm flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                    {t('join.authRequired')}
+                    {t('join:authRequired')}
                   </p>
                 </div>
               )}
@@ -216,13 +216,13 @@ const JoinScene: React.FC = () => {
               {!requiresPassword ? (
                 <div>
                   <label htmlFor="joinCode" className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('join.sessionCode')} *
+                    {t('join:sessionCode')} *
                   </label>
                   <div className="relative">
                     <input
                       id="joinCode"
                       type="text"
-                      placeholder={t('join.sessionCodePlaceholder')}
+                      placeholder={t('join:sessionCodePlaceholder')}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       value={joinCode}
                       onChange={(e) => handleInputChange(e.target.value)}
@@ -238,19 +238,19 @@ const JoinScene: React.FC = () => {
                   </div>
                   {joinCode && (
                     <p className="text-xs text-gray-500 mt-1">
-                      {t('join.sessionCodeHint', { code: joinCode })}
+                      {t('join:sessionCodeHint', { code: joinCode })}
                     </p>
                   )}
                 </div>
               ) : (
                 <div>
                   <label htmlFor="sessionPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('join.sessionPassword')} *
+                    {t('join:sessionPassword')} *
                   </label>
                   <input
                     id="sessionPassword"
                     type="password"
-                    placeholder={t('join.sessionPasswordPlaceholder')}
+                    placeholder={t('join:sessionPasswordPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     value={sessionPassword}
                     onChange={(e) => handlePasswordChange(e.target.value)}
@@ -275,7 +275,7 @@ const JoinScene: React.FC = () => {
                 <div className="bg-blue-50 border border-blue-200 text-blue-600 px-4 py-3 rounded-lg text-sm">
                   <div className="flex items-center">
                     <LoadingSpinner size="sm" color="blue" className="mr-2" />
-                    {requiresPassword ? t('join.verifyingPassword') : t('join.joining')}
+                    {requiresPassword ? t('join:verifyingPassword') : t('join:joining')}
                   </div>
                 </div>
               )}
@@ -288,7 +288,7 @@ const JoinScene: React.FC = () => {
                   variant="secondary"
                   className="flex-1"
                 >
-                  {requiresPassword ? t('join.backToCode') : t('common.actions.back')}
+                  {requiresPassword ? t('join:backToCode') : t('common.actions.back')}
                 </Button>
                 <Button
                   onClick={handleJoinSession}
@@ -305,12 +305,12 @@ const JoinScene: React.FC = () => {
                   {!user && !requiresPassword ? (
                     <span className="flex items-center justify-center gap-2">
                       <LogIn className="w-4 h-4" />
-                      {t('auth.login')}
+                      {t('auth:login')}
                     </span>
                   ) : requiresPassword ? (
-                    t('join.verifyPassword')
+                    t('join:verifyPassword')
                   ) : (
-                    t('join.join')
+                    t('join:join')
                   )}
                 </Button>
               </div>
@@ -325,7 +325,7 @@ const JoinScene: React.FC = () => {
             {isJoining && (
               <p className="text-blue-500 text-sm mt-2 animate-pulse flex items-center justify-center gap-2">
                 <Clock className="w-4 h-4" />
-                {t('join.pleaseWait')}
+                {t('join:pleaseWait')}
               </p>
             )}
           </div>
@@ -335,7 +335,7 @@ const JoinScene: React.FC = () => {
       {showLoginPrompt && (
         <LoginPrompt
           onLoginSuccess={handleLoginSuccess}
-          message={`${t('join.authRequired')} "${joinCode || sessionCode}".`}
+          message={`${t('join:authRequired')} "${joinCode || sessionCode}".`}
         />
       )}
     </>

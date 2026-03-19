@@ -1,0 +1,10 @@
+{
+  "welcome": "Bem-vindo(a) ao Singular, {{name}}!",
+  "subtitle": "Colabore e participe com sua equipe em tempo real.",
+  "createTitle": "Criar uma nova sessão",
+  "createDescription": "Inicie uma nova sessão e convide sua equipe",
+  "createAriaLabel": "Criar uma nova sessão. Inicie uma nova sessão e convide sua equipe",
+  "joinTitle": "Entrar em uma sessão",
+  "joinDescription": "Escolha uma sessão para entrar ou digite um código",
+  "joinAriaLabel": "Entrar em uma sessão. Escolha uma sessão para participar ou digite um código"
+}

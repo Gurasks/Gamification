@@ -28,9 +28,10 @@
 
     /* Types */
     "types": ["vite/client", "node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
 
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
   },
-  "include": ["src"]
+  "include": ["src", "tailwind.config.js"]
 }

@@ -31,25 +31,25 @@ const MembersLeaderboard: React.FC<MembersLeaderboardProps> = ({
   const sortButtons = [
     {
       key: 'score' as LeaderboardSortTypes,
-      label: t('membersLeaderboard.totalScore'),
+      label: t('leaderboard:members.totalScore'),
       icon: Trophy,
       color: 'yellow'
     },
     {
       key: 'comments' as LeaderboardSortTypes,
-      label: t('membersLeaderboard.mostComments'),
+      label: t('leaderboard:members.mostComments'),
       icon: MessageSquare,
       color: 'blue'
     },
     {
       key: 'rating' as LeaderboardSortTypes,
-      label: t('membersLeaderboard.bestRatings'),
+      label: t('leaderboard:members.bestRatings'),
       icon: Star,
       color: 'green'
     },
     {
       key: 'cards' as LeaderboardSortTypes,
-      label: t('membersLeaderboard.mostSuggestions'),
+      label: t('leaderboard:members.mostSuggestions'),
       icon: FileText,
       color: 'purple'
     }
@@ -64,8 +64,8 @@ const MembersLeaderboard: React.FC<MembersLeaderboardProps> = ({
             key={key}
             onClick={() => setSortBy(key)}
             className={`px-5 py-3 rounded-lg transition-all duration-200 flex items-center gap-2 ${sortBy === key
-                ? `bg-gradient-to-r from-${color}-500 to-${color}-600 text-white shadow-lg transform scale-105`
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? `bg-gradient-to-r from-${color}-500 to-${color}-600 text-white shadow-lg transform scale-105`
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
           >
             <Icon className="w-4 h-4" />
@@ -92,8 +92,8 @@ const MembersLeaderboard: React.FC<MembersLeaderboardProps> = ({
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <TrendingUp className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('membersLeaderboard.noParticipants')}</h3>
-          <p className="text-gray-500 mb-6">{t('membersLeaderboard.noParticipantsDescription')}</p>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('leaderboard:members.noParticipants')}</h3>
+          <p className="text-gray-500 mb-6">{t('leaderboard:members.noParticipantsDescription')}</p>
         </div>
       )}
     </div>

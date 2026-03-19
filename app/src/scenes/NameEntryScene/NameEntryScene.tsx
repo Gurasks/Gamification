@@ -26,12 +26,12 @@ const NameEntryScene: React.FC = () => {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error(t('nameEntry.errors.nameRequired'));
+      toast.error(t('login:errors.nameRequired'));
       return;
     }
 
     if (name.trim().length < 2) {
-      toast.error(t('nameEntry.errors.minLength'));
+      toast.error(t('login:errors.minLength'));
       return;
     }
 
@@ -40,10 +40,10 @@ const NameEntryScene: React.FC = () => {
     try {
       if (!user) {
         await signInAnonymously(name.trim());
-        toast.success(t('nameEntry.success.welcome', { name: name.trim() }));
+        toast.success(t('login:success.welcome', { name: name.trim() }));
       } else if (anonymousUser) {
         await updateUserProfile(name.trim());
-        toast.success(t('nameEntry.success.nameUpdated', { name: name.trim() }));
+        toast.success(t('login:success.nameUpdated', { name: name.trim() }));
       }
 
       const pendingSessionCode = sessionStorage.getItem('pending_session_code');
@@ -66,11 +66,11 @@ const NameEntryScene: React.FC = () => {
       console.error('Erro ao configurar usuário:', error);
 
       if (error.code === 'auth/network-request-failed') {
-        toast.error(t('nameEntry.errors.networkError'));
+        toast.error(t('login:errors.networkError'));
       } else if (error.code === 'auth/too-many-requests') {
-        toast.error(t('nameEntry.errors.tooManyRequests'));
+        toast.error(t('login:errors.tooManyRequests'));
       } else {
-        toast.error(t('nameEntry.errors.genericError'));
+        toast.error(t('login:errors.genericError'));
       }
     } finally {
       setIsLoading(false);
@@ -80,13 +80,13 @@ const NameEntryScene: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success(t('nameEntry.success.logout'));
+      toast.success(t('login:success.logout'));
       sessionStorage.removeItem('pending_session_code');
       sessionStorage.removeItem('redirect_path');
       sessionStorage.removeItem('redirect_after_name');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
-      toast.error(t('nameEntry.errors.logoutError'));
+      toast.error(t('login:errors.logoutError'));
     }
   };
 
@@ -137,12 +137,12 @@ const NameEntryScene: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            {user ? t('nameEntry.titles.update') : t('nameEntry.titles.welcome')}
+            {user ? t('login:titles.update') : t('login:titles.welcome')}
           </h1>
           <p className="text-gray-600">
             {user
-              ? t('nameEntry.subtitles.update')
-              : t('nameEntry.subtitles.welcome')
+              ? t('login:subtitles.update')
+              : t('login:subtitles.welcome')
             }
           </p>
         </div>
@@ -158,12 +158,12 @@ const NameEntryScene: React.FC = () => {
               )}
             </div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {user ? t('nameEntry.titles.changeName') : t('nameEntry.titles.identification')}
+              {user ? t('login:titles.changeName') : t('login:titles.identification')}
             </h3>
             <p className="text-gray-600 text-sm">
               {user
-                ? t('nameEntry.descriptions.changeName')
-                : t('nameEntry.descriptions.identification')
+                ? t('login:descriptions.changeName')
+                : t('login:descriptions.identification')
               }
             </p>
           </div>
@@ -173,12 +173,12 @@ const NameEntryScene: React.FC = () => {
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                 <User className="w-4 h-4" />
-                {t('nameEntry.labels.yourName')} *
+                {t('login:labels.yourName')} *
               </label>
               <input
                 type="text"
                 id="name"
-                placeholder={t('nameEntry.placeholders.name')}
+                placeholder={t('login:placeholders.name')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -189,7 +189,7 @@ const NameEntryScene: React.FC = () => {
                 disabled={isLoading}
               />
               <p className="text-xs text-gray-500 mt-1 flex justify-between">
-                <span>{t('validation.minLength', { field: t('nameEntry.labels.yourName'), count: 2 })}</span>
+                <span>{t('validation:minLength', { field: t('login:labels.yourName'), count: 2 })}</span>
                 <span>{name.length}/50</span>
               </p>
             </div>
@@ -203,7 +203,7 @@ const NameEntryScene: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2"
               >
                 <User className="w-4 h-4" />
-                {user ? t('nameEntry.buttons.saveName') : t('nameEntry.buttons.continueAsGuest')}
+                {user ? t('login:buttons.saveName') : t('login:buttons.continueAsGuest')}
               </Button>
 
               {anonymousUser && (
@@ -215,7 +215,7 @@ const NameEntryScene: React.FC = () => {
                   className="w-full flex items-center justify-center gap-2"
                 >
                   <LogOut className="w-4 h-4" />
-                  {t('nameEntry.buttons.logout')}
+                  {t('login:buttons.logout')}
                 </Button>
               )}
             </div>
@@ -226,7 +226,7 @@ const NameEntryScene: React.FC = () => {
             <>
               <div className="flex items-center my-6">
                 <div className="flex-1 border-t border-gray-300"></div>
-                <span className="px-3 text-sm text-gray-500">{t('auth.or')}</span>
+                <span className="px-3 text-sm text-gray-500">{t('auth:or')}</span>
                 <div className="flex-1 border-t border-gray-300"></div>
               </div>
 
@@ -236,20 +236,20 @@ const NameEntryScene: React.FC = () => {
                   type="button"
                   onClick={handleLoginClick}
                   variant="secondary"
-                  className="w-full flex items-center justify-center gap-2"
+                  className="w-full flex items-center justify-center gap-2 capitalize"
                 >
                   <LogIn className="w-4 h-4" />
-                  {t('auth.login')}
+                  {t('auth:login')}
                 </Button>
 
                 <Button
                   type="button"
                   onClick={handleRegisterClick}
                   variant="secondary"
-                  className="w-full flex items-center justify-center gap-2"
+                  className="w-full flex items-center justify-center gap-2 capitalize"
                 >
                   <UserPlus className="w-4 h-4" />
-                  {t('auth.register')}
+                  {t('auth:register')}
                 </Button>
               </div>
             </>
@@ -260,12 +260,12 @@ const NameEntryScene: React.FC = () => {
         <div className="text-center space-y-2">
           <p className="text-gray-500 text-sm flex items-center justify-center gap-1">
             <AlertCircle className="w-4 h-4" />
-            {t('nameEntry.info.visibility')}
+            {t('login:info.visibility')}
           </p>
           {anonymousUser && (
             <p className="text-yellow-600 text-sm flex items-center justify-center gap-1">
               <ShieldAlert className="w-4 h-4" />
-              {t('nameEntry.info.anonymousMode')}
+              {t('login:info.anonymousMode')}
             </p>
           )}
         </div>

@@ -259,33 +259,3 @@ export const voteOnCardMetadata = async (
     throw error;
   }
 };
-
-export const getMetadataVoteSummary = (
-  metadataVotes: CardMetadataVotes | undefined,
-) => {
-  const summary = {
-    priority: { agree: 0, disagree: 0, neutral: 0 },
-    requirementType: { agree: 0, disagree: 0, neutral: 0 },
-    category: { agree: 0, disagree: 0, neutral: 0 },
-    estimatedEffort: { agree: 0, disagree: 0, neutral: 0 },
-  };
-
-  if (!metadataVotes) return summary;
-
-  const countVotes = (votes: Record<string, VoteValue> | undefined) => {
-    if (!votes) return { agree: 0, disagree: 0, neutral: 0 };
-
-    return {
-      agree: Object.values(votes).filter((v) => v === "agree").length,
-      disagree: Object.values(votes).filter((v) => v === "disagree").length,
-      neutral: Object.values(votes).filter((v) => v === "neutral").length,
-    };
-  };
-
-  summary.priority = countVotes(metadataVotes.priority);
-  summary.requirementType = countVotes(metadataVotes.requirementType);
-  summary.category = countVotes(metadataVotes.category);
-  summary.estimatedEffort = countVotes(metadataVotes.estimatedEffort);
-
-  return summary;
-};

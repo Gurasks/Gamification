@@ -26,7 +26,7 @@ const StrengthBar: React.FC<{ strength: any; password: string }> = ({ strength, 
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs font-medium text-gray-700">{t('passwordStrength.strength')}:</span>
+        <span className="text-xs font-medium text-gray-700">{t('auth:passwordStrengthstrength')}:</span>
         <span className={`text-xs font-semibold ${strength.textColor}`}>
           {strength.label}
         </span>
@@ -108,7 +108,7 @@ const ValidationMessage: React.FC<{
       <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-xs text-yellow-800 flex items-center gap-1">
           <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-          {t('passwordStrength.meetAllRequirements')}
+          {t('auth:passwordStrengthmeetAllRequirements')}
         </p>
       </div>
     );
@@ -119,7 +119,7 @@ const ValidationMessage: React.FC<{
       <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
         <p className="text-xs text-green-800 flex items-center gap-1">
           <Check className="w-3 h-3 flex-shrink-0" />
-          {t('passwordStrength.validAndConfirmed')}
+          {t('auth:passwordStrengthvalidAndConfirmed')}
         </p>
       </div>
     );
@@ -144,17 +144,17 @@ const usePasswordRequirements = (
   const getBasicRequirements = (): PasswordRequirement[] => [
     {
       id: 'length',
-      label: t('validation.minLength', { field: t('auth.fields.password'), count: 6 }),
+      label: t('validation:minLength', { field: t('auth:fields.password'), count: 6 }),
       met: password.length >= 6,
     },
     {
       id: 'uppercase',
-      label: t('passwordStrength.uppercase'),
+      label: t('auth:passwordStrengthuppercase'),
       met: /[A-Z]/.test(password)
     },
     {
       id: 'number',
-      label: t('passwordStrength.number'),
+      label: t('auth:passwordStrengthnumber'),
       met: /[0-9]/.test(password)
     }
   ];
@@ -165,7 +165,7 @@ const usePasswordRequirements = (
     if (password.length > 0 && password.length < 8) {
       requirements.push({
         id: 'ideal-length',
-        label: t('passwordStrength.idealLength'),
+        label: t('auth:passwordStrengthidealLength'),
         met: false,
         optional: true,
         warning: true
@@ -175,7 +175,7 @@ const usePasswordRequirements = (
     if (password.length > 0 && !/[^A-Za-z0-9]/.test(password)) {
       requirements.push({
         id: 'special-char',
-        label: t('passwordStrength.specialChar'),
+        label: t('auth:passwordStrengthspecialChar'),
         met: false,
         optional: true,
         warning: true
@@ -183,12 +183,12 @@ const usePasswordRequirements = (
     }
 
     if (confirmPassword !== undefined) {
-      let confirmationLabel = t('passwordStrength.confirmPassword');
+      let confirmationLabel = t('auth:passwordStrengthconfirmPassword');
 
       if (password.length > 0 && confirmPassword.length > 0) {
         confirmationLabel = passwordsMatch
-          ? t('passwordStrength.passwordsMatch')
-          : t('passwordStrength.passwordsDoNotMatch');
+          ? t('auth:passwordStrengthpasswordsMatch')
+          : t('auth:passwordStrengthpasswordsDoNotMatch');
       }
 
       requirements.push({

@@ -1,0 +1,50 @@
+{
+  "priority": {
+    "low": "Baixa",
+    "medium": "Média",
+    "high": "Alta",
+    "critical": "Crítica"
+  },
+  "requirementType": {
+    "functional": "Funcional",
+    "nonFunctional": "Não funcional",
+    "technical": "Técnico",
+    "design": "Design",
+    "other": "Outro"
+  },
+  "category": {
+    "feature": "Nova funcionalidade",
+    "improvement": "Melhoria",
+    "bug": "Bug",
+    "documentation": "Documentação",
+    "question": "Pergunta",
+    "feedback": "Feedback"
+  },
+  "vote": {
+    "agree": "Concordo",
+    "disagree": "Discordo",
+    "neutral": "Neutro",
+    "agreeCount": "concordam",
+    "disagreeCount": "discordam",
+    "neutralCount": "neutros",
+    "noVotes": "Nenhum voto registrado",
+    "question": "{{type}} \"{{value}}\" está correto?",
+    "tooltip": {
+      "agree": "Concordo com estes metadados",
+      "neutral": "Não tenho opinião sobre estes metadados",
+      "disagree": "Discordo destes metadados"
+    }
+  },
+  "selector": {
+    "title": "Metadados da sugestão",
+    "priority": "Prioridade",
+    "priorityPlaceholder": "Prioridade...",
+    "requirementType": "Tipo de requisito",
+    "requirementTypePlaceholder": "Tipo de requisito...",
+    "category": "Categoria",
+    "categoryPlaceholder": "Categoria...",
+    "estimatedEffort": "Esforço estimado",
+    "effortPlaceholder": "Ex: 2",
+    "tip": "Adicione metadados para ajudar a organizar e priorizar as sugestões."
+  }
+}

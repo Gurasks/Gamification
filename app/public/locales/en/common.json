@@ -1,0 +1,93 @@
+ {
+
+ "common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "back": "Back",
+      "close": "Close",
+      "refresh": "Refresh",
+      "view": "View",
+      "export": "Export"
+    },
+    "status": {
+      "loading": "Loading...",
+      "success": "Success!",
+      "error": "Error",
+      "updating": "Updating..."
+    },
+    "navigation": {
+      "backToHome": "Back to Home",
+      "backToTeam": "Back to Team",
+      "viewResults": "View Results"
+    },
+    "placeholders": {
+      "name": "Enter name",
+      "description": "Enter description",
+      "search": "Search..."
+    },
+    "metrics": {
+      "points": "points",
+      "totalPoints": "total points",
+      "score": "Score",
+      "totalScore": "Total Score",
+      "average": "average",
+      "total": "total",
+      "rank": "#{{rank}}",
+      "position": "Position"
+    },
+    "entities": {
+      "team": "Team",
+      "teams": "Teams",
+      "member": "Member",
+      "members": "Members",
+      "user": "User",
+      "participant": "Participant",
+      "participants": "Participants",
+      "author": "Author"
+    },
+    "content": {
+      "comment": "Comment",
+      "comments": "Comments",
+      "suggestion": "Suggestion",
+      "suggestions": "Suggestions",
+      "reply": "Reply",
+      "replies": "Replies",
+      "rating": "Rating",
+      "ratings": "Ratings",
+      "vote": "Vote",
+      "votes": "Votes"
+    },
+    "gamification": {
+      "metadataVotes": "Metadata Votes",
+      "agreedVotes": "agreed votes",
+      "cardRatings": "Card Ratings",
+      "qualityContributions": "quality contributions"
+    },
+    "time": {
+      "minute": "minute",
+      "minutes": "minutes",
+      "second": "second",
+      "seconds": "seconds",
+      "hour": "hour",
+      "hours": "hours",
+      "totalTime": "Total time",
+      "efficiency": "Efficiency"
+    },
+    "export": {
+      "pdf": "PDF",
+      "doc": "DOC"
+    },
+    "labels": {
+      "noData": "No data",
+      "notAvailable": "N/A",
+      "noTeam": "No team",
+      "noComments": "No comments",
+      "noSuggestions": "No suggestions"
+    },
+    "required": "Required field",
+    "na": "N/A",
+    "you": "You"
+  }
+ }

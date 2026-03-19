@@ -1,0 +1,59 @@
+{
+  "title": "Suggestion Board",
+  "participant": "Participant",
+  "addSuggestion": "Add New Suggestion",
+  "sessionClosed": "Session Closed!",
+  "sessionClosedMessage": "The session has been closed.",
+  "timeEnded": "Time's Up!",
+  "timeEndedMessage": "The suggestion and voting phase has ended.",
+  "anonymousReview": "Anonymous Review",
+  "teamSuggestions": "{{team}} Suggestions",
+  "suggestion": "suggestion",
+  "suggestions": "suggestions",
+  "filtered": "filtered",
+  "noSuggestions": "No suggestions yet",
+  "beFirst": "Be the first to add a suggestion!",
+  "useFormAbove": "Use the form above to get started",
+  "metadataUpdated": "Metadata updated!",
+  "metadataUpdateError": "Error updating metadata",
+  "loading": {
+    "session": "Loading session...",
+    "initializing": "Initializing session...",
+    "cards": "Loading cards..."
+  },
+  "errors": {
+    "sessionNotFound": "Session not found"
+  },
+  "filters": {
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "priority": "Priority",
+    "category": "Category",
+    "selected": "selected",
+    "selectedPlural": "selected"
+  },
+  "form": {
+    "creatingSuggestion": "Creating suggestion...",
+    "suggestionPlaceholder": "Type your suggestion...",
+    "submitSuggestion": "Submit suggestion"
+  },
+  "timer": {
+    "timeExpired": "Time's up!",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds",
+    "added": "added",
+    "addError": "Error adding time",
+    "onlyMembersCanAdd": "Only members of {{team}} can add time"
+  },
+
+  "addTime": {
+    "addTimeLabel": "Add time",
+    "timePlaceholder": "Time",
+    "add": "Add",
+    "adding": "Adding...",
+    "cancel": "Cancel",
+    "addTime": "Add time"
+  }
+}

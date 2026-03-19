@@ -68,7 +68,7 @@ const CreateSuggestionForm: React.FC<CreateSuggestionFormProps> = ({
         text={text}
         setText={setText}
         disabled={isSubmitting}
-        placeholder={isSubmitting ? t('form.creatingSuggestion') : t('form.suggestionPlaceholder')}
+        placeholder={isSubmitting ? t('board:form.creatingSuggestion') : t('board:form.suggestionPlaceholder')}
         rows={2}
         showSubmitButton={false}
         submitFormOnEnter={true}
@@ -93,7 +93,7 @@ const CreateSuggestionForm: React.FC<CreateSuggestionFormProps> = ({
           className="flex items-center gap-2"
         >
           {isSubmitting && <LoadingSpinner size="sm" />}
-          {t('form.submitSuggestion')}
+          {t('board:form.submitSuggestion')}
         </Button>
       </div>
     </form>

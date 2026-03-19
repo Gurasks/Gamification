@@ -130,11 +130,11 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                     <Shield className="w-4 h-4" />
                     <span>{t('common.entities.team')}: {session?.teams?.[selectedUser.user.userId]
                       ? getLocalizedTeamName(session.teams[selectedUser.user.userId], t)
-                      : t('team.unassigned')}</span>
+                      : t('team:unassigned')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    <span>{(selectedUser.user as any).totalScore || 0} {t('contributions.totalPoints')}</span>
+                    <span>{(selectedUser.user as any).totalScore || 0} {t('leaderboard:contributions.totalPoints')}</span>
                   </div>
                 </div>
               </div>
@@ -157,28 +157,28 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                 <FileText className="w-5 h-5 text-blue-600" />
                 <div className="text-3xl font-bold text-blue-700">{selectedUser.user.totalCardsCreated}</div>
               </div>
-              <div className="text-center text-sm font-medium text-blue-800">{t('contributions.suggestionsCreated')}</div>
+              <div className="text-center text-sm font-medium text-blue-800">{t('leaderboard:contributions.suggestionsCreated')}</div>
             </div>
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <MessageSquare className="w-5 h-5 text-green-600" />
                 <div className="text-3xl font-bold text-green-700">{selectedUser.user.totalComments}</div>
               </div>
-              <div className="text-center text-sm font-medium text-green-800">{t('contributions.commentsMade')}</div>
+              <div className="text-center text-sm font-medium text-green-800">{t('leaderboard:contributions.commentsMade')}</div>
             </div>
             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-5 border border-yellow-200">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Star className="w-5 h-5 text-yellow-600" />
                 <div className="text-3xl font-bold text-yellow-700">{selectedUser.user.averageRating.toFixed(1)}</div>
               </div>
-              <div className="text-center text-sm font-medium text-yellow-800">{t('contributions.averageRating')}</div>
+              <div className="text-center text-sm font-medium text-yellow-800">{t('leaderboard:contributions.averageRating')}</div>
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <ThumbsUp className="w-5 h-5 text-purple-600" />
                 <div className="text-3xl font-bold text-purple-700">{selectedUser.user.totalReplies}</div>
               </div>
-              <div className="text-center text-sm font-medium text-purple-800">{t('contributions.replies')}</div>
+              <div className="text-center text-sm font-medium text-purple-800">{t('leaderboard:contributions.replies')}</div>
             </div>
           </div>
 
@@ -188,31 +188,31 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200 mb-6">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-3">
                   <Zap className="w-5 h-5 text-orange-500" />
-                  {t('contributions.gamificationScore')}
+                  {t('leaderboard:contributions.gamificationScore')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white rounded-lg p-4 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Tag className="w-4 h-4 text-green-600" />
-                      <h4 className="font-medium text-gray-700">{t('contributions.metadataVotes')}</h4>
+                      <h4 className="font-medium text-gray-700">{t('leaderboard:contributions.metadataVotes')}</h4>
                     </div>
                     <div className="text-2xl font-bold text-gray-800">
                       {selectedUser.user.gamificationPoints?.metadataVotes?.agreeVotes || 0}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {t('contributions.agreedVotes')} • {selectedUser.user.gamificationPoints?.metadataVotes?.totalVotes || 0} {t('contributions.total')}
+                      {t('leaderboard:contributions.agreedVotes')} • {selectedUser.user.gamificationPoints?.metadataVotes?.totalVotes || 0} {t('leaderboard:contributions.total')}
                     </div>
                   </div>
                   <div className="bg-white rounded-lg p-4 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Star className="w-4 h-4 text-blue-600" />
-                      <h4 className="font-medium text-gray-700">{t('contributions.cardRatings')}</h4>
+                      <h4 className="font-medium text-gray-700">{t('leaderboard:contributions.cardRatings')}</h4>
                     </div>
                     <div className="text-2xl font-bold text-gray-800">
                       {selectedUser.user.gamificationPoints?.cardRatings?.totalRatings || 0}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {t('contributions.average')} {selectedUser.user.gamificationPoints?.cardRatings?.averageRating?.toFixed(1) || 0}
+                      {t('leaderboard:contributions.average')} {selectedUser.user.gamificationPoints?.cardRatings?.averageRating?.toFixed(1) || 0}
                     </div>
                   </div>
                   <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -224,7 +224,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                       {selectedUser.user.gamificationPoints?.comments?.totalComments || 0}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {t('contributions.qualityContributions')}
+                      {t('leaderboard:contributions.qualityContributions')}
                     </div>
                   </div>
                 </div>
@@ -238,19 +238,19 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  {t('contributions.createdSuggestions')}
+                  {t('leaderboard:contributions.createdSuggestions')}
                   <span className="text-sm font-normal bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                     {selectedUser.cardsCreated.length}
                   </span>
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {t('contributions.suggestionsBy', { name: selectedUser.user.userName })}
+                  {t('leaderboard:contributions.suggestionsBy', { name: selectedUser.user.userName })}
                 </p>
               </div>
               {selectedUser.cardsCreated.length > 0 && (
                 <div className="text-sm text-gray-500 flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {selectedUser.cardsCreated.length} {t('contributions.items')}
+                  {selectedUser.cardsCreated.length} {t('leaderboard:contributions.items')}
                 </div>
               )}
             </div>
@@ -317,9 +317,9 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
             ) : (
               <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">{t('contributions.noSuggestions')}</h4>
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">{t('leaderboard:contributions.noSuggestions')}</h4>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {t('contributions.noSuggestionsBy', { name: selectedUser.user.userName })}
+                  {t('leaderboard:contributions.noSuggestionsBy', { name: selectedUser.user.userName })}
                 </p>
               </div>
             )}
@@ -331,13 +331,13 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
                   <MessageSquare className="w-5 h-5 text-green-600" />
-                  {t('contributions.commentsMade')}
+                  {t('leaderboard:contributions.commentsMade')}
                   <span className="text-sm font-normal bg-green-100 text-green-700 px-3 py-1 rounded-full">
                     {selectedUser.comments.length}
                   </span>
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {t('contributions.commentsBy', { name: selectedUser.user.userName })}
+                  {t('leaderboard:contributions.commentsBy', { name: selectedUser.user.userName })}
                 </p>
               </div>
               {selectedUser.comments.length > 0 && (
@@ -358,7 +358,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <FileText className="w-4 h-4 text-gray-600" />
-                            <h4 className="font-medium text-gray-900">{t('contributions.originalSuggestion')}</h4>
+                            <h4 className="font-medium text-gray-900">{t('leaderboard:contributions.originalSuggestion')}</h4>
                           </div>
                           <p className="text-gray-700 line-clamp-2">{card.text}</p>
                           <div className="flex flex-wrap gap-2 mt-2">
@@ -366,7 +366,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                               {t('common.entities.team')}: {getLocalizedTeamName(card.teamName, t)}
                             </span>
                             <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
-                              {t('contributions.author')}: {card.createdBy}
+                              {t('leaderboard:contributions.author')}: {card.createdBy}
                             </span>
                             {card.createdAt && (
                               <span className="text-xs text-gray-500">
@@ -393,7 +393,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                           <MessageSquare className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">{t('contributions.commentBy', { name: selectedUser.user.userName })}</div>
+                          <div className="font-medium text-gray-900">{t('leaderboard:contributions.commentBy', { name: selectedUser.user.userName })}</div>
                           <div className="text-xs text-gray-500 flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {new Date(comment.createdAt).toLocaleString()}
@@ -411,12 +411,12 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                           <div className="flex items-center gap-4 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
-                              <span>{card.comments.length} {t('contributions.commentsInThread')}</span>
+                              <span>{card.comments.length} {t('leaderboard:contributions.commentsInThread')}</span>
                             </div>
                             {card.comments.findIndex(c => c.id === comment.id) !== -1 && (
                               <div className="flex items-center gap-1">
                                 <TrendingUp className="w-4 h-4" />
-                                <span>{t('contributions.positionInThread')} #{card.comments.findIndex(c => c.id === comment.id) + 1}</span>
+                                <span>{t('leaderboard:contributions.positionInThread')} #{card.comments.findIndex(c => c.id === comment.id) + 1}</span>
                               </div>
                             )}
                           </div>
@@ -429,9 +429,9 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
             ) : (
               <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-green-50 rounded-xl border border-gray-200">
                 <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">{t('contributions.noComments')}</h4>
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">{t('leaderboard:contributions.noComments')}</h4>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  {t('contributions.noCommentsBy', { name: selectedUser.user.userName })}
+                  {t('leaderboard:contributions.noCommentsBy', { name: selectedUser.user.userName })}
                 </p>
               </div>
             )}
@@ -443,7 +443,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              <span>{t('contributions.realTimeStats')}</span>
+              <span>{t('leaderboard:contributions.realTimeStats')}</span>
             </div>
             <div className="flex gap-3">
               <Button
@@ -460,7 +460,7 @@ const ContributionsModal: React.FC<ContributionsModalProps> = ({
                   className="flex items-center gap-2"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  {t('contributions.viewFullDetails')}
+                  {t('leaderboard:contributions.viewFullDetails')}
                 </Button>
               )}
             </div>

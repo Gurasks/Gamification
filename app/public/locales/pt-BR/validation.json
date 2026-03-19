@@ -1,0 +1,7 @@
+{
+  "required": "{{field}} é obrigatório",
+  "minLength": "{{field}} deve ter pelo menos {{count}} caracteres",
+  "maxLength": "{{field}} deve ter no máximo {{count}} caracteres",
+  "invalid": "{{field}} inválido",
+  "passwordsDoNotMatch": "As senhas não coincidem"
+}

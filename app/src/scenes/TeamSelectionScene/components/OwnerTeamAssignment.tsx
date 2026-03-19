@@ -47,7 +47,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800">
-          {t('ownerAssignment.title')}
+          {t('team:selection.ownerAssignment.title')}
         </h3>
 
         <div className="flex gap-4 text-sm">
@@ -70,7 +70,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('ownerAssignment.participants')}
+                {t('team:selection.ownerAssignment.participants')}
               </th>
               {availableTeams.map(teamId => (
                 <th
@@ -80,7 +80,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
                 </th>
               ))}
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('ownerAssignment.currentTeam')}
+                {t('team:selection.ownerAssignment.currentTeam')}
               </th>
             </tr>
           </thead>
@@ -99,7 +99,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {participant.displayName || t('ownerAssignment.anonymous')}
+                        {participant.displayName || t('team:selection.ownerAssignment.anonymous')}
                       </div>
                       {participant.email && (
                         <div className="text-sm text-gray-500">
@@ -129,7 +129,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
                       {getLocalizedTeamName(currentAssignments[participant.uid], t)}
                     </span>
                   ) : (
-                    <span className="badge-gray">{t('team.unassigned')}</span>
+                    <span className="badge-gray">{t('team:unassigned')}</span>
                   )}
                 </td>
               </tr>
@@ -142,7 +142,7 @@ const OwnerTeamAssignment: React.FC<OwnerTeamAssignmentProps> = ({
       {assigningUser && (
         <div className="flex items-center justify-center py-2">
           <Loader2 className="w-4 h-4 text-indigo-600 animate-spin mr-2" />
-          <span className="text-sm text-gray-600">{t('ownerAssignment.assigning')}</span>
+          <span className="text-sm text-gray-600">{t('team:selection.ownerAssignment.assigning')}</span>
         </div>
       )}
     </div>

@@ -61,7 +61,7 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!isReadOnly && onCommentDelete && window.confirm(t('card.confirmDeleteComment'))) {
+    if (!isReadOnly && onCommentDelete && window.confirm(t('card:confirmDeleteComment'))) {
       setDeletingCommentId(commentId);
       try {
         await onCommentDelete(card.id, commentId);
@@ -146,11 +146,11 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
               ? 'text-gray-600 cursor-pointer hover:text-gray-800'
               : 'text-blue-600 hover:text-blue-800'
               }`}
-            title={isReadOnly ? t('card.tooltip.viewVotes') : t('card.tooltip.vote')}
+            title={isReadOnly ? t('card:tooltip.viewVotes') : t('card:tooltip.vote')}
           >
             <Vote size={16} />
             <span>
-              {t('card.voteOnMetadata')}
+              {t('card:voteOnMetadata')}
             </span>
           </button>
         </div>
@@ -227,11 +227,11 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
             ? 'text-gray-600 cursor-pointer hover:text-gray-800'
             : 'text-purple-600 hover:text-purple-800'
             }`}
-          title={isReadOnly ? t('card.tooltip.viewComments') : t('card.tooltip.toggleComments')}
+          title={isReadOnly ? t('card:tooltip.viewComments') : t('card:tooltip.toggleComments')}
         >
           <MessageSquareMore size={16} />
           <span>
-            {card.comments?.length || 0} {card.comments?.length === 1 ? t('card.comment') : t('card.comments')}
+            {card.comments?.length || 0} {card.comments?.length === 1 ? t('card:comment') : t('card:comments')}
           </span>
         </button>
 
@@ -252,21 +252,21 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
                           setText={setEditCommentText}
                           handleSubmit={handleCommentEditSubmit}
                           disabled={isReadOnly}
-                          placeholder={isReadOnly ? t('card.editDisabled') : t('card.editPlaceholder')}
+                          placeholder={isReadOnly ? t('card:editDisabled') : t('card:editPlaceholder')}
                         />
                         {!isReadOnly && (
                           <div className="flex gap-2 mt-2">
                             <button
                               onClick={handleCommentEditSubmit}
                               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                              title={t('card.save')}
+                              title={t('card:save')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setCommentIdToEdit("")}
                               className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:bg-red-500 transition-colors"
-                              title={t('card.cancel')}
+                              title={t('card:cancel')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -288,7 +288,7 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
                                   setEditCommentText(comment.text);
                                 }}
                                 className="text-xs text-indigo-500 hover:text-indigo-700 p-1"
-                                title={t('card.editComment')}
+                                title={t('card:editComment')}
                               >
                                 <PencilLine className="w-4 h-4" />
                               </button>
@@ -296,7 +296,7 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
                                 onClick={() => handleDeleteComment(comment.id)}
                                 disabled={isDeleting}
                                 className="text-xs text-red-500 hover:text-red-700 p-1 disabled:opacity-50"
-                                title={t('card.deleteComment')}
+                                title={t('card:deleteComment')}
                               >
                                 {isDeleting ? (
                                   <Clock className="w-4 h-4 animate-pulse" />
@@ -316,12 +316,12 @@ const AnonymousCard: React.FC<AnonymousCardProps> = ({
 
             {!isReadOnly && (
               <div className="mt-4 pt-4 border-t border-gray-300/50">
-                <p className="text-xs font-medium text-gray-700 mb-3">{t('card.addComment')}:</p>
+                <p className="text-xs font-medium text-gray-700 mb-3">{t('card:addComment')}:</p>
                 <VariableTextArea
                   text={commentText}
                   setText={setCommentText}
                   handleSubmit={handleCommentSubmit}
-                  placeholder={t('card.commentPlaceholder')}
+                  placeholder={t('card:commentPlaceholder')}
                 />
               </div>
             )}

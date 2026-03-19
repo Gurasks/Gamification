@@ -20,22 +20,22 @@ const SelectionMethodChooser: React.FC<SelectionMethodChooserProps> = ({
     {
       value: 'RANDOM' as SelectionMethod,
       icon: Shuffle,
-      label: t('teamSelection.methods.random'),
-      description: t('teamSelection.methods.randomDesc'),
+      label: t('team:selection.methods.random'),
+      description: t('team:selection.methods.randomDesc'),
       alwaysShow: true,
     },
     {
       value: 'CHOOSE_YOUR_TEAM' as SelectionMethod,
       icon: Users,
-      label: t('teamSelection.methods.chooseTeam'),
-      description: t('teamSelection.methods.chooseTeamDesc'),
+      label: t('team:selection.methods.chooseTeam'),
+      description: t('team:selection.methods.chooseTeamDesc'),
       alwaysShow: true,
     },
     {
       value: 'OWNER_CHOOSES' as SelectionMethod,
       icon: UserCog,
-      label: t('teamSelection.methods.ownerChooses'),
-      description: t('teamSelection.methods.ownerChoosesDesc'),
+      label: t('team:selection.methods.ownerChooses'),
+      description: t('team:selection.methods.ownerChoosesDesc'),
       alwaysShow: false,
       requiresOwner: true,
     },
@@ -49,15 +49,15 @@ const SelectionMethodChooser: React.FC<SelectionMethodChooserProps> = ({
     <div className="space-y-4 p-4 bg-white rounded-lg shadow">
       <div className="flex items-center gap-2">
         <h3 className="text-lg font-semibold text-gray-800">
-          {t('teamSelection.methods.title')}
+          {t('team:selection.methods.title')}
         </h3>
         <div
           className="relative group"
-          aria-label={t('teamSelection.methods.helpTooltip')}
+          aria-label={t('team:selection.methods.helpTooltip')}
         >
           <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
           <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
-            {t('teamSelection.methods.helpText')}
+            {t('team:selection.methods.helpText')}
           </div>
         </div>
       </div>

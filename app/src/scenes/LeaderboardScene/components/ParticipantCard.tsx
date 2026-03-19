@@ -53,7 +53,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
       onClick={onViewDetails}
       onKeyDown={handleKeyDown}
       className={`rounded-xl shadow-lg border p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${getRankColor()}`}
-      aria-label={t('participantCard.ariaLabel', {
+      aria-label={t('card:participant.ariaLabel', {
         name: user.userName,
         rank,
         points: user.totalScore || 0
@@ -70,7 +70,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
               <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
                 {session?.teams?.[user.userId]
                   ? getLocalizedTeamName(session.teams[user.userId], t)
-                  : t('participantCard.noTeam')}
+                  : t('card:participant.noTeam')}
               </span>
             </div>
           </div>
@@ -97,7 +97,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
           <Star className="w-4 h-4 text-green-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-green-800">{user.averageRating.toFixed(1)}</div>
-            <div className="text-xs text-green-600">{t('participantCard.avgRating')}</div>
+            <div className="text-xs text-green-600">{t('card:participant.avgRating')}</div>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
           <ThumbsUp className="w-4 h-4 text-amber-600" aria-hidden="true" />
           <div>
             <div className="text-sm font-medium text-amber-800">{user.totalReplies}</div>
-            <div className="text-xs text-amber-600">{t('participantCard.replies')}</div>
+            <div className="text-xs text-amber-600">{t('card:participant.replies')}</div>
           </div>
         </div>
       </div>
@@ -121,10 +121,10 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
       {/* Gamification */}
       {user.gamificationPoints && (
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="text-xs text-gray-500 mb-2">{t('participantCard.gamification')}:</div>
+          <div className="text-xs text-gray-500 mb-2">{t('card:participant.gamification')}:</div>
           <div className="flex flex-wrap gap-1">
             <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
-              {user.gamificationPoints?.metadataVotes?.agreeVotes || 0} {t('participantCard.agreedVotes')}
+              {user.gamificationPoints?.metadataVotes?.agreeVotes || 0} {t('card:participant.agreedVotes')}
             </span>
             <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
               {user.gamificationPoints?.cardRatings?.totalRatings || 0} {t('common.content.ratings')}
@@ -139,7 +139,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
           className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-1"
           role="presentation"
         >
-          {t('participantCard.viewDetails')}
+          {t('card:participant.viewDetails')}
           <svg
             className="w-4 h-4"
             fill="none"

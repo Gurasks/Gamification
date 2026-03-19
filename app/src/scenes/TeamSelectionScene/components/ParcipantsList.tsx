@@ -17,7 +17,7 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ members, user, owne
   return (<div className="border-t pt-4">
     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
       <Users className="w-5 h-5 text-gray-600" />
-      {t('teamSelection.participantsList', { count: members.length })}
+      {t('team:selection.participantsList', { count: members.length })}
     </h3>
     <div className="bg-gray-50 rounded-lg p-4">
       <ul className="space-y-2">
@@ -43,13 +43,13 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ members, user, owne
               {member.uid === owner && (
                 <span className="px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-full font-medium flex items-center gap-1">
                   <Crown className="w-3 h-3" />
-                  {t('team.organizer')}
+                  {t('team:organizer')}
                 </span>
               )}
               {member.uid === user.uid && (
                 <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full font-medium flex items-center gap-1">
                   <UserIcon className="w-3 h-3" />
-                  {t('team.you')}
+                  {t('common:you')}
                 </span>
               )}
             </div>

@@ -93,7 +93,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   if (!user) {
     return (
       <div className="p-4 bg-red-50 text-red-800 rounded-lg">
-        {t('teamSelection.unauthenticated')}
+        {t('team:selection.unauthenticated')}
       </div>
     );
   }
@@ -102,7 +102,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
     return (
       <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg flex items-center gap-2">
         <Clock className="w-4 h-4" />
-        <span>{t('teamSelection.waitingOwner')}</span>
+        <span>{t('team:selection.waitingOwner')}</span>
       </div>
     );
   }
@@ -122,7 +122,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
       {selectionMethod === 'CHOOSE_YOUR_TEAM' && (
         <div className="space-y-3">
           <h4 className="font-medium text-gray-700">
-            {t('teamSelection.selectYourTeam')}:
+            {t('team:selection.selectYourTeam')}:
           </h4>
           <div className="flex flex-wrap gap-3">
             {availableTeams.map(teamId => (
@@ -147,7 +147,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
         <div className="p-4 bg-green-50 text-green-800 rounded-lg border border-green-200 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-green-600" />
           <p>
-            {t('teamSelection.yourTeamIs')}{' '}
+            {t('team:selection.yourTeamIs')}{' '}
             <strong className="font-semibold">
               {getLocalizedTeamName(selectedTeam, t)}
             </strong>
@@ -158,7 +158,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
       {selectionMethod === 'RANDOM' && !selectedTeam && (
         <div className="p-4 bg-blue-50 text-blue-800 rounded-lg flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span>{t('teamSelection.assigningRandom')}</span>
+          <span>{t('team:selection.assigningRandom')}</span>
         </div>
       )}
     </div>

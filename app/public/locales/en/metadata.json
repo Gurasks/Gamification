@@ -1,0 +1,50 @@
+{
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "requirementType": {
+    "functional": "Functional",
+    "nonFunctional": "Non-Functional",
+    "technical": "Technical",
+    "design": "Design",
+    "other": "Other"
+  },
+  "category": {
+    "feature": "New Feature",
+    "improvement": "Improvement",
+    "bug": "Bug",
+    "documentation": "Documentation",
+    "question": "Question",
+    "feedback": "Feedback"
+  },
+  "vote": {
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "neutral": "Neutral",
+    "agreeCount": "agree",
+    "disagreeCount": "disagree",
+    "neutralCount": "neutral",
+    "noVotes": "No votes registered",
+    "question": "Is {{type}} \"{{value}}\" correct?",
+    "tooltip": {
+      "agree": "I agree with this metadata",
+      "neutral": "I have no opinion on this metadata",
+      "disagree": "I disagree with this metadata"
+    }
+  },
+  "selector": {
+    "title": "Suggestion Metadata",
+    "priority": "Priority",
+    "priorityPlaceholder": "Priority...",
+    "requirementType": "Requirement Type",
+    "requirementTypePlaceholder": "Requirement type...",
+    "category": "Category",
+    "categoryPlaceholder": "Category...",
+    "estimatedEffort": "Estimated Effort",
+    "effortPlaceholder": "Ex: 2",
+    "tip": "Add metadata to help organize and prioritize suggestions."
+  }
+}

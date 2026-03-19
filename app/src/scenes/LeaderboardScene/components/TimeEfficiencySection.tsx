@@ -26,7 +26,7 @@ const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = ({
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
       <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <Clock className="w-5 h-5 text-green-600" />
-        {t('timeEfficiency.title')}
+        {t('leaderboard:timeEfficiency.title')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -40,7 +40,7 @@ const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = ({
                 <span className="font-semibold">{getLocalizedTeamName(team.teamName, t)}</span>
                 {team.teamName === fastestTeam.teamName && (
                   <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    {t('timeEfficiency.fastest')}
+                    {t('leaderboard:timeEfficiency.fastest')}
                   </span>
                 )}
               </div>
@@ -50,7 +50,7 @@ const TimeEfficiencySection: React.FC<TimeEfficiencySectionProps> = ({
               </div>
 
               <div className="text-sm text-gray-600 mb-2">
-                {t('timeEfficiency.cards')}: {teamCards.length}
+                {t('leaderboard:timeEfficiency.cards')}: {teamCards.length}
               </div>
 
               <div className="mt-2">

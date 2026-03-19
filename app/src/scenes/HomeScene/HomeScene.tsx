@@ -63,10 +63,10 @@ const HomeScene: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            {t('home.welcome', { name: user?.displayName })}
+            {t('home:welcome', { name: user?.displayName })}
           </h1>
           <p className="text-gray-600">
-            {t('home.subtitle')}
+            {t('home:subtitle')}
           </p>
         </div>
 
@@ -78,7 +78,7 @@ const HomeScene: React.FC = () => {
             onClick={handleCreateScene}
             onKeyDown={handleCreateKeyDown}
             className="bg-white rounded-xl shadow-lg p-6 cursor-pointer transform transition-all duration-200 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            aria-label={t('home.createAriaLabel')}
+            aria-label={t('home:createAriaLabel')}
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -86,10 +86,10 @@ const HomeScene: React.FC = () => {
 
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {t('home.createTitle')}
+                {t('home:createTitle')}
               </h3>
               <p className="text-gray-600 text-sm">
-                {t('home.createDescription')}
+                {t('home:createDescription')}
               </p>
             </div>
           </div>
@@ -101,17 +101,17 @@ const HomeScene: React.FC = () => {
             onClick={handleJoinScene}
             onKeyDown={handleJoinKeyDown}
             className="bg-white rounded-xl shadow-lg p-6 cursor-pointer transform transition-all duration-200 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            aria-label={t('home.joinAriaLabel')}
+            aria-label={t('home:joinAriaLabel')}
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-green-500" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {t('home.joinTitle')}
+                {t('home:joinTitle')}
               </h3>
               <p className="text-gray-600 text-sm">
-                {t('home.joinDescription')}
+                {t('home:joinDescription')}
               </p>
             </div>
           </div>

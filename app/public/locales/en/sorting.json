@@ -1,0 +1,21 @@
+{
+  "sortBy": "Sort by",
+  "options": {
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "highest": "Highest Rated",
+    "lowest": "Lowest Rated",
+    "mostComments": "Most Comments",
+    "leastComments": "Least Comments",
+    "author": "By Author"
+  },
+  "descriptions": {
+    "newest": "Sorts by newest cards first",
+    "oldest": "Sorts by oldest cards first",
+    "highest": "Sorts by highest rated cards first",
+    "lowest": "Sorts by lowest rated cards first",
+    "mostComments": "Sorts by cards with most comments first",
+    "leastComments": "Sorts by cards with fewest comments first",
+    "author": "Sorts cards alphabetically by author"
+  }
+}

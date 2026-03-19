@@ -1,0 +1,47 @@
+{
+  "titles": {
+    "welcome": "Bem-vindo!",
+    "update": "Definir nome",
+    "changeName": "Alterar nome",
+    "identification": "Identificação"
+  },
+  "subtitles": {
+    "welcome": "Identifique-se para entrar nas sessões",
+    "update": "Escolha como deseja ser identificado"
+  },
+  "descriptions": {
+    "changeName": "Escolha um nome para ser identificado nas sessões",
+    "identification": "Digite seu nome para continuar"
+  },
+  "labels": {
+    "yourName": "Seu nome"
+  },
+  "placeholders": {
+    "name": "Ex: João Silva"
+  },
+  "buttons": {
+    "continueAsGuest": "Continuar como convidado",
+    "saveName": "Salvar nome",
+    "logout": "Sair e fazer login"
+  },
+  "info": {
+    "visibility": "Seu nome ficará visível para os outros participantes da sessão",
+    "anonymousMode": "Modo anônimo — seus dados serão perdidos ao sair"
+  },
+  "loginPrompt": {
+    "message": "Faça login com sua conta para continuar"
+  },
+  "errors": {
+    "nameRequired": "Por favor, digite seu nome",
+    "minLength": "O nome deve ter pelo menos 2 caracteres",
+    "networkError": "Erro de conexão. Verifique sua internet e tente novamente.",
+    "tooManyRequests": "Muitas tentativas. Tente novamente em alguns minutos.",
+    "genericError": "Erro ao configurar o usuário. Tente novamente.",
+    "logoutError": "Erro ao sair da conta"
+  },
+  "success": {
+    "welcome": "Bem-vindo, {{name}}!",
+    "nameUpdated": "Nome atualizado para {{name}}!",
+    "logout": "Sessão encerrada"
+  }
+}

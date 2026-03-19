@@ -1,0 +1,33 @@
+{
+  "title": "Criar nova sessão",
+  "subtitle": "Configure uma nova sessão para sua equipe",
+  "cardTitle": "Nova sessão de refinamento",
+  "cardDescription": "Configure os detalhes da sessão",
+  "sessionName": "Nome da sessão",
+  "sessionNamePlaceholder": "Ex: Sprint 15 - Refinamento de histórias",
+  "sessionDescription": "Descrição da sessão",
+  "descriptionPlaceholder": "Descreva o objetivo da sessão, quais histórias serão refinadas, critérios de aceitação, etc.",
+  "descriptionOptional": "Opcional: esta descrição ajudará os participantes",
+  "protectWithPassword": "Proteger sessão com senha",
+  "sessionPassword": "Senha da sessão",
+  "passwordPlaceholder": "Digite uma senha para a sessão",
+  "confirmPassword": "Confirmar senha",
+  "confirmPasswordPlaceholder": "Digite a senha novamente",
+  "passwordMinLengthHint": "A senha deve ter pelo menos 4 caracteres",
+  "createButton": "Criar sessão",
+  "errors": {
+    "nameRequired": "O nome da sessão é obrigatório",
+    "nameTooLong": "O nome da sessão deve ter no máximo 100 caracteres",
+    "descriptionTooLong": "A descrição deve ter no máximo {{max}} caracteres",
+    "userNotAuthenticated": "Usuário não autenticado",
+    "createFailed": "Erro ao criar a sessão. Tente novamente."
+  },
+  "loading": {
+    "creating": "Criando sua sessão...",
+    "configuring": "Configurando sessão...",
+    "saving": "Salvando dados..."
+  },
+  "success": {
+    "sessionCreated": "Sessão criada com sucesso!"
+  }
+}

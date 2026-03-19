@@ -6,9 +6,8 @@ export const METADATA_AGREE_70_WEIGHT = 3;
 export const METADATA_AGREE_50_WEIGHT = 1;
 export const RATING_4_WEIGHT = 5;
 export const RATING_3_WEIGHT = 3;
-export const TIME_MULTIPLIER_BASE = 1.0;
-export const TIME_BONUS_MAX = 15;
-export const TIME_PENALTY_MAX = -15;
+const TIME_BONUS_MAX = 15;
+const TIME_PENALTY_MAX = -15;
 
 export interface GamificationPoints {
   metadataVotes: {
@@ -33,7 +32,7 @@ export interface GamificationPoints {
 
 const calculateMetadataVoteScore = (
   votes: Record<string, VoteValue>,
-  cardOwnerId: string
+  cardOwnerId: string,
 ): number => {
   let score = 0;
 
@@ -51,7 +50,7 @@ export const calculateUserGamificationPoints = (
   cards: Card[],
   userId: string,
   teamName?: string,
-  teamTimeData?: TeamTimeData[]
+  teamTimeData?: TeamTimeData[],
 ): GamificationPoints => {
   let metadataScore = 0;
   let totalMetadataVotes = 0;
@@ -99,7 +98,7 @@ export const calculateUserGamificationPoints = (
 
     if (card.comments) {
       totalComments += card.comments.filter(
-        (comment) => comment.createdById === userId
+        (comment) => comment.createdById === userId,
       ).length;
     }
   });
@@ -120,7 +119,7 @@ export const calculateUserGamificationPoints = (
       const bonusPoints = calculateTimeEfficiencyScore(
         userTeam.totalTime,
         minTime,
-        teamCards.length
+        teamCards.length,
       );
 
       timeEfficiency = {
@@ -149,10 +148,10 @@ export const calculateUserGamificationPoints = (
   };
 };
 
-export const calculateTimeEfficiencyScore = (
+const calculateTimeEfficiencyScore = (
   teamTime: number,
   minTime: number,
-  totalCards: number
+  totalCards: number,
 ): number => {
   if (totalCards === 0) return 0;
 
@@ -166,12 +165,12 @@ export const calculateTimeEfficiencyScore = (
   } else {
     const timeRatio = minTime / teamTime;
     bonusPoints = Math.round(
-      TIME_BONUS_MAX * timeRatio + TIME_PENALTY_MAX * (1 - timeRatio)
+      TIME_BONUS_MAX * timeRatio + TIME_PENALTY_MAX * (1 - timeRatio),
     );
 
     bonusPoints = Math.max(
       TIME_PENALTY_MAX,
-      Math.min(TIME_BONUS_MAX, bonusPoints)
+      Math.min(TIME_BONUS_MAX, bonusPoints),
     );
   }
 
@@ -183,7 +182,7 @@ export const calculateTimeEfficiencyScore = (
 
 export const calculateTeamTimes = (
   cards: Card[],
-  teamTimers: Record<string, TeamTimer>
+  teamTimers: Record<string, TeamTimer>,
 ): TeamTimeData[] => {
   if (!cards.length) return [];
 
@@ -219,7 +218,7 @@ export const calculateTeamTimes = (
 
   // 3. Encontrar o menor averageTimePerCard
   const minAverageTimePerCard = Math.min(
-    ...teamTimesTemp.map((t) => t.averageTimePerCard)
+    ...teamTimesTemp.map((t) => t.averageTimePerCard),
   );
 
   // 4. Calcular eficiência (%)

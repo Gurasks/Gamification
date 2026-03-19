@@ -34,42 +34,42 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({
   }> = [
       {
         value: 'newest',
-        label: t('sorting.options.newest'),
+        label: t('sorting:options.newest'),
         icon: <Clock className="w-4 h-4" />,
-        description: t('sorting.descriptions.newest')
+        description: t('sorting:descriptions.newest')
       },
       {
         value: 'oldest',
-        label: t('sorting.options.oldest'),
+        label: t('sorting:options.oldest'),
         icon: <Clock className="w-4 h-4" />,
-        description: t('sorting.descriptions.oldest')
+        description: t('sorting:descriptions.oldest')
       },
       {
         value: 'mostComments',
-        label: t('sorting.options.mostComments'),
+        label: t('sorting:options.mostComments'),
         icon: <MessageSquare className="w-4 h-4" />,
-        description: t('sorting.descriptions.mostComments')
+        description: t('sorting:descriptions.mostComments')
       },
       {
         value: 'leastComments',
-        label: t('sorting.options.leastComments'),
+        label: t('sorting:options.leastComments'),
         icon: <MessageSquare className="w-4 h-4" />,
-        description: t('sorting.descriptions.leastComments')
+        description: t('sorting:descriptions.leastComments')
       }
     ];
 
   if (showRatedOptions) {
     sortOptions.push({
       value: 'highest',
-      label: t('sorting.options.highest'),
+      label: t('sorting:options.highest'),
       icon: <Star className="w-4 h-4" />,
-      description: t('sorting.descriptions.highest')
+      description: t('sorting:descriptions.highest')
     },
       {
         value: 'lowest',
-        label: t('sorting.options.lowest'),
+        label: t('sorting:options.lowest'),
         icon: <Star className="w-4 h-4" />,
-        description: t('sorting.descriptions.lowest')
+        description: t('sorting:descriptions.lowest')
       }
     )
   }
@@ -78,9 +78,9 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({
     sortOptions.push(
       {
         value: 'author',
-        label: t('sorting.options.author'),
+        label: t('sorting:options.author'),
         icon: <Pencil className="w-4 h-4" />,
-        description: t('sorting.descriptions.author')
+        description: t('sorting:descriptions.author')
       });
   }
 
@@ -91,7 +91,7 @@ const CardSortingSelector: React.FC<CardSortingSelectorProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ArrowUpDown className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">{t('sorting.sortBy')}:</span>
+          <span className="text-sm font-medium text-gray-700">{t('sorting:sortBy')}:</span>
         </div>
 
         <div className="relative group">

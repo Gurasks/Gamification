@@ -36,7 +36,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const defaultPlaceholder = t('dropdown.select') || "Selecione...";
+  const defaultPlaceholder = t('misc:dropdown.select') || "Selecione...";
   const finalPlaceholder = placeholder || defaultPlaceholder;
 
   const validOptions = Array.isArray(options) ? options : [];
