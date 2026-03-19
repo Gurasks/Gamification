@@ -92,11 +92,6 @@ npm run deploy:all
 ### 📊 Análise de Qualidade
 
 ```bash
-# Testes com cobertura
-npm run test:coverage
-
-# Testes em modo watch
-npm run test:watch
 
 # Verificação de tipos
 npm run type-check
@@ -104,8 +99,6 @@ npm run type-check
 # Linting
 npm run lint
 
-# Validação completa (types, lint, tests)
-npm run validate
 ```
 
 ## 🔗 Links Úteis
@@ -122,7 +115,6 @@ npm run validate
 |---------|-----------|
 | **Pipeline CI/CD** |  [Ver Actions](https://github.com/Gurasks/Gamification/actions) |
 | **Quality Gate** | [Ver SonarCloud](https://sonarcloud.io/summary/new_code?id=Gurasks_Gamification) |
-| **Cobertura de Testes** | [Ver Cobertura](https://sonarcloud.io/component_measures?id=Gurasks_Gamification&metric=coverage) |
 | **Bugs** | [Ver Bugs](https://sonarcloud.io/project/issues?id=Gurasks_Gamification&resolved=false&types=BUG) |
 | **Vulnerabilidades** |  [Ver Vulnerabilidades](https://sonarcloud.io/project/issues?id=Gurasks_Gamification&resolved=false&types=VULNERABILITY) |
 | **Dívida Técnica** | [Ver Dívida](https://sonarcloud.io/component_measures?id=Gurasks_Gamification&metric=sqale_index) |
